@@ -1,12 +1,16 @@
 import React from 'react'
 
-import '../styles/Overview.css'
+import Table from 'react-bootstrap/Table';
+import Spinner from 'react-bootstrap/Spinner';
+import Pagination from 'react-bootstrap/Pagination';
 
 export default function Overview() {
     return (
         <>
             <h2>Overview</h2>
-            <table>
+
+            {/* https://react-bootstrap.github.io/components/placeholder/ */}
+            <Table hover striped>
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -31,7 +35,36 @@ export default function Overview() {
                         </tr>
                     ))}
                 </tbody>
-            </table>
+            </Table>
+
+            <div style={{
+                margin: "auto",
+                width: "50%",
+                textAlign: "center"
+            }}>
+            <Spinner animation="border" />
+            
+
+
+
+            <Pagination style={{
+                alignSelf: "center"
+            }}>
+                <Pagination.First />
+                <Pagination.Prev />
+                <Pagination.Item>{1}</Pagination.Item>
+
+                <Pagination.Ellipsis />
+                <Pagination.Item>{4}</Pagination.Item>
+                <Pagination.Item active>{5}</Pagination.Item>
+                <Pagination.Item>{6}</Pagination.Item>
+                <Pagination.Ellipsis />
+
+                <Pagination.Item>{10}</Pagination.Item>
+                <Pagination.Next />
+                <Pagination.Last />
+            </Pagination>
+            </div>
         </>
     )
 }
