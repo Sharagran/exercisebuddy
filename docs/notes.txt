@@ -1,0 +1,49 @@
+"Datenbank und die Schnittstellen bereits bestehen"
+
+
+Muss ich auch die REST-Api entwickeln (muss ich DB abfragen schreiben, was für ein DBMS wird benutzt)
+
+Anwendung: Übungen bei Knieschmerzen (beschwerde auswählen und Übung dagegen erhalten?)
+
+"Falls Sie lieber technisch unterwegs sind, könnten Sie sich auch mit den verschiedenen Frameworks und Technologien beschäftigen."
+
+Welche Technologien gibt es als Vorgabe (react)?
+
+
+Flutter
+Kamera, Körperhaltung erkennen AI Classification
+Eigenes backend, sicherer
+Front&Back-end getrennt, Modular (alles auf einer Maschiene)
+
+API ist ein Github projekt
+
+Wissenschaftliche Arbeit:
+Wissenschaftliche Arbeit lite
+Wissenschaftlicher bericht
+Aufzeigen dass man wissenschaftlich vorgegangen ist in der Arbeit
+Warum bestimmte Technologien verwendet wurde
+
+Kriterien für wahl
+React, angular performance vergleich
+Next vs React (Community size support)
+zb Wo ich performance verbessert habe
+
+Robin dürhager (Fragen zur API)
+Schppi (Allgemeine Fragen zum Projekt) auch kurzfristiger webex termin möglich
+
+
+Login
+Admin der Nutzer anlegen kann
+Rollen
+
+Suche für Übungen
+Strichmänchen
+
+
+Datenbank:
+	StartAngle
+	AngleThreshhold (toleranz)
+	Index des Körperteils
+
+
+Aufbau eines Berichts, Grundaufbau von Schippi
