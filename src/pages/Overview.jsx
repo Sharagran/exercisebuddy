@@ -1,10 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import Table from 'react-bootstrap/Table';
 import Spinner from 'react-bootstrap/Spinner';
-import Pagination from 'react-bootstrap/Pagination';
+import MyPagination from '../components/MyPagination';
 
 export default function Overview() {
+
+    const [page, setPage] = useState(1);
+
+    // generate table data
+    const tableData = [];
+    for (let i = 0; i < 85; i++) {
+        tableData.push({
+            id: i,
+            name: 'name ' + i,
+            author: 'author ' + i,
+            created: 'created ' + i,
+
+            startAngle: 'StartAngle ' + i,
+            angleThreshhold: 'AngleThreshhold ' + i,
+            jointIndex: 'jointIndex ' + i
+        });
+    }
+
     return (
         <>
             <h2>Overview</h2>
@@ -23,15 +41,15 @@ export default function Overview() {
                     </tr>
                 </thead>
                 <tbody>
-                    {/* Generate 10 entries */}
-                    {Array(10).fill(0).map((_, index) => (
-                        <tr key={index}>
-                            <td>Stickman</td>
-                            <td>Jakob</td>
-                            <td>2019-01-01</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
+                    {/* map talbe data 0-10 */}
+                    {tableData.slice((page-1) * 10, (page-1) * 10 + 10).map(row => (
+                        <tr key={row.id}>
+                            <td>{row.name}</td>
+                            <td>{row.author}</td>
+                            <td>{row.created}</td>
+                            <td>{row.startAngle}</td>
+                            <td>{row.angleThreshhold}</td>
+                            <td>{row.jointIndex}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -42,28 +60,12 @@ export default function Overview() {
                 width: "50%",
                 textAlign: "center"
             }}>
-            <Spinner animation="border" />
-            
+                {tableData.length !== 0 || <Spinner animation="border" />}
 
 
 
-            <Pagination style={{
-                alignSelf: "center"
-            }}>
-                <Pagination.First />
-                <Pagination.Prev />
-                <Pagination.Item>{1}</Pagination.Item>
 
-                <Pagination.Ellipsis />
-                <Pagination.Item>{4}</Pagination.Item>
-                <Pagination.Item active>{5}</Pagination.Item>
-                <Pagination.Item>{6}</Pagination.Item>
-                <Pagination.Ellipsis />
-
-                <Pagination.Item>{10}</Pagination.Item>
-                <Pagination.Next />
-                <Pagination.Last />
-            </Pagination>
+                <MyPagination dataSize={tableData.length} page={page} setPage={setPage} />
             </div>
         </>
     )
