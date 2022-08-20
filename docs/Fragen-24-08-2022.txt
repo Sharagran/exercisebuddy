@@ -1,0 +1,7 @@
+Login wird benötigt: Eigenes (extra) Backend?
+
+
+Datenbank oder JsonFile?
+
+Rollen (databank oder hardcoded)
+Nutzer in der Datenbank

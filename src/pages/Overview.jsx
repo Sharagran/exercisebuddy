@@ -2,7 +2,9 @@ import React, { useState } from 'react'
 
 import Table from 'react-bootstrap/Table';
 import Spinner from 'react-bootstrap/Spinner';
+
 import MyPagination from '../components/MyPagination';
+import Search from '../components/Search';
 
 export default function Overview() {
 
@@ -10,7 +12,7 @@ export default function Overview() {
 
     // generate table data
     const tableData = [];
-    for (let i = 0; i < 85; i++) {
+    for (let i = 0; i < 50; i++) {
         tableData.push({
             id: i,
             name: 'name ' + i,
@@ -27,6 +29,8 @@ export default function Overview() {
         <>
             <h2>Overview</h2>
 
+            <Search />
+
             {/* https://react-bootstrap.github.io/components/placeholder/ */}
             <Table hover striped>
                 <thead>
@@ -42,7 +46,7 @@ export default function Overview() {
                 </thead>
                 <tbody>
                     {/* map talbe data 0-10 */}
-                    {tableData.slice((page-1) * 10, (page-1) * 10 + 10).map(row => (
+                    {tableData.slice((page - 1) * 10, (page - 1) * 10 + 10).map(row => (
                         <tr key={row.id}>
                             <td>{row.name}</td>
                             <td>{row.author}</td>
@@ -61,11 +65,8 @@ export default function Overview() {
                 textAlign: "center"
             }}>
                 {tableData.length !== 0 || <Spinner animation="border" />}
-
-
-
-
                 <MyPagination dataSize={tableData.length} page={page} setPage={setPage} />
+                <p>test</p>
             </div>
         </>
     )
