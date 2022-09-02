@@ -1,7 +1,54 @@
-Login wird benötigt: Eigenes (extra) Backend?
+Login wird benötigt: Eigenes (extra) Backend? Ja
+Datenbank oder JsonFile (Nutzer & Rollen)? Vorhanden
+
+Projektname?    Exercisebuddy
+Github zugang
+
+Username in datenbank im token?
+
+Auhterize on top und token eingheben
+
+Bei bugs issue auf github für Robin (DB)
+
+Verwalter und Nutzer von Übungen
+User und Patienten (Beide Login)
+Patienten spezifische Übungen
+Verwalter dürfen alles einsehen
+
+Patiendaten anonymisiert
+Gibt es admin user welche Rollen anlegen können
+
+Admin != User
+Admin, Verwaltungsuser anlegen
+(Optional Admin können rollen erstellen)
+
+akutell (admin & user):
+admin können exercices(alles) erstellen
+(TODO: Moderator welcher exercices erstellen kann und patientendaten einsehen kann)
+(Accountant zurgriffsrechte bei den Usern, Stats etc da daten anonymisiert)
+user können nur exercices lesen
+
+Freischalttoken laufen ab und sind ein Quatal lang gültig
+Freischalttoken werden benutzt um Token zu erhalten
+
+Verwlatungen der Übungen Priorität
+(Optional Rollen)
+
+Zeit tracking
+
+(Admin darf alles sehen)
+Accountant sieht nur user (kann aktuell noch keine erstellen, könnte aber so sein), exercices egal 
+Content-Generator/exercice-manager (sieht nur exercices)
+
+Login durch Token
+
+.env.sample -> .env
+
+DEBUG=http,error,info
+npm run seed = datenbank seeded (mit env datei vorbindungsdaten)
 
 
-Datenbank oder JsonFile?
+Benutzername Passwort,
+Nicht relevant da über app: (Patienten Token)
 
-Rollen (databank oder hardcoded)
-Nutzer in der Datenbank
+ICB? code in übersicht

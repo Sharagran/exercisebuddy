@@ -47,7 +47,7 @@ export default function Search() {
                     </Accordion.Body>
                 </Accordion>
 
-                <Button variant="primary" type="submit">Submit</Button>
+                <Button variant="primary" type="submit">Search</Button>
             </Form>
         </div>
     )

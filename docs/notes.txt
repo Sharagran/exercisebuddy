@@ -9,6 +9,7 @@ Anwendung: Übungen bei Knieschmerzen (beschwerde auswählen und Übung dagegen 
 
 Welche Technologien gibt es als Vorgabe (react)?
 
+Aufbau eines Berichts, Grundaufbau von Schippi
 
 Flutter
 Kamera, Körperhaltung erkennen AI Classification
@@ -46,4 +47,7 @@ Datenbank:
 	Index des Körperteils
 
 
-Aufbau eines Berichts, Grundaufbau von Schippi
+
+Eine exercice hat mehrere Poses (Posen)
+(Alle angle settings pro pose)
+
