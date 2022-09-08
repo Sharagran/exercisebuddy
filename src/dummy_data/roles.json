@@ -1,0 +1,114 @@
+[
+  {
+    "_id": "63121e8ba55b77e78cf1f23c",
+    "type": "ADMIN",
+    "permissions": {
+      "exercises": {
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true,
+        "_id": "63121e8ba55b77e78cf1f23e"
+      },
+      "users": {
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true,
+        "_id": "63121e8ba55b77e78cf1f23f"
+      },
+      "roles": {
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true,
+        "_id": "63121e8ba55b77e78cf1f240"
+      },
+      "_id": "63121e8ba55b77e78cf1f23d"
+    }
+  },
+  {
+    "_id": "63121e8ba55b77e78cf1f241",
+    "type": "USER",
+    "permissions": {
+      "exercises": {
+        "create": false,
+        "read": true,
+        "update": false,
+        "delete": false,
+        "_id": "63121e8ca55b77e78cf1f243"
+      },
+      "users": {
+        "create": false,
+        "read": false,
+        "update": false,
+        "delete": false,
+        "_id": "63121e8ca55b77e78cf1f244"
+      },
+      "roles": {
+        "create": false,
+        "read": false,
+        "update": false,
+        "delete": false,
+        "_id": "63121e8ca55b77e78cf1f245"
+      },
+      "_id": "63121e8ca55b77e78cf1f242"
+    }
+  },
+  {
+    "_id": "63121e8ca55b77e78cf1f246",
+    "type": "MODERATOR",
+    "permissions": {
+      "exercises": {
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true,
+        "_id": "63121e8ca55b77e78cf1f248"
+      },
+      "users": {
+        "create": false,
+        "read": false,
+        "update": false,
+        "delete": false,
+        "_id": "63121e8ca55b77e78cf1f249"
+      },
+      "roles": {
+        "create": false,
+        "read": false,
+        "update": false,
+        "delete": false,
+        "_id": "63121e8ca55b77e78cf1f24a"
+      },
+      "_id": "63121e8ca55b77e78cf1f247"
+    }
+  },
+  {
+    "_id": "63121e8ca55b77e78cf1f24b",
+    "type": "ACCOUNTANT",
+    "permissions": {
+      "exercises": {
+        "create": false,
+        "read": false,
+        "update": false,
+        "delete": false,
+        "_id": "63121e8ca55b77e78cf1f24d"
+      },
+      "users": {
+        "create": false,
+        "read": true,
+        "update": false,
+        "delete": false,
+        "_id": "63121e8ca55b77e78cf1f24e"
+      },
+      "roles": {
+        "create": false,
+        "read": false,
+        "update": false,
+        "delete": false,
+        "_id": "63121e8ca55b77e78cf1f24f"
+      },
+      "_id": "63121e8ca55b77e78cf1f24c"
+    }
+  }
+]

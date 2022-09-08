@@ -5,45 +5,49 @@ import Spinner from 'react-bootstrap/Spinner';
 
 import MyPagination from '../components/MyPagination';
 import Search from '../components/Search';
+import Exercise from '../components/Exercise';
+
+import dummyData from '../dummy_data/exercises.json';
 
 export default function Overview() {
 
     const [page, setPage] = useState(1);
 
+    const tableData = dummyData;
     // generate table data (db dummy data)
-    const tableData = [];
-    for (let i = 0; i < 50; i++) {
-        tableData.push({
-            _id: i,
-            title: `Title ${i}`,
-            description: `Description ${i}`,
-            createdAt: `createdAt ${i}`,
-            updatedAt: `updatedAt ${i}`,
+    // const tableData = [];
+    // for (let i = 0; i < 50; i++) {
+    //     tableData.push({
+    //         _id: i,
+    //         title: `Title ${i}`,
+    //         description: `Description ${i}`,
+    //         createdAt: `createdAt ${i}`,
+    //         updatedAt: `updatedAt ${i}`,
 
-            link: `https://www.google.com/search?q=${i}`,
-            neededReps: 9,
-            neededDuration: 80,
-            poses: [
-                {
-                    _id: 1,
-                    requirements: [
-                        {
-                            _id: 1,
-                            requiredAngle: 26,
-                            angleThreshold: 61,
-                            bodyJoint: {
-                                _id: 1,
-                                label: 'Knie',
-                                firstEdgeIndex: 6,
-                                secondEdgeIndex: 5,
-                                desiredAngle: 12
-                            }
-                        }
-                    ]
-                }
-            ]
-        });
-    }
+    //         link: `https://www.google.com/search?q=${i}`,
+    //         neededReps: 9,
+    //         neededDuration: 80,
+    //         poses: [
+    //             {
+    //                 _id: 1,
+    //                 requirements: [
+    //                     {
+    //                         _id: 1,
+    //                         requiredAngle: 26,
+    //                         angleThreshold: 61,
+    //                         bodyJoint: {
+    //                             _id: 1,
+    //                             label: 'Knie',
+    //                             firstEdgeIndex: 6,
+    //                             secondEdgeIndex: 5,
+    //                             desiredAngle: 12
+    //                         }
+    //                     }
+    //                 ]
+    //             }
+    //         ]
+    //     });
+    // }
 
     return (
         <>
@@ -67,15 +71,16 @@ export default function Overview() {
                 <tbody>
                     {/* map talbe data 0-10 */}
                     {tableData.slice((page - 1) * 10, (page - 1) * 10 + 10).map(row => (
-                        <tr key={row._id}>
-                            <td>{row.title}</td>
-                            <td>{row.description}</td>
-                            <td>{row.createdAt}</td>
-                            <td>{row.updatedAt}</td>
-                            <td>{row.link}</td>
-                            <td>{row.neededReps}</td>
-                            <td>{row.neededDuration}</td>
-                        </tr>
+                        // <tr key={row._id}>
+                        //     <td>{row.title}</td>
+                        //     <td>{row.description}</td>
+                        //     <td>{row.createdAt}</td>
+                        //     <td>{row.updatedAt}</td>
+                        //     <td>{row.link}</td>
+                        //     <td>{row.neededReps}</td>
+                        //     <td>{row.neededDuration}</td>
+                        // </tr>
+                        <Exercise key={row._id} {...row} />
                     ))}
                 </tbody>
             </Table>

@@ -1,0 +1,642 @@
+[
+  {
+    "_id": "63121e8ea55b77e78cf23926",
+    "token": "69bf11e1",
+    "diagnoses": [
+      "V640XXS",
+      "S5001XD"
+    ],
+    "role": "63121e8ba55b77e78cf1f23c",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.886Z",
+    "updatedAt": "2022-09-02T15:17:34.886Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2392a",
+    "token": "8e8tvu51",
+    "diagnoses": [
+      "A198"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.886Z",
+    "updatedAt": "2022-09-02T15:17:34.886Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23927",
+    "token": "77fa22b2",
+    "diagnoses": [
+      "A0220",
+      "A072"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.886Z",
+    "updatedAt": "2022-09-02T15:17:34.886Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2392c",
+    "token": "okmxo9g3",
+    "diagnoses": [
+      "A001"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.886Z",
+    "updatedAt": "2022-09-02T15:17:34.886Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23928",
+    "token": "88gb33c3",
+    "diagnoses": [
+      "S5001XD",
+      "A0220"
+    ],
+    "role": "63121e8ca55b77e78cf1f246",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.886Z",
+    "updatedAt": "2022-09-02T15:17:34.886Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2392b",
+    "token": "t6y5oq9b",
+    "diagnoses": [
+      "M84443D",
+      "A072",
+      "A041"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.886Z",
+    "updatedAt": "2022-09-02T15:17:34.886Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23929",
+    "token": "99hc44d4",
+    "diagnoses": [
+      "F15122",
+      "V640XXS"
+    ],
+    "role": "63121e8ca55b77e78cf1f24b",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.886Z",
+    "updatedAt": "2022-09-02T15:17:34.886Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2392d",
+    "token": "vvza3tcv",
+    "diagnoses": [
+      "A041",
+      "A0105"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.886Z",
+    "updatedAt": "2022-09-02T15:17:34.886Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2392e",
+    "token": "lwcm5b4v",
+    "diagnoses": [
+      "M84443D",
+      "A4181"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.886Z",
+    "updatedAt": "2022-09-02T15:17:34.886Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2392f",
+    "token": "n3c6jcu7",
+    "diagnoses": [
+      "A0101"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.886Z",
+    "updatedAt": "2022-09-02T15:17:34.886Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23930",
+    "token": "gz7yhlyi",
+    "diagnoses": [
+      "A4181",
+      "A0101"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.886Z",
+    "updatedAt": "2022-09-02T15:17:34.886Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23931",
+    "token": "a8w5vv6w",
+    "diagnoses": [
+      "C8519"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.886Z",
+    "updatedAt": "2022-09-02T15:17:34.886Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23932",
+    "token": "l7gvxeio",
+    "diagnoses": [
+      "A198",
+      "A833",
+      "H7500"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23933",
+    "token": "060pkxk9",
+    "diagnoses": [
+      "A4181",
+      "A4181"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23934",
+    "token": "j3d3efrw",
+    "diagnoses": [
+      "A0105",
+      "S5001XD"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23935",
+    "token": "jwmtsam5",
+    "diagnoses": [
+      "B9621",
+      "H7500"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23936",
+    "token": "gev0yabk",
+    "diagnoses": [
+      "A072"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23937",
+    "token": "f1gb0hcv",
+    "diagnoses": [
+      "S5001XD",
+      "A4181"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23938",
+    "token": "9xmyu9ie",
+    "diagnoses": [
+      "B9621",
+      "A833",
+      "A0105"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23939",
+    "token": "5bpivzmg",
+    "diagnoses": [
+      "C8519"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2393a",
+    "token": "5fvr8p5f",
+    "diagnoses": [
+      "A041"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2393b",
+    "token": "7258we3k",
+    "diagnoses": [
+      "M84443D",
+      "S5001XD"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2393c",
+    "token": "4lr5q1o9",
+    "diagnoses": [
+      "A0220",
+      "A0105",
+      "A4181"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2393d",
+    "token": "ecm6xij6",
+    "diagnoses": [
+      "A833",
+      "C8519"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2393e",
+    "token": "rbqqn0i9",
+    "diagnoses": [
+      "A001",
+      "A0220",
+      "A4181"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2393f",
+    "token": "exraf0ba",
+    "diagnoses": [
+      "A0220"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23940",
+    "token": "otop6lkz",
+    "diagnoses": [
+      "F15122",
+      "H7500",
+      "A041"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23941",
+    "token": "53787gk0",
+    "diagnoses": [
+      "A041"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23942",
+    "token": "96eighr0",
+    "diagnoses": [
+      "B9621",
+      "B9621"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23943",
+    "token": "vk4w7cah",
+    "diagnoses": [
+      "A198"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23944",
+    "token": "r0fnch2d",
+    "diagnoses": [
+      "B9621",
+      "A833"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23945",
+    "token": "5sxo6tl9",
+    "diagnoses": [
+      "A833",
+      "A072"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23946",
+    "token": "66f0c2wv",
+    "diagnoses": [
+      "A001",
+      "C8519"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23947",
+    "token": "5mncg03l",
+    "diagnoses": [
+      "A0101",
+      "C8519"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23948",
+    "token": "owwsmpjx",
+    "diagnoses": [
+      "A0101",
+      "S5001XD",
+      "A001"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23949",
+    "token": "ycisf87q",
+    "diagnoses": [
+      "A198"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2394a",
+    "token": "eomel8qs",
+    "diagnoses": [
+      "A001",
+      "B9621"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2394b",
+    "token": "afxaqde5",
+    "diagnoses": [
+      "H7500",
+      "A0105",
+      "V640XXS"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2394c",
+    "token": "w3bs9fns",
+    "diagnoses": [
+      "F15122"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2394d",
+    "token": "yo9v5zwi",
+    "diagnoses": [
+      "M84443D"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2394f",
+    "token": "7dseom9m",
+    "diagnoses": [
+      "C8519",
+      "A072"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23950",
+    "token": "j063ve80",
+    "diagnoses": [
+      "A0101",
+      "B9621"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23951",
+    "token": "12e0c577",
+    "diagnoses": [
+      "A001",
+      "F15122",
+      "S5001XD"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23952",
+    "token": "v5enxyaq",
+    "diagnoses": [
+      "C8519",
+      "A001"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23953",
+    "token": "z7lgya8z",
+    "diagnoses": [
+      "C8519",
+      "C8519"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23954",
+    "token": "9cffyg5a",
+    "diagnoses": [
+      "S5001XD"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23955",
+    "token": "aol347ff",
+    "diagnoses": [
+      "B9621",
+      "A009"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23956",
+    "token": "dvp579c0",
+    "diagnoses": [
+      "A072"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23957",
+    "token": "q5jqbu6j",
+    "diagnoses": [
+      "A072",
+      "S5001XD"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23958",
+    "token": "fbqg6uka",
+    "diagnoses": [
+      "A072",
+      "A833"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf23959",
+    "token": "bppmw81p",
+    "diagnoses": [
+      "A0105",
+      "F15122"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": true,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2395a",
+    "token": "qnp50d3j",
+    "diagnoses": [
+      "A0101"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2395b",
+    "token": "dzsu2u2o",
+    "diagnoses": [
+      "A041",
+      "M84443D"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  },
+  {
+    "_id": "63121e8ea55b77e78cf2394e",
+    "token": "oepgm5c1",
+    "diagnoses": [
+      "A0101"
+    ],
+    "role": "63121e8ba55b77e78cf1f241",
+    "active": false,
+    "createdAt": "2022-09-02T15:17:34.887Z",
+    "updatedAt": "2022-09-02T15:17:34.887Z"
+  }
+]
