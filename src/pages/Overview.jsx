@@ -10,18 +10,38 @@ export default function Overview() {
 
     const [page, setPage] = useState(1);
 
-    // generate table data
+    // generate table data (db dummy data)
     const tableData = [];
     for (let i = 0; i < 50; i++) {
         tableData.push({
-            id: i,
-            name: 'name ' + i,
-            author: 'author ' + i,
-            created: 'created ' + i,
+            _id: i,
+            title: `Title ${i}`,
+            description: `Description ${i}`,
+            createdAt: `createdAt ${i}`,
+            updatedAt: `updatedAt ${i}`,
 
-            startAngle: 'StartAngle ' + i,
-            angleThreshhold: 'AngleThreshhold ' + i,
-            jointIndex: 'jointIndex ' + i
+            link: `https://www.google.com/search?q=${i}`,
+            neededReps: 9,
+            neededDuration: 80,
+            poses: [
+                {
+                    _id: 1,
+                    requirements: [
+                        {
+                            _id: 1,
+                            requiredAngle: 26,
+                            angleThreshold: 61,
+                            bodyJoint: {
+                                _id: 1,
+                                label: 'Knie',
+                                firstEdgeIndex: 6,
+                                secondEdgeIndex: 5,
+                                desiredAngle: 12
+                            }
+                        }
+                    ]
+                }
+            ]
         });
     }
 
@@ -35,25 +55,26 @@ export default function Overview() {
             <Table hover striped>
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Author</th>
-                        <th>Creation date</th>
-
-                        <th>StartAngle</th>
-                        <th>AngleThreshhold</th>
-                        <th>JointIndex</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                        <th>Link</th>
+                        <th>Needed Reps</th>
+                        <th>Needed Duration</th>
                     </tr>
                 </thead>
                 <tbody>
                     {/* map talbe data 0-10 */}
                     {tableData.slice((page - 1) * 10, (page - 1) * 10 + 10).map(row => (
-                        <tr key={row.id}>
-                            <td>{row.name}</td>
-                            <td>{row.author}</td>
-                            <td>{row.created}</td>
-                            <td>{row.startAngle}</td>
-                            <td>{row.angleThreshhold}</td>
-                            <td>{row.jointIndex}</td>
+                        <tr key={row._id}>
+                            <td>{row.title}</td>
+                            <td>{row.description}</td>
+                            <td>{row.createdAt}</td>
+                            <td>{row.updatedAt}</td>
+                            <td>{row.link}</td>
+                            <td>{row.neededReps}</td>
+                            <td>{row.neededDuration}</td>
                         </tr>
                     ))}
                 </tbody>
