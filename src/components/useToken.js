@@ -12,7 +12,6 @@ export default function useToken() {
 
   const saveToken = userToken => {
     localStorage.setItem('token', JSON.stringify(userToken));
-    // Token axios hinzufügen für anfragen
     axios.defaults.headers.common = { 'Authorization': `Bearer ${userToken.token}` };
 
     setToken(userToken.token);

@@ -1,9 +1,12 @@
 import React from 'react'
 import { useState } from 'react'
 import Table from 'react-bootstrap/Table';
+import { useParams } from "react-router-dom";
 
 export default function Exercise({ title, description, createdAt, updatedAt, link, neededReps, neededDuration, poses }) {
 
+    let params = useParams();
+    console.log(params);
     const [expended, setExpended] = useState(false);
 
     function toggleExpender(e) {
