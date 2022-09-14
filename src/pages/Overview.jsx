@@ -15,30 +15,45 @@ export default function Overview() {
 
     function setPage(page) {
         setSearchParams({ ...searchParams, page });
+        console.log(searchParams);
 
         // TODO: usability: Seitenwechsel oder nur Suchparameter wechsel im History stack speichern???
         navigate('/', {
-            state: searchParams,
-            replace: true // ersetzt den letzen Eintrag im History Stack (back button führt dann nicht mehr zurück) https://reach.tech/router/api/navigate
+            state: {...searchParams, page},
+            replace: false // ersetzt den letzen Eintrag im History Stack (back button führt dann nicht mehr zurück) https://reach.tech/router/api/navigate
         });
     }
 
     const [searchParams, setSearchParams] = useState(() => {
         const params = new URLSearchParams(window.location.search);
-        return {
-            page: params.get('page') || 1,
-            search: params.get('search') || ''
+
+        // get URL paramKeys
+        let urlString = window.location.search;
+        urlString = urlString.substring(urlString.indexOf('?')+1, urlString.length);
+        let paramKeys = urlString.split('&');
+        
+        for (let i = 0; i < paramKeys.length; i++) {
+            paramKeys[i] = paramKeys[i].split('=')[0];
         }
+
+        // get URL paramValues
+        const parsedParams = {
+            page: 1
+        };
+        paramKeys.forEach(key => {
+            if(key !== '') //remove empty key
+                parsedParams[key] = params.get(key);
+        });
+
+        
+        return parsedParams;
     });
-    console.log(searchParams);
-
-
 
     const tableData = dummyData;
 
     return (
         <>
-            <Search />
+            <Search setSearchParams={setSearchParams} />
 
             {/* https://react-bootstrap.github.io/components/placeholder/ */}
             <Table hover striped>
