@@ -11,8 +11,28 @@ import dummyData from '../dummy_data/exercises.json';
 
 export default function Overview() {
 
-    const [page, setPage] = useState(1);
     let navigate = useNavigate();
+
+    function setPage(page) {
+        setSearchParams({ ...searchParams, page });
+
+        // TODO: usability: Seitenwechsel oder nur Suchparameter wechsel im History stack speichern???
+        navigate('/', {
+            state: searchParams,
+            replace: true // ersetzt den letzen Eintrag im History Stack (back button führt dann nicht mehr zurück) https://reach.tech/router/api/navigate
+        });
+    }
+
+    const [searchParams, setSearchParams] = useState(() => {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            page: params.get('page') || 1,
+            search: params.get('search') || ''
+        }
+    });
+    console.log(searchParams);
+
+
 
     const tableData = dummyData;
 
@@ -34,7 +54,7 @@ export default function Overview() {
                     </tr>
                 </thead>
                 <tbody>
-                    {tableData.slice((page - 1) * 10, (page - 1) * 10 + 10).map(exercise => (
+                    {tableData.slice((searchParams.page - 1) * 10, (searchParams.page - 1) * 10 + 10).map(exercise => (
                         <tr key={exercise._id} onClick={() => {
                             navigate(`/exercise/${exercise._id}`);
                         }}>
@@ -57,7 +77,7 @@ export default function Overview() {
                 textAlign: "center"
             }}>
                 {tableData.length !== 0 || <Spinner animation="border" />}
-                <MyPagination dataSize={tableData.length} page={page} setPage={setPage} />
+                <MyPagination dataSize={tableData.length} page={searchParams.page} setPage={setPage} />
                 <p>test</p>
             </div>
         </>
