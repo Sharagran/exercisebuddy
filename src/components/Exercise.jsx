@@ -1,63 +1,58 @@
 import React from 'react'
-import { useState } from 'react'
-import Table from 'react-bootstrap/Table';
 import { useParams } from "react-router-dom";
 
-export default function Exercise({ title, description, createdAt, updatedAt, link, neededReps, neededDuration, poses }) {
+import dummy_data from '../dummy_data/exercises_new.json';
+
+export default function Exercise() {
 
     let params = useParams();
-    console.log(params);
-    const [expended, setExpended] = useState(false);
+    var exercise;
 
-    function toggleExpender(e) {
-        if (e.target.type === 'checkbox') return;
-
-        setExpended(!expended);
+    function getExercise() {
+        exercise = dummy_data.find(exercise => exercise._id === params.id);
     }
 
+    function deleteExercise() {
+
+    }
+
+    function updateExercise() {
+
+    }
+
+    getExercise();
+
+    // TODO: recursive function to map exercise data to JSX (id as key)
     return (
         <>
-            <tr onClick={toggleExpender}>
-                <td>{title}</td>
-                <td>{description}</td>
-                <td>{createdAt}</td>
-                <td>{updatedAt}</td>
-                <td>{link}</td>
-                <td>{neededReps}</td>
-                <td>{neededDuration}</td>
-            </tr>
-            {expended &&
-                <div>
-                    <h4>Poses</h4>
-                    <Table>
-                        <thead>
-                            <tr>
-                                <th>Label</th>
-                                <th>First Edge Index</th>
-                                <th>Second Edge Index</th>
-                                <th>Desired Angle</th>
-                                <th>Required Angle</th>
-                                <th>Angle Threshold</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {poses.map((pose, index) => {
-                                return pose.requirements.map((requirement, index) => {
-                                    return (
-                                        <tr key={index}>
-                                            <td>{requirement.bodyJoint.label}</td>
-                                            <td>{requirement.bodyJoint.firstEdgeIndex}</td>
-                                            <td>{requirement.bodyJoint.secondEdgeIndex}</td>
-                                            <td>{requirement.bodyJoint.desiredAngle}</td>
-                                            <td>{requirement.requiredAngle}</td>
-                                            <td>{requirement.angleThreshold}</td>
-                                        </tr>
-                                    )
-                                })
-                            })}
-                        </tbody>
-                    </Table>
-                </div>}
+            <h1>Exercise: {exercise._id}</h1>
+            <p>{exercise.title}</p>
+            <p>{exercise.description}</p>
+            <p>{exercise.createdAt}</p>
+            <p>{exercise.updatedAt}</p>
+            <p>{exercise.link}</p>
+            <p>{exercise.neededReps}</p>
+            <p>{exercise.neededDuration}</p>
+
+            {exercise.poses.map((pose, index) => (
+                <div key={pose._id}>
+                    <h2>Pose: {pose._id}</h2>
+                    {pose.requirements.map((requirement, index) => (
+                        <div key={requirement._id}>
+                            <h3>Requirement: {requirement._id}</h3>
+                            <p>{requirement.requiredAngle}</p>
+                            <p>{requirement.angleThreshold}</p>
+                            <div key={requirement.bodyJoint._id}>
+                                <h4>Body Joint: {requirement.bodyJoint._id}</h4>
+                                <p>{requirement.bodyJoint.label}</p>
+                                <p>{requirement.bodyJoint.firstEdgeIndex}</p>
+                                <p>{requirement.bodyJoint.secondEdgeIndex}</p>
+                                <p>{requirement.bodyJoint.desiredAngle}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ))}
         </>
     )
 }
