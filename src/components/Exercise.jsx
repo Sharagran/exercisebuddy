@@ -20,39 +20,45 @@ export default function Exercise() {
 
     }
 
+    function exerciseToHTML(exercise) {
+        // map object properties to HTML
+        var content = [];
+        for (const [key, value] of Object.entries(exercise)) {
+            if(key === "_id") {
+                continue;
+            }
+            if (Array.isArray(value)) {
+                // recursion to iterate over array
+                content.push(<>
+                    <h3>{key}</h3>
+                    <div className='testDiv' style={{
+                        border: '1px solid black',
+                        padding: '32px'
+                    }}>
+                        {exerciseToHTML(value)}
+                    </div>
+                </>);
+            } else if (typeof value === 'object') {
+                // recursion to iterate through object
+                content.push(<>
+                    {Number.isNaN(Number.parseInt(key)) && <h3>{key}</h3>}
+                    <div className='testDiv' style={{
+                        border: '1px solid black',
+                        padding: '32px'
+                    }}>
+                        {exerciseToHTML(value)}
+                    </div>
+                </>);
+            } else {
+                // render property
+                content.push(<p>{key}: {value}</p>);
+            }
+        }
+        return content;
+    }
+
     getExercise();
 
     // TODO: recursive function to map exercise data to JSX (id as key)
-    return (
-        <>
-            <h1>Exercise: {exercise._id}</h1>
-            <p>{exercise.title}</p>
-            <p>{exercise.description}</p>
-            <p>{exercise.createdAt}</p>
-            <p>{exercise.updatedAt}</p>
-            <p>{exercise.link}</p>
-            <p>{exercise.neededReps}</p>
-            <p>{exercise.neededDuration}</p>
-
-            {exercise.poses.map((pose, index) => (
-                <div key={pose._id}>
-                    <h2>Pose: {pose._id}</h2>
-                    {pose.requirements.map((requirement, index) => (
-                        <div key={requirement._id}>
-                            <h3>Requirement: {requirement._id}</h3>
-                            <p>{requirement.requiredAngle}</p>
-                            <p>{requirement.angleThreshold}</p>
-                            <div key={requirement.bodyJoint._id}>
-                                <h4>Body Joint: {requirement.bodyJoint._id}</h4>
-                                <p>{requirement.bodyJoint.label}</p>
-                                <p>{requirement.bodyJoint.firstEdgeIndex}</p>
-                                <p>{requirement.bodyJoint.secondEdgeIndex}</p>
-                                <p>{requirement.bodyJoint.desiredAngle}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            ))}
-        </>
-    )
+    return exerciseToHTML(exercise);
 }
