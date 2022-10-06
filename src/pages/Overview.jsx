@@ -17,16 +17,35 @@ export default function Overview() {
         setSearchParams({ ...searchParams, page });
     }
 
-    //  TODO: preserve state, get page from cookies
+    function search(params) {
+        var newSearchParams = { ...params, page: searchParams.page };
+        setSearchParams(newSearchParams);
+
+        // remove empty properties from url
+        var urlParams = {...newSearchParams};
+        for (const key in urlParams) {
+            if (urlParams[key] === "") {
+                delete urlParams[key];
+            }
+        }
+
+        // search
+        navigate(`/?${new URLSearchParams(urlParams)}`);
+    }
+
+    //  TODO: get State from url params
+    const params = new URLSearchParams(window.location.search);
     const [searchParams, setSearchParams] = useState({
-        page: 1,
+        page: Number(params.get('page')) || 1,
+        author: params.get('author') || '',
+        created: params.get('created') || '',
     });
 
     const tableData = dummyData;
 
     return (
         <>
-            <Search setSearchParams={setSearchParams} />
+            <Search search={search} />
 
             <Table hover striped>
                 <thead>
@@ -65,7 +84,6 @@ export default function Overview() {
             }}>
                 {tableData.length !== 0 || <Spinner animation="border" />}
                 <MyPagination dataSize={tableData.length} page={searchParams.page} setPage={setPage} />
-                <p>test</p>
             </div>
         </>
     )
