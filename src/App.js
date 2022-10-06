@@ -26,6 +26,9 @@ function App() {
         <Routes>
           <Route exact path="/" element={<Overview />}></Route>
           <Route path="/exercise/:id" element={<Exercise />}></Route>
+
+          {/* FIXME: Dev only routes */}
+          <Route path="/login" element={<Login setToken={setToken} />}></Route>
         </Routes>
       </BrowserRouter>
     </>

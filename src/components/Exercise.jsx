@@ -60,5 +60,9 @@ export default function Exercise() {
     getExercise();
 
     // TODO: recursive function to map exercise data to JSX (id as key)
-    return exerciseToHTML(exercise);
+    return <>
+    {exerciseToHTML(exercise)}
+    <button onClick={deleteExercise}>Delete</button>
+    <button onClick={updateExercise}>Update</button>
+    </>;
 }
