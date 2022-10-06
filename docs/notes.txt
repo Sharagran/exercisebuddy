@@ -54,3 +54,11 @@ Eine exercice hat mehrere Poses (Posen)
 
 2-3 Werktage vorm Termin Leseprobe der wissenschaftlichen Arbeit
 kleine Namen änderungen
+
+login json web token (expires in noch nicht implementiert)
+TODOs:
+- login
+- suchanfrage in browser history
+- anzeigen von Datensätzen überarbeiten
+
+- (optional) Pagination
