@@ -56,9 +56,14 @@ Eine exercice hat mehrere Poses (Posen)
 kleine Namen änderungen
 
 login json web token (expires in noch nicht implementiert)
+
+
 TODOs:
 - login
 - suchanfrage in browser history
 - anzeigen von Datensätzen überarbeiten
 
 - (optional) Pagination
+
+
+TODO: Page nicht in URL schreibe, alle Daten laden und nur state wechseln?

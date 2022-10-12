@@ -4,17 +4,25 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
+import axios from 'axios';
 
-export default function Login() {
+export default function Login({setToken}) {
 
-  const [username, setUsername] = useState("");
+  const [email, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   function signIn(e) {
     e.preventDefault();
 
-    console.log("sign in");
-    console.log(username, password);
+    axios.post(`${process.env.REACT_APP_EXERCISEBUDDY_API_SERVER}/login`, {
+      email: email,
+      password: password
+    }).then(res => {
+      console.log("JWT token: ", res.data);
+      setToken(res.data);
+    }).catch(err => {
+      console.log("error: ", err);
+    })
   }
 
   return (
@@ -29,9 +37,9 @@ export default function Login() {
       }}>
         <h1>Login</h1>
         <Form onSubmit={signIn}>
-          <Form.Group className="mb-3" controlId="formLogin">
-            <Form.Label>Login</Form.Label>
-            <Form.Control type="email" placeholder="Enter Login" value={username} onChange={e => setUsername(e.target.value)} />
+          <Form.Group className="mb-3" controlId="formEmail">
+            <Form.Label>Email</Form.Label>
+            <Form.Control type="email" placeholder="Enter Email" value={email} onChange={e => setUsername(e.target.value)} />
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="formPassword">

@@ -2,23 +2,36 @@ import React, { useState } from 'react'
 
 import Table from 'react-bootstrap/Table';
 import Spinner from 'react-bootstrap/Spinner';
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import MyPagination from '../components/MyPagination';
 import Search from '../components/Search';
 
 import dummyData from '../dummy_data/exercises_new.json';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 export default function Overview() {
-
-    let navigate = useNavigate();
-
+    //FIXME: page back button not rerendering component
     function setPage(page) {
-        setSearchParams({ ...searchParams, page });
+        var newSearchParams = { ...searchParams, page };
+        setSearchParams(newSearchParams);
+
+        //FIXME: page swap in url history? (replace property)
+        //TODO: delte url params if empty (custom hook for url params?)
+         // remove empty properties from url
+         var urlParams = {...newSearchParams};
+         for (const key in urlParams) {
+             if (urlParams[key] === "") {
+                 delete urlParams[key];
+             }
+         }
+
+        navigate(`/?${new URLSearchParams(urlParams, { replace: true } )}`);
     }
 
     function search(params) {
-        var newSearchParams = { ...params, page: searchParams.page };
+        var newSearchParams = { page: searchParams.page, ...params };
         setSearchParams(newSearchParams);
 
         // remove empty properties from url
@@ -33,16 +46,21 @@ export default function Overview() {
         navigate(`/?${new URLSearchParams(urlParams)}`);
     }
 
-    //  TODO: get State from url params
-    const params = new URLSearchParams(window.location.search);
+    let navigate = useNavigate();
+    let location = useLocation();
+    const params = new URLSearchParams(location.search);
     const [searchParams, setSearchParams] = useState({
         page: Number(params.get('page')) || 1,
         author: params.get('author') || '',
         created: params.get('created') || '',
     });
 
-    const tableData = dummyData;
+    useEffect(() => {
+        console.log("Overview: useEffect");
+    }, [location.search])
+    
 
+    const tableData = dummyData; //FIXME: dummy data
     return (
         <>
             <Search search={search} />
@@ -71,7 +89,6 @@ export default function Overview() {
                             <td>{exercise.link}</td>
                             <td>{exercise.neededReps}</td>
                             <td>{exercise.neededDuration}</td>
-                            {/* <Exercise key={exercise._id} {...exercise} /> */ }
                         </tr>
                     ))}
                 </tbody>
@@ -83,8 +100,14 @@ export default function Overview() {
                 textAlign: "center"
             }}>
                 {tableData.length !== 0 || <Spinner animation="border" />}
-                <MyPagination dataSize={tableData.length} page={searchParams.page} setPage={setPage} />
+                <MyPagination dataSize={tableData.length} currentPage={searchParams.page} changePage={setPage} />
             </div>
+            <button onClick={() => {
+                axios.defaults.headers.common['Authorization'] = '69bf11e1';
+                axios.get('http://localhost:3000/exercises').then(res => {
+                    console.log(res.data);
+                });
+            }}>Test</button>
         </>
     )
 }
