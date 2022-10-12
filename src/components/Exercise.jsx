@@ -2,6 +2,8 @@ import React from 'react'
 import { useParams } from "react-router-dom";
 
 import dummy_data from '../dummy_data/exercises_new.json';
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
 
 export default function Exercise() {
 
@@ -61,7 +63,11 @@ export default function Exercise() {
 
     // TODO: recursive function to map exercise data to JSX (id as key)
     return <>
+    <Tabs
+      className="mb-3"
+    >
     {exerciseToHTML(exercise)}
+    </Tabs>
     <button onClick={deleteExercise}>Delete</button>
     <button onClick={updateExercise}>Update</button>
     </>;

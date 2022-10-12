@@ -103,7 +103,7 @@ export default function Overview() {
                 <MyPagination dataSize={tableData.length} currentPage={searchParams.page} changePage={setPage} />
             </div>
             <button onClick={() => {
-                axios.defaults.headers.common['Authorization'] = '69bf11e1';
+                // axios.defaults.headers.common['Authorization'] = '69bf11e1';
                 axios.get('http://localhost:3000/exercises').then(res => {
                     console.log(res.data);
                 });

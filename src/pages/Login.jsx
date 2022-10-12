@@ -8,7 +8,7 @@ import axios from 'axios';
 
 export default function Login({setToken}) {
 
-  const [email, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   function signIn(e) {
@@ -39,7 +39,7 @@ export default function Login({setToken}) {
         <Form onSubmit={signIn}>
           <Form.Group className="mb-3" controlId="formEmail">
             <Form.Label>Email</Form.Label>
-            <Form.Control type="email" placeholder="Enter Email" value={email} onChange={e => setUsername(e.target.value)} />
+            <Form.Control type="email" placeholder="Enter Email" value={email} onChange={e => setEmail(e.target.value)} />
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="formPassword">
