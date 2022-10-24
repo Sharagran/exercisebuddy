@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 export default function Login({setToken}) {
 
@@ -18,9 +19,11 @@ export default function Login({setToken}) {
       email: email,
       password: password
     }).then(res => {
+      toast.success("Successfully logged in!");
       console.log("JWT token: ", res.data);
       setToken(res.data);
     }).catch(err => {
+      toast.error("Login failed");
       console.log("error: ", err);
     })
   }
