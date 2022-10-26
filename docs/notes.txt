@@ -63,7 +63,16 @@ TODOs:
 - suchanfrage in browser history
 - anzeigen von Datensätzen überarbeiten
 
+Next todos:
+- Feedback (button Feedback)
+- grafische aufbereitung!!
+- Search history (url) for created start & end date
+- TODO: reset button for search filters (dates)
+
 - (optional) Pagination
 
 
 TODO: Page nicht in URL schreibe, alle Daten laden und nur state wechseln?
+
+key login? Nicht nötig da key umständlich	zu merken & frontend ist eh nur für entwickler
+nur frontend Pagination nötig, nicht backend

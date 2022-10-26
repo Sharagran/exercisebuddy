@@ -8,12 +8,15 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Accordion from 'react-bootstrap/Accordion';
 import { useState } from 'react';
 
+import DateRangePicker from 'react-bootstrap-daterangepicker';
+import 'bootstrap-daterangepicker/daterangepicker.css';
+
 // controlId: fügt eine id allen relevanten child elementen hinzu (zB. Label, Input)
 
-export default function Search({search}) {
+export default function Search({ search }) {
 
     const [Author, setAuthor] = useState("");
-    const [Created, setCreated] = useState("");
+    const [Created, setCreated] = useState(new Date(), new Date());
 
     function submit(e) {
         e.preventDefault();
@@ -56,6 +59,44 @@ export default function Search({search}) {
                                         <Form.Control type="date" placeholder="Created" onChange={e => setCreated(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group className="mb-3" controlId="formCreated">
+                                    <FloatingLabel label="Creation date">
+                                        <DateRangePicker
+                                        onCallback={(start, end) => {
+                                            console.log(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
+                                            setCreated(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
+                                        }}
+                                        initialSettings={{
+                                            startDate: Created[0],
+                                            endDate: Created[1],
+                                            // timePicker: true,
+                                            // timePicker24Hour: true,
+                                         }}>
+                                            <Form.Control type="text" placeholder="Created" />
+                                        </DateRangePicker>
+                                    </FloatingLabel>
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3" controlId="formUpdated">
+                                    <FloatingLabel label="Update date">
+                                    <DateRangePicker
+                                        onCallback={(start, end) => {
+                                            console.log(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
+                                            setCreated(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
+                                        }}
+                                        initialSettings={{
+                                            startDate: Created[0],
+                                            endDate: Created[1],
+                                            // timePicker: true,
+                                            // timePicker24Hour: true,
+                                         }}>
+                                            <Form.Control type="text" placeholder="Updated" />
+                                        </DateRangePicker>
+                                    </FloatingLabel>
+                            </Form.Group>
                             </Col>
                         </Row>
                     </Accordion.Body>

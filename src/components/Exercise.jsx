@@ -63,11 +63,7 @@ export default function Exercise() {
 
     // TODO: recursive function to map exercise data to JSX (id as key)
     return <>
-    <Tabs
-      className="mb-3"
-    >
     {exerciseToHTML(exercise)}
-    </Tabs>
     <button onClick={deleteExercise}>Delete</button>
     <button onClick={updateExercise}>Update</button>
     </>;
