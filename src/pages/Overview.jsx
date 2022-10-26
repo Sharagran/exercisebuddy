@@ -12,6 +12,28 @@ import { useEffect } from 'react';
 import axios from 'axios';
 
 export default function Overview() {
+
+    let navigate = useNavigate();
+    let location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const [searchParams, setSearchParams] = useState({
+        page: Number(params.get('page')) || 1,
+        author: params.get('author') || '',
+        created: params.get('created') || '',
+    });
+    const [tableData, setTableData] = useState(dummyData);
+
+
+    useEffect(() => {
+        console.log("Overview: useEffect get exercises");
+        // getExercises();
+        setTableData(dummyData);
+    }, [])
+
+    useEffect(() => {
+        console.log("Overview: useEffect location.search");
+    }, [location.search])
+
     //FIXME: page back button not rerendering component
     function setPage(page) {
         var newSearchParams = { ...searchParams, page };
@@ -46,21 +68,14 @@ export default function Overview() {
         navigate(`/?${new URLSearchParams(urlParams)}`);
     }
 
-    let navigate = useNavigate();
-    let location = useLocation();
-    const params = new URLSearchParams(location.search);
-    const [searchParams, setSearchParams] = useState({
-        page: Number(params.get('page')) || 1,
-        author: params.get('author') || '',
-        created: params.get('created') || '',
-    });
+    function getExercises() {
+        // axios.defaults.headers.common['Authorization'] = '69bf11e1';
+        axios.get('http://localhost:3000/exercises').then(res => {
+            console.log(res.data);
+            setTableData(res.data);
+        });
+    }
 
-    useEffect(() => {
-        console.log("Overview: useEffect");
-    }, [location.search])
-    
-
-    const tableData = dummyData; //FIXME: dummy data
     return (
         <>
             <Search search={search} />
@@ -102,12 +117,7 @@ export default function Overview() {
                 {tableData.length !== 0 || <Spinner animation="border" />}
                 <MyPagination dataSize={tableData.length} currentPage={searchParams.page} changePage={setPage} />
             </div>
-            <button onClick={() => {
-                // axios.defaults.headers.common['Authorization'] = '69bf11e1';
-                axios.get('http://localhost:3000/exercises').then(res => {
-                    console.log(res.data);
-                });
-            }}>Test</button>
+            <button onClick={getExercises}>Test</button>
         </>
     )
 }
