@@ -31,8 +31,8 @@ export default function Search({ search }) {
         <div className='search'>
             <h3>Search</h3>
             <Form onSubmit={submit}>
-                <Form.Group className="mb-3" controlId="formName">
-                    <Form.Control type="search" placeholder="Enter Name" />
+                <Form.Group className="mb-3" controlId="formTitle">
+                    <Form.Control type="search" placeholder="Enter Title" />
                 </Form.Group>
 
                 {/* Advanced search */}
@@ -42,27 +42,8 @@ export default function Search({ search }) {
                     <Accordion.Body>
                         <Row>
                             <Col>
-                                <Form.Group className="mb-3" controlId="formAuthor">
-                                    <FloatingLabel label="Author">
-                                        <Form.Select onChange={e => setAuthor(e.target.value)}>
-                                            <option value="">Select an author</option>
-                                            <option value="0">author 0</option>
-                                            <option value="1">author 1</option>
-                                            <option value="2">author 2</option>
-                                        </Form.Select>
-                                    </FloatingLabel>
-                                </Form.Group>
-                            </Col>
-                            <Col>
                                 <Form.Group className="mb-3" controlId="formCreated">
-                                    <FloatingLabel label="Creation date">
-                                        <Form.Control type="date" placeholder="Created" onChange={e => setCreated(e.target.value)} />
-                                    </FloatingLabel>
-                                </Form.Group>
-                            </Col>
-                            <Col>
-                                <Form.Group className="mb-3" controlId="formCreated">
-                                    <FloatingLabel label="Creation date">
+                                    <FloatingLabel label="Created At">
                                         <DateRangePicker
                                         onCallback={(start, end) => {
                                             console.log(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
@@ -74,14 +55,14 @@ export default function Search({ search }) {
                                             // timePicker: true,
                                             // timePicker24Hour: true,
                                          }}>
-                                            <Form.Control type="text" placeholder="Created" />
+                                            <Form.Control type="text" placeholder="Created At" />
                                         </DateRangePicker>
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
                             <Col>
                             <Form.Group className="mb-3" controlId="formUpdated">
-                                    <FloatingLabel label="Update date">
+                                    <FloatingLabel label="Updated At">
                                     <DateRangePicker
                                         onCallback={(start, end) => {
                                             console.log(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
@@ -93,11 +74,12 @@ export default function Search({ search }) {
                                             // timePicker: true,
                                             // timePicker24Hour: true,
                                          }}>
-                                            <Form.Control type="text" placeholder="Updated" />
+                                            <Form.Control type="text" placeholder="Updated At" />
                                         </DateRangePicker>
                                     </FloatingLabel>
                             </Form.Group>
                             </Col>
+                            {/* TODO: difficulty, set, repetition, duration, pause, equipment(string array) */}
                         </Row>
                     </Accordion.Body>
                 </Accordion>

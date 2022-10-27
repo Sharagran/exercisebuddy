@@ -94,14 +94,16 @@ export default function Overview() {
                 </thead>
                 <tbody>
                     {tableData.slice((searchParams.page - 1) * 10, (searchParams.page - 1) * 10 + 10).map(exercise => (
-                        <tr key={exercise._id} onClick={() => {
-                            navigate(`/exercise/${exercise._id}`);
+                        <tr key={exercise._id} onClick={(args) => {
+                            if(args.target.tagName !== 'A') {
+                                navigate(`/exercise/${exercise._id}`);
+                            }
                         }}>
                             <td>{exercise.title}</td>
                             <td>{exercise.description}</td>
                             <td>{exercise.createdAt}</td>
                             <td>{exercise.updatedAt}</td>
-                            <td>{exercise.link}</td>
+                            <td><a href={exercise.link}>{exercise.link}</a></td>
                             <td>{exercise.neededReps}</td>
                             <td>{exercise.neededDuration}</td>
                         </tr>
