@@ -14,27 +14,27 @@ import DatePicker from './DateRangePickerWrapper';
 
 export default function Search({ search }) {
 
-    const [CreatedAt, setCreatedAt] = useState(new Date(), new Date());
-    const [UpdatedAt, setUpdatedAt] = useState(new Date(), new Date());
-    const [Difficulty, setDifficulty] = useState(0);
-    const [Set, setSet] = useState(0);
-    const [Repetition, setRepetition] = useState(0);
-    const [Duration, setDuration] = useState(0);
-    const [Pause, setPause] = useState(0);
-    const [Equipment, SetEquipment] = useState([]);
+    const [createdAt, setCreatedAt] = useState(new Date(), new Date());
+    const [updatedAt, setUpdatedAt] = useState(new Date(), new Date());
+    const [difficulty, setDifficulty] = useState(0);
+    const [set, setSet] = useState(0);
+    const [repetition, setRepetition] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [pause, setPause] = useState(0);
+    const [equipment, SetEquipment] = useState([]);
 
     function submit(e) {
         e.preventDefault();
 
         search({
-            CreatedAt,
-            UpdatedAt,
-            Difficulty,
-            Set,
-            Repetition,
-            Duration,
-            Pause,
-            Equipment,
+            createdAt,
+            updatedAt,
+            difficulty,
+            set,
+            repetition,
+            duration,
+            pause,
+            equipment
         });
     }
 
@@ -56,8 +56,8 @@ export default function Search({ search }) {
                                 <Form.Group className="mb-3" controlId="formCreated">
                                     <FloatingLabel label="Created At">
                                          <DatePicker
-                                            initalStartDate={CreatedAt[0]}
-                                            initalEndDate={CreatedAt[1]}
+                                            initalStartDate={createdAt[0]}
+                                            initalEndDate={createdAt[1]}
                                             refDate={setCreatedAt}
                                             includeTime={true}
                                          >
@@ -70,8 +70,8 @@ export default function Search({ search }) {
                             <Form.Group className="mb-3" controlId="formUpdated">
                                     <FloatingLabel label="Updated At">
                                             <DatePicker
-                                                initalStartDate={UpdatedAt[0]}
-                                                initalEndDate={UpdatedAt[1]}
+                                                initalStartDate={updatedAt[0]}
+                                                initalEndDate={updatedAt[1]}
                                                 refDate={setUpdatedAt}
                                                 includeTime={true}
                                             >

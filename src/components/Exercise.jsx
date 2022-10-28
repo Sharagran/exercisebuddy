@@ -4,14 +4,20 @@ import { useParams } from "react-router-dom";
 import dummy_data from '../dummy_data/exercises_new.json';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import { useEffect } from 'react';
+import { useState } from 'react';
+import Spinner from 'react-bootstrap/Spinner';
 
-export default function Exercise() {
+export default function Exercise({ exercises }) {
 
     let params = useParams();
-    var exercise;
+    const [exercise, setExercise] = useState({});
 
     function getExercise() {
-        exercise = dummy_data.find(exercise => exercise._id === params.id);
+        // exercise = dummy_data.find(exercise => exercise.id === Number(params.id));
+        if(exercises.length > 0) {
+            setExercise(exercises.find(e => e._id === params.id));
+        }
     }
 
     function deleteExercise() {
@@ -59,12 +65,24 @@ export default function Exercise() {
         return content;
     }
 
-    getExercise();
+    useEffect(() => {
+        getExercise();
+    }, [exercises])
+    
 
     // TODO: recursive function to map exercise data to JSX (id as key)
     return <>
-    {exerciseToHTML(exercise)}
+    {/* {exerciseToHTML(exercise)} */}
+
+    {exercises.length > 0 ? <>
+    <h2>{exercise.title}</h2>
+    <p>{exercise.description}</p>
+
     <button onClick={deleteExercise}>Delete</button>
     <button onClick={updateExercise}>Update</button>
+    </>
+    : <Spinner animation="border" role="status" />
+    }
+    
     </>;
 }

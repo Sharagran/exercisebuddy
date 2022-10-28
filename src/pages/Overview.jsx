@@ -11,8 +11,7 @@ import dummyData from '../dummy_data/exercises_new.json';
 import { useEffect } from 'react';
 import axios from 'axios';
 
-export default function Overview() {
-
+export default function Overview({ exercises }) {
     let navigate = useNavigate();
     let location = useLocation();
     const params = new URLSearchParams(location.search);
@@ -21,14 +20,6 @@ export default function Overview() {
         author: params.get('author') || '',
         created: params.get('created') || '',
     });
-    const [tableData, setTableData] = useState(dummyData);
-
-
-    useEffect(() => {
-        console.log("Overview: useEffect get exercises");
-        // getExercises();
-        setTableData(dummyData);
-    }, [])
 
     useEffect(() => {
         console.log("Overview: useEffect location.search");
@@ -69,14 +60,6 @@ export default function Overview() {
         navigate(`/?${new URLSearchParams(urlParams)}`);
     }
 
-    function getExercises() {
-        // axios.defaults.headers.common['Authorization'] = '69bf11e1';
-        axios.get('http://localhost:3000/exercises').then(res => {
-            console.log(res.data);
-            setTableData(res.data);
-        });
-    }
-
     return (
         <>
             <Search search={search} />
@@ -94,7 +77,7 @@ export default function Overview() {
                     </tr>
                 </thead>
                 <tbody>
-                    {tableData.slice((searchParams.page - 1) * 10, (searchParams.page - 1) * 10 + 10).map(exercise => (
+                    {exercises.slice((searchParams.page - 1) * 10, (searchParams.page - 1) * 10 + 10).map(exercise => (
                         <tr key={exercise._id} onClick={(args) => {
                             if(args.target.tagName !== 'A') {
                                 navigate(`/exercise/${exercise._id}`);
@@ -117,10 +100,9 @@ export default function Overview() {
                 width: "50%",
                 textAlign: "center"
             }}>
-                {tableData.length !== 0 || <Spinner animation="border" />}
-                <MyPagination dataSize={tableData.length} currentPage={searchParams.page} changePage={setPage} />
+                {exercises.length !== 0 || <Spinner animation="border" />}
+                <MyPagination dataSize={exercises.length} currentPage={searchParams.page} changePage={setPage} />
             </div>
-            <button onClick={getExercises}>Test</button>
         </>
     )
 }
