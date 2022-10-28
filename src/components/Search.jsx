@@ -15,15 +15,27 @@ import 'bootstrap-daterangepicker/daterangepicker.css';
 
 export default function Search({ search }) {
 
-    const [Author, setAuthor] = useState("");
-    const [Created, setCreated] = useState(new Date(), new Date());
+    const [CreatedAt, setCreatedAt] = useState(new Date(), new Date());
+    const [UpdatedAt, setUpdatedAt] = useState(new Date(), new Date());
+    const [Difficulty, setDifficulty] = useState(0);
+    const [Set, setSet] = useState(0);
+    const [Repetition, setRepetition] = useState(0);
+    const [Duration, setDuration] = useState(0);
+    const [Pause, setPause] = useState(0);
+    const [Equipment, SetEquipment] = useState([]);
 
     function submit(e) {
         e.preventDefault();
 
         search({
-            author: Author,
-            created: Created,
+            CreatedAt,
+            UpdatedAt,
+            Difficulty,
+            Set,
+            Repetition,
+            Duration,
+            Pause,
+            Equipment,
         });
     }
 
@@ -47,11 +59,11 @@ export default function Search({ search }) {
                                         <DateRangePicker
                                         onCallback={(start, end) => {
                                             console.log(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
-                                            setCreated(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
+                                            setCreatedAt(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
                                         }}
                                         initialSettings={{
-                                            startDate: Created[0],
-                                            endDate: Created[1],
+                                            startDate: CreatedAt[0],
+                                            endDate: CreatedAt[1],
                                             // timePicker: true,
                                             // timePicker24Hour: true,
                                          }}>
@@ -66,11 +78,11 @@ export default function Search({ search }) {
                                     <DateRangePicker
                                         onCallback={(start, end) => {
                                             console.log(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
-                                            setCreated(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
+                                            setUpdatedAt(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
                                         }}
                                         initialSettings={{
-                                            startDate: Created[0],
-                                            endDate: Created[1],
+                                            startDate: CreatedAt[0],
+                                            endDate: CreatedAt[1],
                                             // timePicker: true,
                                             // timePicker24Hour: true,
                                          }}>
@@ -79,7 +91,54 @@ export default function Search({ search }) {
                                     </FloatingLabel>
                             </Form.Group>
                             </Col>
-                            {/* TODO: difficulty, set, repetition, duration, pause, equipment(string array) */}
+                        </Row>
+                        {/* TODO: limit number ranges */}
+                        <Row>
+                            <Col>
+                                <Form.Group className="mb-3" controlId="formDifficulty">
+                                    <FloatingLabel label="Difficulty">
+                                        <Form.Control type="number" placeholder="Difficulty" onChange={(e) => setDifficulty(e.target.value)} />
+                                    </FloatingLabel>
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group className="mb-3" controlId="formSet">
+                                    <FloatingLabel label="Set">
+                                        <Form.Control type="number" placeholder="Set" onChange={(e) => setSet(e.target.value)} />
+                                    </FloatingLabel>
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group className="mb-3" controlId="formRepetition">
+                                    <FloatingLabel label="Repetition">
+                                        <Form.Control type="number" placeholder="Repetition" onChange={(e) => setRepetition(e.target.value)} />
+                                    </FloatingLabel>
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group className="mb-3" controlId="formDuration">
+                                    <FloatingLabel label="Duration">
+                                        <Form.Control type="number" placeholder="Duration" onChange={(e) => setDuration(e.target.value)} />
+                                    </FloatingLabel>
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group className="mb-3" controlId="formPause">
+                                    <FloatingLabel label="Pause">
+                                        <Form.Control type="number" placeholder="Pause" onChange={(e) => setPause(e.target.value)} />
+                                    </FloatingLabel>
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        {/* Find a system to add multiple items to array (tag list from CloudNein?) */}
+                        <Row>
+                            <Col>
+                                <Form.Group className="mb-3" controlId="formEquipment">
+                                    <FloatingLabel label="Equipment">
+                                        <Form.Control type="text" placeholder="Equipment" onChange={(e) => SetEquipment(e.target.value)} />
+                                    </FloatingLabel>
+                                </Form.Group>
+                            </Col>
                         </Row>
                     </Accordion.Body>
                 </Accordion>

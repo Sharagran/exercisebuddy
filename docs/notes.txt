@@ -59,7 +59,7 @@ login json web token (expires in noch nicht implementiert)
 
 
 TODOs:
-- login
+- login (weiterleitung)
 - suchanfrage in browser history
 - anzeigen von Datensätzen überarbeiten
 
@@ -76,3 +76,7 @@ TODO: Page nicht in URL schreibe, alle Daten laden und nur state wechseln?
 
 key login? Nicht nötig da key umständlich	zu merken & frontend ist eh nur für entwickler
 nur frontend Pagination nötig, nicht backend
+
+
+Fragen:
+- Difficulty sind numbers, sollen diese im UI in Text umgewandelt werden? 1=leicht, 2=mittel, 3=schwer etc?

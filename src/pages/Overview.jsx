@@ -53,6 +53,7 @@ export default function Overview() {
     }
 
     function search(params) {
+        // TODO: construct search query dynamically from params
         var newSearchParams = { page: searchParams.page, ...params };
         setSearchParams(newSearchParams);
 
