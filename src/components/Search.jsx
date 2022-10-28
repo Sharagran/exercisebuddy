@@ -8,8 +8,7 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Accordion from 'react-bootstrap/Accordion';
 import { useState } from 'react';
 
-import DateRangePicker from 'react-bootstrap-daterangepicker';
-import 'bootstrap-daterangepicker/daterangepicker.css';
+import DatePicker from './DateRangePickerWrapper';
 
 // controlId: fügt eine id allen relevanten child elementen hinzu (zB. Label, Input)
 
@@ -56,38 +55,28 @@ export default function Search({ search }) {
                             <Col>
                                 <Form.Group className="mb-3" controlId="formCreated">
                                     <FloatingLabel label="Created At">
-                                        <DateRangePicker
-                                        onCallback={(start, end) => {
-                                            console.log(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
-                                            setCreatedAt(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
-                                        }}
-                                        initialSettings={{
-                                            startDate: CreatedAt[0],
-                                            endDate: CreatedAt[1],
-                                            // timePicker: true,
-                                            // timePicker24Hour: true,
-                                         }}>
+                                         <DatePicker
+                                            initalStartDate={CreatedAt[0]}
+                                            initalEndDate={CreatedAt[1]}
+                                            refDate={setCreatedAt}
+                                            includeTime={true}
+                                         >
                                             <Form.Control type="text" placeholder="Created At" />
-                                        </DateRangePicker>
+                                        </DatePicker>
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
                             <Col>
                             <Form.Group className="mb-3" controlId="formUpdated">
                                     <FloatingLabel label="Updated At">
-                                    <DateRangePicker
-                                        onCallback={(start, end) => {
-                                            console.log(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
-                                            setUpdatedAt(start.format('YYYY-MM-DDTHH:mm:ss.SSS').toString(), end.format('YYYY-MM-DDTHH:mm:ss.SSS').toString())
-                                        }}
-                                        initialSettings={{
-                                            startDate: CreatedAt[0],
-                                            endDate: CreatedAt[1],
-                                            // timePicker: true,
-                                            // timePicker24Hour: true,
-                                         }}>
-                                            <Form.Control type="text" placeholder="Updated At" />
-                                        </DateRangePicker>
+                                            <DatePicker
+                                                initalStartDate={UpdatedAt[0]}
+                                                initalEndDate={UpdatedAt[1]}
+                                                refDate={setUpdatedAt}
+                                                includeTime={true}
+                                            >
+                                                <Form.Control type="text" placeholder="Updated At" />
+                                            </DatePicker>
                                     </FloatingLabel>
                             </Form.Group>
                             </Col>
