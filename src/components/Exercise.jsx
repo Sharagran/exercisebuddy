@@ -70,6 +70,7 @@ export default function Exercise({ exercises }) {
     }, [exercises])
     
 
+    // TODO: display error when loading failed: try catch in use effect with multiple returns?
     // TODO: recursive function to map exercise data to JSX (id as key)
     return <>
     {/* {exerciseToHTML(exercise)} */}
