@@ -15,6 +15,8 @@ function App() {
   const { token, setToken } = useToken();
   const [exercises, setExercises] = useState([]);
 
+  axios.defaults.baseURL = process.env.REACT_APP_EXERCISEBUDDY_API_URL;
+
   function fetchExercises() {
     console.log('fetching exercises');
     // axios.defaults.headers.common['Authorization'] = '69bf11e1';

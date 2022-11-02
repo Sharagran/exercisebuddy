@@ -80,3 +80,4 @@ nur frontend Pagination nötig, nicht backend
 
 Fragen:
 - Difficulty sind numbers, sollen diese im UI in Text umgewandelt werden? 1=leicht, 2=mittel, 3=schwer etc?
+- Wo werden media files bereitgestellt? Videos und Bilder

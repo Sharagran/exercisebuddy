@@ -15,7 +15,7 @@ export default function Login({setToken}) {
   function signIn(e) {
     e.preventDefault();
 
-    axios.post(`${process.env.REACT_APP_EXERCISEBUDDY_API_SERVER}/login`, {
+    axios.post(`${process.env.REACT_APP_EXERCISEBUDDY_API_URL}/login`, {
       email: email,
       password: password
     }).then(res => {
