@@ -2,11 +2,15 @@ import React from 'react'
 import { useParams } from "react-router-dom";
 
 import dummy_data from '../dummy_data/exercises_new.json';
+import { useEffect, useState } from 'react';
+import Stickman from './Stickman';
+
+import Badge from 'react-bootstrap/Badge';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-import { useEffect } from 'react';
-import { useState } from 'react';
 import Spinner from 'react-bootstrap/Spinner';
+import Placeholder from 'react-bootstrap/Placeholder';
+import Button from 'react-bootstrap/Button';
 
 export default function Exercise({ exercises }) {
 
@@ -15,24 +19,24 @@ export default function Exercise({ exercises }) {
 
     function getExercise() {
         // exercise = dummy_data.find(exercise => exercise.id === Number(params.id));
-        if(exercises.length > 0) {
+        if (exercises.length > 0) {
             setExercise(exercises.find(e => e._id === params.id));
         }
     }
 
     function deleteExercise() {
-
+        console.log("delete exercise");
     }
 
     function updateExercise() {
-
+        console.log("update exercise");
     }
 
     function exerciseToHTML(exercise) {
         // map object properties to HTML
         var content = [];
         for (const [key, value] of Object.entries(exercise)) {
-            if(key === "_id") {
+            if (key === "_id") {
                 continue;
             }
             if (Array.isArray(value)) {
@@ -68,22 +72,53 @@ export default function Exercise({ exercises }) {
     useEffect(() => {
         getExercise();
     }, [exercises])
-    
 
     // TODO: display error when loading failed: try catch in use effect with multiple returns?
-    // TODO: recursive function to map exercise data to JSX (id as key)
-    return <>
-    {/* {exerciseToHTML(exercise)} */}
+    if (exercises.length === 0) {
+        // display placeholder while loading
+        return (
+            <>
+                <h2><Placeholder xs={6} /></h2>
+                <p><Placeholder xs={6} /></p>
 
-    {exercises.length > 0 ? <>
-    <h2>{exercise.title}</h2>
-    <p>{exercise.description}</p>
+                <p>Difficulty: <Placeholder xs={1} /></p>
+                <p>Equipment: <Placeholder xs={3} /></p>
+                <p>Set: <Placeholder xs={1} /></p>
+                <p>Repetition: <Placeholder xs={1} /></p>
+                <p>Duration: <Placeholder xs={1} /></p>
+                <p>Pause: <Placeholder xs={1} /></p>
 
-    <button onClick={deleteExercise}>Delete</button>
-    <button onClick={updateExercise}>Update</button>
-    </>
-    : <Spinner animation="border" role="status" />
+                <Placeholder.Button variant='primary' xs={1} />
+                <Placeholder.Button variant='danger' xs={1} />
+            </>
+        )
+    } else {
+        return <>
+            {/* TODO: dynamic generate input fields for exercise data (from json schema)[input type text, number, etc.] */}
+
+            <h2>{exercise.title} <a target="_blank" rel="noopener noreferrer" href={exercise.link}><Badge bg="secondary">open external</Badge></a></h2>
+            <p>{exercise.description}</p>
+            <img src={exercise.image} alt="" />
+            {/* <video width="320" height="240" controls>
+        <source src={exercise.video} type="video/mp4" />
+        Your browser does not support the video tag.
+    </video> */}
+
+            <Stickman />
+
+            <p>Difficulty: {exercise.difficulty}</p>
+            <p>Equipment: {exercise.equipment}</p>
+            <p>Set: {exercise.set}</p>
+            <p>Repetition: {exercise.repetition}</p>
+            <p>Duration: {exercise.duration}</p>
+            <p>Pause: {exercise.pause}</p>
+            <p>Diagnoses: {exercise.diagnoses}</p>
+
+            <p>createdAt: {exercise.createdAt}</p>
+            <p>updatedAt: {exercise.updatedAt}</p>
+
+            <Button variant='primary' onClick={updateExercise}>Update</Button>
+            <Button variant='danger' onClick={deleteExercise}>Delete</Button>
+        </>;
     }
-    
-    </>;
 }
