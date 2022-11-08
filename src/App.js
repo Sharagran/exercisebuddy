@@ -15,12 +15,12 @@ function App() {
   const { token, setToken } = useToken();
   const [exercises, setExercises] = useState([]);
 
-  axios.defaults.baseURL = process.env.REACT_APP_EXERCISEBUDDY_API_URL;
+  axios.defaults.baseURL = process.env.REACT_APP_EXERCISEBUDDY_API_SERVER;
 
   function fetchExercises() {
     console.log('fetching exercises');
     // axios.defaults.headers.common['Authorization'] = '69bf11e1';
-    axios.get('http://localhost:3000/exercises').then(res => {
+    axios.get('/exercises').then(res => {
       console.log(res.data);
       setExercises(res.data);
     });
