@@ -57,25 +57,34 @@ kleine Namen änderungen
 
 login json web token (expires in noch nicht implementiert)
 
+key login? Nicht nötig da key umständlich	zu merken & frontend ist eh nur für entwickler
+nur frontend Pagination nötig, nicht backend
 
 TODOs:
 - login (weiterleitung)
-- suchanfrage in browser history
-- anzeigen von Datensätzen überarbeiten
-
-Next todos:
 - Feedback (button Feedback)
 - grafische aufbereitung!!
 - Search history (url) for created start & end date
-- TODO: reset button for search filters (dates)
-
+- reset button for search filters (dates)
 - (optional) Pagination
+
+Done:
+- Feedback (toast notifications)
+- 3D Model for Poses
+- exercice now displaying all values
+- search DateRangePicker
+- added all search options (not working yet)
+
+Next TODOs:
+- Model parser
+- Diffrent model poses (pagination)
+- 
+
 
 
 TODO: Page nicht in URL schreibe, alle Daten laden und nur state wechseln?
 
-key login? Nicht nötig da key umständlich	zu merken & frontend ist eh nur für entwickler
-nur frontend Pagination nötig, nicht backend
+
 
 
 Fragen:

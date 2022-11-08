@@ -62,8 +62,10 @@ export default function Overview({ exercises }) {
 
     return (
         <>
+            <h3>Search</h3>
             <Search search={search} />
 
+            <h3>Exercises</h3>
             <Table hover striped>
                 <thead>
                     <tr>
@@ -88,8 +90,8 @@ export default function Overview({ exercises }) {
                             <td>{exercise.createdAt}</td>
                             <td>{exercise.updatedAt}</td>
                             <td><a href={exercise.link}>{exercise.link}</a></td>
-                            <td>{exercise.neededReps}</td>
-                            <td>{exercise.neededDuration}</td>
+                            <td>{exercise.repetition}</td>
+                            <td>{exercise.duration}</td>
                         </tr>
                     ))}
                 </tbody>

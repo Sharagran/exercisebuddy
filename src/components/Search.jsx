@@ -40,7 +40,6 @@ export default function Search({ search }) {
 
     return (
         <div className='search'>
-            <h3>Search</h3>
             <Form onSubmit={submit}>
                 <Form.Group className="mb-3" controlId="formTitle">
                     <Form.Control type="search" placeholder="Enter Title" />
