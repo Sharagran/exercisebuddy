@@ -11,7 +11,9 @@ import dummyData from '../dummy_data/exercises_new.json';
 import { useEffect } from 'react';
 import axios from 'axios';
 
-export default function Overview({ exercises }) {
+import { ExerciseConsumer } from '../components/ExerciseProvider';
+
+export default function Overview() {
     let navigate = useNavigate();
     let location = useLocation();
     const params = new URLSearchParams(location.search);
@@ -32,15 +34,15 @@ export default function Overview({ exercises }) {
 
         //FIXME: page swap in url history? (replace property)
         //TODO: delte url params if empty (custom hook for url params?)
-         // remove empty properties from url
-         var urlParams = {...newSearchParams};
-         for (const key in urlParams) {
-             if (urlParams[key] === "") {
-                 delete urlParams[key];
-             }
-         }
+        // remove empty properties from url
+        var urlParams = { ...newSearchParams };
+        for (const key in urlParams) {
+            if (urlParams[key] === "") {
+                delete urlParams[key];
+            }
+        }
 
-        navigate(`/?${new URLSearchParams(urlParams, { replace: true } )}`);
+        navigate(`/?${new URLSearchParams(urlParams, { replace: true })}`);
     }
 
     function search(params) {
@@ -49,7 +51,7 @@ export default function Overview({ exercises }) {
         setSearchParams(newSearchParams);
 
         // remove empty properties from url
-        var urlParams = {...newSearchParams};
+        var urlParams = { ...newSearchParams };
         for (const key in urlParams) {
             if (urlParams[key] === "") {
                 delete urlParams[key];
@@ -79,21 +81,26 @@ export default function Overview({ exercises }) {
                     </tr>
                 </thead>
                 <tbody>
-                    {exercises.slice((searchParams.page - 1) * 10, (searchParams.page - 1) * 10 + 10).map(exercise => (
-                        <tr key={exercise._id} onClick={(args) => {
-                            if(args.target.tagName !== 'A') {
-                                navigate(`/exercise/${exercise._id}`);
-                            }
-                        }}>
-                            <td>{exercise.title}</td>
-                            <td>{exercise.description}</td>
-                            <td>{exercise.createdAt}</td>
-                            <td>{exercise.updatedAt}</td>
-                            <td><a href={exercise.link}>{exercise.link}</a></td>
-                            <td>{exercise.repetition}</td>
-                            <td>{exercise.duration}</td>
-                        </tr>
-                    ))}
+                    <ExerciseConsumer>
+                        {exercises => {
+                            return exercises.slice((searchParams.page - 1) * 10, (searchParams.page - 1) * 10 + 10).map(exercise => (
+                                <tr key={exercise._id} onClick={(args) => {
+                                    if (args.target.tagName !== 'A') {
+                                        navigate(`/exercise/${exercise._id}`);
+                                    }
+                                }}>
+                                    <td>{exercise.title}</td>
+                                    <td>{exercise.description}</td>
+                                    <td>{exercise.createdAt}</td>
+                                    <td>{exercise.updatedAt}</td>
+                                    <td><a href={exercise.link}>{exercise.link}</a></td>
+                                    <td>{exercise.repetition}</td>
+                                    <td>{exercise.duration}</td>
+                                </tr>
+                            ))
+
+                        }}
+                    </ExerciseConsumer>
                 </tbody>
             </Table>
 
@@ -102,8 +109,14 @@ export default function Overview({ exercises }) {
                 width: "50%",
                 textAlign: "center"
             }}>
-                {exercises.length !== 0 || <Spinner animation="border" />}
-                <MyPagination dataSize={exercises.length} currentPage={searchParams.page} changePage={setPage} />
+                <ExerciseConsumer>
+                    {exercises => {
+                        return (<>
+                            {exercises.length !== 0 || <Spinner animation="border" />}
+                            <MyPagination dataSize={exercises.length} currentPage={searchParams.page} changePage={setPage} />
+                        </>)
+                    }}
+                </ExerciseConsumer>
             </div>
         </>
     )
