@@ -2,9 +2,11 @@ import React, { createContext } from "react";
 import axios from "axios";
 import { useEffect } from "react";
 
+import { Outlet } from "react-router-dom";
+
 const { Provider, Consumer } = createContext();
 
-function ExerciseProvider({ children }) {
+function ExerciseProvider() {
 
     const [exercises, setExercises] = React.useState([]);
 
@@ -26,7 +28,7 @@ function ExerciseProvider({ children }) {
 
     return (
         <Provider value={exercises}>
-            {children}
+            <Outlet />
         </Provider>
     )
 }

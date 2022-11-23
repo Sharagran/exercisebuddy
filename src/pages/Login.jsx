@@ -1,16 +1,19 @@
 import React from 'react'
+import { useState } from 'react';
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { useState } from 'react';
-import axios from 'axios';
-import toast from 'react-hot-toast';
+
 
 export default function Login({setToken}) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   function signIn(e) {
     e.preventDefault();
@@ -19,12 +22,16 @@ export default function Login({setToken}) {
       email: email,
       password: password
     }).then(res => {
-      toast.success("Successfully logged in!");
-      console.log("JWT token: ", res.data);
       setToken(res.data);
+      toast.success("Successfully logged in!");
+      navigate("/");
     }).catch(err => {
-      toast.error("Login failed");
-      console.log("error: ", err);
+      if(err.response.status === 401) {
+        toast.error("Username or password incorrect!");
+      } else {
+        toast.error("An error occured!");
+        console.error(err);
+      }
     })
   }
 
