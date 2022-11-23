@@ -7,7 +7,6 @@ import { Outlet } from "react-router-dom";
 const { Provider, Consumer } = createContext();
 
 function ExerciseProvider() {
-
     const [exercises, setExercises] = React.useState([]);
 
     function fetchExercises() {

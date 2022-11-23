@@ -16,7 +16,6 @@ function AuthProvider({ children }) {
     const { token, setToken } = useToken();
 
     if(token) {
-        // axios.defaults.headers.common = { 'Authorization': `Bearer ${token}` };
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
 
