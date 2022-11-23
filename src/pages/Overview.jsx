@@ -1,21 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useLocation, useNavigate } from "react-router-dom";
 
 import Table from 'react-bootstrap/Table';
 import Spinner from 'react-bootstrap/Spinner';
-import { useLocation, useNavigate } from "react-router-dom";
 
 import MyPagination from '../components/MyPagination';
 import Search from '../components/Search';
-
-import dummyData from '../dummy_data/exercises_new.json';
-import { useEffect } from 'react';
-import axios from 'axios';
-
-import { ExerciseConsumer } from '../components/ExerciseProvider';
+import ExerciseContext from '../components/ExerciseProvider';
 
 export default function Overview() {
     let navigate = useNavigate();
     let location = useLocation();
+    const exercises = React.useContext(ExerciseContext);
     const params = new URLSearchParams(location.search);
     const [searchParams, setSearchParams] = useState({
         page: Number(params.get('page')) || 1,
@@ -81,26 +77,21 @@ export default function Overview() {
                     </tr>
                 </thead>
                 <tbody>
-                    <ExerciseConsumer>
-                        {exercises => {
-                            return exercises.slice((searchParams.page - 1) * 10, (searchParams.page - 1) * 10 + 10).map(exercise => (
-                                <tr key={exercise._id} onClick={(args) => {
-                                    if (args.target.tagName !== 'A') {
-                                        navigate(`/exercise/${exercise._id}`);
-                                    }
-                                }}>
-                                    <td>{exercise.title}</td>
-                                    <td>{exercise.description}</td>
-                                    <td>{exercise.createdAt}</td>
-                                    <td>{exercise.updatedAt}</td>
-                                    <td><a href={exercise.link}>{exercise.link}</a></td>
-                                    <td>{exercise.repetition}</td>
-                                    <td>{exercise.duration}</td>
-                                </tr>
-                            ))
-
-                        }}
-                    </ExerciseConsumer>
+                    {exercises.slice((searchParams.page - 1) * 10, (searchParams.page - 1) * 10 + 10).map(exercise => (
+                        <tr key={exercise._id} onClick={(args) => {
+                            if (args.target.tagName !== 'A') {
+                                navigate(`/exercise/${exercise._id}`);
+                            }
+                        }}>
+                            <td>{exercise.title}</td>
+                            <td>{exercise.description}</td>
+                            <td>{exercise.createdAt}</td>
+                            <td>{exercise.updatedAt}</td>
+                            <td><a href={exercise.link}>{exercise.link}</a></td>
+                            <td>{exercise.repetition}</td>
+                            <td>{exercise.duration}</td>
+                        </tr>
+                    ))}
                 </tbody>
             </Table>
 
@@ -109,14 +100,8 @@ export default function Overview() {
                 width: "50%",
                 textAlign: "center"
             }}>
-                <ExerciseConsumer>
-                    {exercises => {
-                        return (<>
-                            {exercises.length !== 0 || <Spinner animation="border" />}
-                            <MyPagination dataSize={exercises.length} currentPage={searchParams.page} changePage={setPage} />
-                        </>)
-                    }}
-                </ExerciseConsumer>
+                {exercises.length !== 0 || <Spinner animation="border" />}
+                <MyPagination dataSize={exercises.length} currentPage={searchParams.page} changePage={setPage} />
             </div>
         </>
     )

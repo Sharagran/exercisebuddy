@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 import { Outlet } from "react-router-dom";
 
-const { Provider, Consumer } = createContext();
+const ExerciseContext = createContext();
 
 function ExerciseProvider() {
     const [exercises, setExercises] = React.useState([]);
@@ -26,15 +26,14 @@ function ExerciseProvider() {
     
 
     return (
-        <Provider value={exercises}>
+        <ExerciseContext.Provider value={exercises}>
             <Outlet />
-        </Provider>
+        </ExerciseContext.Provider>
     )
 }
 
-
-
 export {
-    ExerciseProvider,
-    Consumer as ExerciseConsumer
+    ExerciseProvider
 };
+
+export default ExerciseContext;

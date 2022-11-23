@@ -12,11 +12,11 @@ import Spinner from 'react-bootstrap/Spinner';
 import Placeholder from 'react-bootstrap/Placeholder';
 import Button from 'react-bootstrap/Button';
 
-import { ExerciseConsumer } from '../components/ExerciseProvider';
+import ExerciseContext from '../components/ExerciseProvider';
 
 export default function Exercise() {
-
     let params = useParams();
+    const exercises = React.useContext(ExerciseContext);
     // const [exercise, setExercise] = useState({});
 
     function getExercise(exercises) {
@@ -72,57 +72,51 @@ export default function Exercise() {
         return content;
     }
 
-    return <ExerciseConsumer>
-        {exercises => {
-            // TODO: display error when loading failed: try catch in use effect with multiple returns?
-            if (exercises.length === 0) {
-                // display placeholder while loading
-                return (
-                    <>
-                        <h2><Placeholder xs={6} /></h2>
-                        <p><Placeholder xs={6} /></p>
+    if (exercises.length === 0) {
+        return (
+            <>
+                <h2><Placeholder xs={6} /></h2>
+                <p><Placeholder xs={6} /></p>
 
-                        <p>Difficulty: <Placeholder xs={1} /></p>
-                        <p>Equipment: <Placeholder xs={3} /></p>
-                        <p>Set: <Placeholder xs={1} /></p>
-                        <p>Repetition: <Placeholder xs={1} /></p>
-                        <p>Duration: <Placeholder xs={1} /></p>
-                        <p>Pause: <Placeholder xs={1} /></p>
+                <p>Difficulty: <Placeholder xs={1} /></p>
+                <p>Equipment: <Placeholder xs={3} /></p>
+                <p>Set: <Placeholder xs={1} /></p>
+                <p>Repetition: <Placeholder xs={1} /></p>
+                <p>Duration: <Placeholder xs={1} /></p>
+                <p>Pause: <Placeholder xs={1} /></p>
 
-                        <Placeholder.Button variant='primary' xs={1} />
-                        <Placeholder.Button variant='danger' xs={1} />
-                    </>
-                )
-            } else {
-                const exercise = getExercise(exercises);
-                return (<>
-                    {/* TODO: dynamic generate input fields for exercise data (from json schema)[input type text, number, etc.] */}
+                <Placeholder.Button variant='primary' xs={1} />
+                <Placeholder.Button variant='danger' xs={1} />
+            </>
+        )
+    } else {
+        const exercise = getExercise(exercises);
+        return (<>
+            {/* TODO: dynamic generate input fields for exercise data (from json schema)[input type text, number, etc.] */}
 
-                    <h2>{exercise.title} <a target="_blank" rel="noopener noreferrer" href={exercise.link}><Badge bg="secondary">open external</Badge></a></h2>
-                    <p>{exercise.description}</p>
-                    <img src={exercise.image} alt="" />
-                    {/* <video width="320" height="240" controls>
+            <h2>{exercise.title} <a target="_blank" rel="noopener noreferrer" href={exercise.link}><Badge bg="secondary">open external</Badge></a></h2>
+            <p>{exercise.description}</p>
+            <img src={exercise.image} alt="" />
+            {/* <video width="320" height="240" controls>
         <source src={exercise.video} type="video/mp4" />
         Your browser does not support the video tag.
     </video> */}
 
-                    {/* <Stickman /> */}
+            {/* <Stickman /> */}
 
-                    <p>Difficulty: {exercise.difficulty}</p>
-                    <p>Equipment: {exercise.equipment}</p>
-                    <p>Set: {exercise.set}</p>
-                    <p>Repetition: {exercise.repetition}</p>
-                    <p>Duration: {exercise.duration}</p>
-                    <p>Pause: {exercise.pause}</p>
-                    <p>Diagnoses: {exercise.diagnoses}</p>
+            <p>Difficulty: {exercise.difficulty}</p>
+            <p>Equipment: {exercise.equipment}</p>
+            <p>Set: {exercise.set}</p>
+            <p>Repetition: {exercise.repetition}</p>
+            <p>Duration: {exercise.duration}</p>
+            <p>Pause: {exercise.pause}</p>
+            <p>Diagnoses: {exercise.diagnoses}</p>
 
-                    <p>createdAt: {exercise.createdAt}</p>
-                    <p>updatedAt: {exercise.updatedAt}</p>
+            <p>createdAt: {exercise.createdAt}</p>
+            <p>updatedAt: {exercise.updatedAt}</p>
 
-                    <Button variant='primary' onClick={updateExercise}>Update</Button>
-                    <Button variant='danger' onClick={deleteExercise}>Delete</Button>
-                </>)
-            }
-        }}
-    </ExerciseConsumer>;
+            <Button variant='primary' onClick={updateExercise}>Update</Button>
+            <Button variant='danger' onClick={deleteExercise}>Delete</Button>
+        </>)
+    }
 }
