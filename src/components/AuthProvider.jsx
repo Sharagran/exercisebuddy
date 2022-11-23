@@ -7,7 +7,7 @@ import Login from "../pages/Login";
 
 
 
-const { Provider, Consumer } = createContext();
+const AuthContext = createContext();
 
 function AuthProvider({ children }) {
     const navigate = useNavigate();
@@ -36,16 +36,21 @@ function AuthProvider({ children }) {
         })
     }
 
-    async function signIn() {
-        const token = await requestLogin(null, null);
-        setToken(token);
+    async function signIn(email, password) {
+        console.log(email, password);
+        const token = await requestLogin(email, password);
+        //setToken(token); //FIXME: only one setToken call (see line 27)
 
         const origin = location.state?.from?.pathname || '/';
         navigate(origin);
+
+        // return login status
+        return true;
+        // return false;
     }
 
     function signOut() {
-        setToken(null);
+        // setToken(null);
         navigate("/");
     }
 
@@ -58,9 +63,9 @@ function AuthProvider({ children }) {
     }
 
     return (
-        <Provider value={contextValue}>
+        <AuthContext.Provider value={contextValue}>
             {children}
-        </Provider>
+        </AuthContext.Provider>
     )
 }
 
@@ -70,14 +75,14 @@ const ProtectedRoutes = () => {
     if (token) {
         return <Outlet />;
     } else {
-        return <Login setToken={setToken} />
+        return <Login />
     }
 };
 
 
 export {
     AuthProvider,
-    Consumer as AuthConsumer,
-
     ProtectedRoutes
 }
+
+export default AuthContext;

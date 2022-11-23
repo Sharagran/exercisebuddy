@@ -1,38 +1,39 @@
 import React from 'react'
 import { useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from 'axios';
 import toast from 'react-hot-toast';
 
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
+import AuthContext from '../components/AuthProvider';
 
-export default function Login({setToken}) {
+
+export default function Login() {
+  const Auth = React.useContext(AuthContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  
   function signIn(e) {
     e.preventDefault();
-
-    axios.post(`/login`, {
-      email: email,
-      password: password
-    }).then(res => {
-      setToken(res.data);
+    // TODO: return more than true or false (e.g. error message or error code)
+    const successful = Auth.signIn(email, password);
+    if (successful) {
       toast.success("Successfully logged in!");
       navigate("/");
-    }).catch(err => {
-      if(err.response.status === 401) {
-        toast.error("Username or password incorrect!");
-      } else {
-        toast.error("An error occured!");
-        console.error(err);
-      }
-    })
+    } else {
+      toast.error("Username or password incorrect!");
+      //     if (err.response.status === 401) {
+      //       toast.error("Username or password incorrect!");
+      //     } else {
+      //       toast.error("An error occured!");
+      //       console.error(err);
+      //     }
+    }
   }
 
   return (
