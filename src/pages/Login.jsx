@@ -11,28 +11,29 @@ import AuthContext from '../components/AuthProvider';
 
 
 export default function Login() {
-  const Auth = React.useContext(AuthContext);
+  const { token, signIn, signOut } = React.useContext(AuthContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
 
-  
-  function signIn(e) {
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    // TODO: return more than true or false (e.g. error message or error code)
-    const successful = Auth.signIn(email, password);
-    if (successful) {
+
+    const result = await signIn(email, password);
+
+    if (result.status >= 200 && result.status < 300) {
+      console.log("Successfully logged in!");
       toast.success("Successfully logged in!");
-      navigate("/");
-    } else {
+
+      // TODO: comment
+      window.location.reload();
+    } else if (result.status === 401) {
       toast.error("Username or password incorrect!");
-      //     if (err.response.status === 401) {
-      //       toast.error("Username or password incorrect!");
-      //     } else {
-      //       toast.error("An error occured!");
-      //       console.error(err);
-      //     }
+      console.log(result.statusText);
+    } else {
+      toast.error("Something went wrong!");
+      console.error(result.statusText);
     }
   }
 
@@ -47,7 +48,7 @@ export default function Login() {
         backgroundColor: '#eee'
       }}>
         <h1>Login</h1>
-        <Form onSubmit={signIn}>
+        <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3" controlId="formEmail">
             <Form.Label>Email</Form.Label>
             <Form.Control type="email" placeholder="Enter Email" value={email} onChange={e => setEmail(e.target.value)} />
@@ -57,10 +58,10 @@ export default function Login() {
             <Form.Label>Password</Form.Label>
             <Form.Control type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
           </Form.Group>
-          <Button variant="primary" type="submit">
-            Sign in
-          </Button>
+          <Button variant="primary" type="submit">Sign in</Button>
         </Form>
+        {/* FIXME: debug only */}
+        <Button onClick={signOut}>Sign Out</Button>
       </div>
     </>
   )

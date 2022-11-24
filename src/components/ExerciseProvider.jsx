@@ -13,7 +13,7 @@ function ExerciseProvider() {
         console.log('fetching exercises');
         // axios.defaults.headers.common['Authorization'] = '69bf11e1';
         axios.get('/exercises').then(res => {
-            console.log(res.data); //FIXME: debug only
+            console.log(`fetched ${res.data.length} exercises`); //FIXME: debug only
             setExercises(res.data);
         }).catch(err => {
             console.log(err);
