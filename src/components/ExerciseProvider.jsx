@@ -20,13 +20,38 @@ function ExerciseProvider() {
         });
     }
 
+    function getExercise(id) {
+        return exercises.find(e => e._id === id);
+    }
+
+    function reloadExercise(id) {
+        console.log('reloading exercise');
+    }
+
+    function updateExercise(exercise) {
+        console.log('updating exercise');
+    }
+
+    function deleteExercise(id) {
+        console.log('deleting exercise');
+    }
+
     useEffect(() => {
         fetchExercises();
     }, [])
     
+    const contextValue = {
+        exercises,
+        getExercise,
+        reloadExercises: fetchExercises,
+        reloadExercise,
+
+        updateExercise,
+        deleteExercise
+    };
 
     return (
-        <ExerciseContext.Provider value={exercises}>
+        <ExerciseContext.Provider value={contextValue}>
             <Outlet />
         </ExerciseContext.Provider>
     )
