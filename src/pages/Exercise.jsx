@@ -1,18 +1,14 @@
-import React, { useState } from 'react'
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 import Badge from 'react-bootstrap/Badge';
-import Tab from 'react-bootstrap/Tab';
-import Tabs from 'react-bootstrap/Tabs';
-import Spinner from 'react-bootstrap/Spinner';
 import Placeholder from 'react-bootstrap/Placeholder';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
 import ExerciseContext from '../components/ExerciseProvider';
-import { useEffect } from 'react';
 
-const ExerciseAttributeList = [
+const exerciseAttributeList = [
     { label: 'Title' },
     { label: 'Description' },
     { label: 'Difficulty', type: 'number' },
@@ -22,40 +18,39 @@ const ExerciseAttributeList = [
     { label: 'Duration', type: 'number' },
     { label: 'Pause', type: 'number' },
     { label: 'Diagnoses' },
-    { label: 'createdAt', attrKey: 'createdAt' },
-    { label: 'updatedAt', attrKey: 'updatedAt' },
-]
+    { label: 'createdAt', attrKey: 'createdAt', type: 'text' },
+    { label: 'updatedAt', attrKey: 'updatedAt', type: 'text' },
+    { label: 'Link' },
+    { label: 'Image' },
+    { label: 'Video' },
+];
+
+function ExerciseAttribute({ label, attrKey = label.toLowerCase(), type = 'text', exercise, setExercise, editMode }) {
+    return (
+        <Form.Group className="mb-3" controlId={`form${label}`}>
+            <Form.Label>{label}</Form.Label>
+            <Form.Control disabled={!editMode} type={type} value={exercise[attrKey]} onChange={e => {
+                setExercise({
+                    ...exercise,
+                    [attrKey]: e.target.value
+                });
+
+            }} />
+        </Form.Group>
+    );
+}
 
 export default function Exercise() {
-    let params = useParams();
-    const id = params.id;
+    const { id } = useParams();
     const { exercises, reloadExercise, getExercise, updateExercise, deleteExercise } = React.useContext(ExerciseContext);
     const [exercise, setExercise] = useState();
     const [editMode, setEditMode] = useState(true);
 
+
+
     useEffect(() => {
         setExercise(getExercise(id));
     }, [exercises]);
-
-    console.log(exercise.equipment);
-
-    function ExerciseAttribute({ label, attrKey = label.toLowerCase(), type = 'text' }) {
-        return (
-            <Form.Group className='mb-3' controlId={`form${label}`}>
-                <Form.Label>{label}</Form.Label>
-                <Form.Control isValid disabled={!editMode} type={type} value={exercise[attrKey]} onChange={(e) => {
-                    setExercise({
-                        ...exercise,
-                        [attrKey]: e.target.value
-                    });
-
-                }} />
-                {/* <Form.Text className="text-muted">
-                    Description
-                </Form.Text> */}
-            </Form.Group>
-        )
-    }
 
     function saveExercise() {
         updateExercise(exercise);
@@ -67,56 +62,25 @@ export default function Exercise() {
     if (exercise) {
         return (
             <Form>
-                {ExerciseAttributeList.map((attr, i) => <ExerciseAttribute key={i} {...attr} />)}
-                <Button variant='primary' onClick={updateExercise}>Update</Button>
-                <Button variant='danger' onClick={deleteExercise}>Delete</Button>
-                <Button variant='danger' onClick={reloadExercise}>Reload</Button>
+                {exerciseAttributeList.map((attr, i) => <ExerciseAttribute key={i} {...attr} exercise={exercise} setExercise={setExercise} editMode={editMode} />)}
+                <Button variant="primary" onClick={updateExercise}>Update</Button>
+                <Button variant="danger" onClick={deleteExercise}>Delete</Button>
+                <Button variant="danger" onClick={reloadExercise}>Reload</Button>
             </Form>
         )
-        return (<>
-            {/* TODO: dynamic generate input fields for exercise data (from json schema)[input type text, number, etc.] */}
-
-            <h2>{exercise.title} <a target="_blank" rel="noopener noreferrer" href={exercise.link}><Badge bg="secondary">open external</Badge></a></h2>
-            <p>{exercise.description}</p>
-            <img src={exercise.image} alt="" />
-            {/* <video width="320" height="240" controls>
-        <source src={exercise.video} type="video/mp4" />
-        Your browser does not support the video tag.
-    </video> */}
-
-            {/* <Stickman /> */}
-
-            <p>Difficulty: {exercise.difficulty}</p>
-            <p>Equipment: {exercise.equipment}</p>
-            <p>Set: {exercise.set}</p>
-            <p>Repetition: {exercise.repetition}</p>
-            <p>Duration: {exercise.duration}</p>
-            <p>Pause: {exercise.pause}</p>
-            <p>Diagnoses: {exercise.diagnoses}</p>
-
-            <p>createdAt: {exercise.createdAt}</p>
-            <p>updatedAt: {exercise.updatedAt}</p>
-
-            <Button variant='primary' onClick={updateExercise}>Update</Button>
-            <Button variant='danger' onClick={deleteExercise}>Delete</Button>
-            <Button variant='danger' onClick={reloadExercise}>Reload</Button>
-        </>)
     } else {
         return (
-            <>
-                <h2><Placeholder xs={6} /></h2>
-                <p><Placeholder xs={6} /></p>
+            <Form>
+                {/* TODO: optimise ExerciseAttribute to accept Placeholders as value for component reusability */}
+                {exerciseAttributeList.map((attr, i) => <Form.Group className="mb-3" key={i}>
+                    <Form.Label>{attr.label}</Form.Label>
+                    <Placeholder xs={1} as={Form.Control} animation='wave' bg="secondary" disabled />
+                </Form.Group>)}
 
-                <p>Difficulty: <Placeholder xs={1} /></p>
-                <p>Equipment: <Placeholder xs={3} /></p>
-                <p>Set: <Placeholder xs={1} /></p>
-                <p>Repetition: <Placeholder xs={1} /></p>
-                <p>Duration: <Placeholder xs={1} /></p>
-                <p>Pause: <Placeholder xs={1} /></p>
-
-                <Placeholder.Button variant='primary' xs={1} />
-                <Placeholder.Button variant='danger' xs={1} />
-            </>
+                <Placeholder.Button variant="primary" xs={1} />
+                <Placeholder.Button variant="danger" xs={1} />
+                <Placeholder.Button variant="danger" xs={1} />
+            </Form>
         )
     }
 }

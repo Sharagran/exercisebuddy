@@ -1,10 +1,11 @@
+import React from 'react';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './styles/main.css'
+import './styles/main.css';
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
-import { useEffect, useState } from 'react';
 
 import Login from './pages/Login';
 import Overview from './pages/Overview';
@@ -43,7 +44,6 @@ function App() {
       </BrowserRouter>
     </>
   );
-
 }
 
 export default App;
