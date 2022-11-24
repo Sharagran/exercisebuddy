@@ -6,7 +6,6 @@ import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 
-import useToken from './components/useToken';
 import Login from './pages/Login';
 import Overview from './pages/Overview';
 import Exercise from './pages/Exercise';
@@ -15,8 +14,6 @@ import { AuthProvider, ProtectedRoutes } from './components/AuthProvider';
 import { ExerciseProvider } from './components/ExerciseProvider';
 
 function App() {
-  const { token, setToken } = useToken();
-
   axios.defaults.baseURL = process.env.REACT_APP_EXERCISEBUDDY_API_URL;
 
   return (
@@ -37,7 +34,7 @@ function App() {
             {/* Public Routes */}
             <Route>
               {/* FIXME: Dev only routes */}
-              <Route path="/login" element={<Login setToken={setToken} />} />
+              <Route path="/login" element={<Login />} />
               {/* TODO: implement page not found page */}
               <Route path="*" element={<h1>404</h1>} />
             </Route>

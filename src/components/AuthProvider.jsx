@@ -1,53 +1,46 @@
 import React, { createContext } from "react";
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import axios from 'axios';
 
 import useToken from './useToken';
 import Login from "../pages/Login";
 
 
-
-const { Provider, Consumer } = createContext();
+const AuthContext = createContext();
 
 function AuthProvider({ children }) {
-    const navigate = useNavigate();
-    const location = useLocation();
-
     const { token, setToken } = useToken();
 
-    if(token) {
-        // axios.defaults.headers.common = { 'Authorization': `Bearer ${token}` };
+    if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
 
-    function requestLogin(email, password) {
-        axios.post(`/login`, {
-            email: email,
-            password: password
-        }).then(res => {
-            setToken(res.data);
-            console.log("Successfully logged in!");
-            navigate("/");
-        }).catch(err => {
-            if (err.response.status === 401) {
-                console.info("Username or password incorrect!");
-            } else {
-                console.error(err);
-            }
-        })
-    }
-
-    async function signIn() {
-        const token = await requestLogin(null, null);
-        setToken(token);
-
-        const origin = location.state?.from?.pathname || '/';
-        navigate(origin);
+    async function signIn(email, password) {
+        return new Promise((resolve, reject) => {
+            axios.post(`/login`, {
+                email: email,
+                password: password
+            }).then(res => {
+                setToken(res.data);
+                resolve({
+                    status: res.status,
+                    statusText: res.statusText
+                });
+            }).catch(err => {
+                if (err.response) {
+                    resolve({
+                        status: err.response.status,
+                        statusText: err.response.statusText
+                    });
+                } else {
+                    reject(err);
+                }
+            })
+        });
     }
 
     function signOut() {
         setToken(null);
-        navigate("/");
     }
 
 
@@ -59,9 +52,9 @@ function AuthProvider({ children }) {
     }
 
     return (
-        <Provider value={contextValue}>
+        <AuthContext.Provider value={contextValue}>
             {children}
-        </Provider>
+        </AuthContext.Provider>
     )
 }
 
@@ -71,14 +64,14 @@ const ProtectedRoutes = () => {
     if (token) {
         return <Outlet />;
     } else {
-        return <Login setToken={setToken} />
+        return <Login />
     }
 };
 
 
 export {
     AuthProvider,
-    Consumer as AuthConsumer,
-
     ProtectedRoutes
 }
+
+export default AuthContext;
