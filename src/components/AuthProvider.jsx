@@ -58,7 +58,7 @@ function AuthProvider({ children }) {
     )
 }
 
-const ProtectedRoutes = () => {
+function ProtectedRoutes() {
     const { token, setToken } = useToken();
 
     if (token) {

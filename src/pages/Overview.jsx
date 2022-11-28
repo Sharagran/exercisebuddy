@@ -11,7 +11,7 @@ import ExerciseContext from '../components/ExerciseProvider';
 export default function Overview() {
     let navigate = useNavigate();
     let location = useLocation();
-    const exercises = React.useContext(ExerciseContext);
+    const { exercises } = React.useContext(ExerciseContext);
     const params = new URLSearchParams(location.search);
     const [searchParams, setSearchParams] = useState({
         page: Number(params.get('page')) || 1,
@@ -63,6 +63,7 @@ export default function Overview() {
             <h3>Search</h3>
             <Search search={search} />
 
+            <hr />
             <h3>Exercises</h3>
             <Table hover striped>
                 <thead>
