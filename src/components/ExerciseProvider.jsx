@@ -8,15 +8,20 @@ const ExerciseContext = createContext();
 
 function ExerciseProvider() {
     const [exercises, setExercises] = React.useState([]);
+    const [finishedLoading, setFinishedLoading] = React.useState(false);
 
     function fetchExercises() {
         console.log('fetching exercises');
-        axios.get('/exercises').then(res => {
-            console.log(res);
-            console.log(`fetched ${res.data.length} exercises`); //FIXME: debug only, toast notifications instead?
-            setExercises(res.data);
-        }).catch(err => {
-            console.log(err);
+        return new Promise((resolve, reject) => {
+            axios.get('/exercises').then(res => {
+                console.log(`fetched ${res.data.length} exercises`); //FIXME: debug only, toast notifications instead?
+                setExercises(res.data);
+                setFinishedLoading(true);
+                resolve(res.data);
+            }).catch(err => {
+                console.log(err);
+                reject(err);
+            });
         });
     }
 
@@ -26,10 +31,13 @@ function ExerciseProvider() {
 
     function reloadExercise(id) {
         console.log('reloading exercise');
-        axios.get(`/exercises/${id}`).then(res => {
-            // override old exercise with new one
-            setExercises(exercises.map(e => e._id === id ? res.data : e));
-        })
+        return new Promise((resolve, reject) => {
+            axios.get(`/exercises/${id}`).then(res => {
+                // override old exercise with new one
+                setExercises(exercises.map(e => e._id === id ? res.data : e));
+                resolve(res.data);
+            }).catch(reject);
+        });
     }
 
     function createExercise(exercise) {
@@ -66,6 +74,8 @@ function ExerciseProvider() {
 
     const contextValue = {
         exercises,
+        finishedLoading,
+
         getExercise,
         reloadExercises: fetchExercises,
         reloadExercise,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, createContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Row, Col, Form, Button, Placeholder } from 'react-bootstrap';
+import { Row, Col, Form, Button, Placeholder, Alert } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 
 import ExerciseContext from '../components/ExerciseProvider';
@@ -34,7 +34,7 @@ function ExerciseAttributePlaceholder({ label }) {
 export default function Exercise() {
     const { id } = useParams();
     const naivgate = useNavigate();
-    const { exercises, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise } = React.useContext(ExerciseContext);
+    const { finishedLoading, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise } = React.useContext(ExerciseContext);
     const [exercise, setExercise] = useState();
     const [editMode, setEditMode] = useState(false);
 
@@ -47,7 +47,7 @@ export default function Exercise() {
             setExercise(clearForm);
             setEditMode(true);
         }
-    }, [exercises]);
+    }, [finishedLoading]);
 
     function clearForm() {
         setExercise({
@@ -72,7 +72,7 @@ export default function Exercise() {
         // set created at and updated at
         exercise.createdAt = new Date();
         exercise.updatedAt = new Date();
-        console.log(exercise);
+        console.log(exercise); //FIXME: debug only, remove this
 
         toast.promise(createExercise(exercise), {
             loading: 'Creating exercise...',
@@ -135,98 +135,7 @@ export default function Exercise() {
         });
     }
 
-    if (exercise) {
-        // Display exercise
-        var FormAttributes = {
-            exercise,
-            setExercise,
-            editMode
-        };
-
-        return (
-            <Form onSubmit={id === "create" ? handleCreateButton : handleSaveButton }>
-                <FormContext.Provider value={FormAttributes}>
-                    <Row>
-                        <Col>
-                            <ExerciseAttribute label="Title" required />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <ExerciseAttribute label="Description" />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <ExerciseAttribute label="Difficulty" type="number" required />
-                        </Col>
-                        <Col>
-                            <ExerciseAttribute label="Set" type="number" required />
-                        </Col>
-                        <Col>
-                            <ExerciseAttribute label="Repetition" type="number" required />
-                        </Col>
-                        <Col>
-                            <ExerciseAttribute label="Duration" type="number" required />
-                        </Col>
-                        <Col>
-                            <ExerciseAttribute label="Pause" type="number" required />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <ExerciseAttribute label="Diagnoses" />
-                        </Col>
-                        <Col>
-                            <ExerciseAttribute label="Equipment" />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <ExerciseAttribute label="Link" />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            {/* <ExerciseAttribute label="Image" type='file' /> */}
-                            <Form.Group className="mb-3" controlId={`formImage`}>
-                                <Form.Label>Image</Form.Label>
-                                <Form.Control disabled={!editMode} type='file' onChange={e => {
-                                    console.log(e.target.files[0]);
-                                    setExercise({
-                                        ...exercise,
-                                        image: e.target.value
-                                    });
-                                }} />
-                            </Form.Group>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <ExerciseAttribute label="Video" />
-                        </Col>
-                    </Row>
-                </FormContext.Provider>
-
-                {id === 'create' ? <Button variant="primary" type="submit">Create</Button>
-                    :
-                    <>
-                        {editMode ?
-                            <>
-                                <Button variant="primary" type="submit" key="saveChangesButton">Save changes</Button>
-                                <Button variant="warning" onClick={handleDiscardButton} key="discardButton">Discard changes</Button>
-                            </>
-                            :
-                            <>
-                                <Button variant="primary" onClick={handleEditButton} key="editButton">Edit</Button>
-                                <Button variant="danger" onClick={handleDeleteButton} key="deleteButton">Delete</Button>
-                            </>
-                        }
-                    </>
-                }
-            </Form>
-        )
-    } else {
+    if (!finishedLoading) {
         // Placeholder during loading
         return (
             <Form>
@@ -287,4 +196,104 @@ export default function Exercise() {
         )
     }
 
+    if (!exercise) {
+        // Exercise not found
+        return (
+            <Alert variant="danger">
+                Exercise not found!
+            </Alert>
+        );
+    }
+
+
+    // Display exercise
+    var FormAttributes = {
+        exercise,
+        setExercise,
+        editMode
+    };
+
+    return (
+        <Form onSubmit={id === "create" ? handleCreateButton : handleSaveButton}>
+            <FormContext.Provider value={FormAttributes}>
+                <Row>
+                    <Col>
+                        <ExerciseAttribute label="Title" required />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <ExerciseAttribute label="Description" />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <ExerciseAttribute label="Difficulty" type="number" required />
+                    </Col>
+                    <Col>
+                        <ExerciseAttribute label="Set" type="number" required />
+                    </Col>
+                    <Col>
+                        <ExerciseAttribute label="Repetition" type="number" required />
+                    </Col>
+                    <Col>
+                        <ExerciseAttribute label="Duration" type="number" required />
+                    </Col>
+                    <Col>
+                        <ExerciseAttribute label="Pause" type="number" required />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <ExerciseAttribute label="Diagnoses" />
+                    </Col>
+                    <Col>
+                        <ExerciseAttribute label="Equipment" />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <ExerciseAttribute label="Link" />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        {/* <ExerciseAttribute label="Image" type='file' /> */}
+                        <Form.Group className="mb-3" controlId={`formImage`}>
+                            <Form.Label>Image</Form.Label>
+                            <Form.Control disabled={!editMode} type='file' onChange={e => {
+                                console.log(e.target.files[0]);
+                                setExercise({
+                                    ...exercise,
+                                    image: e.target.value
+                                });
+                            }} />
+                        </Form.Group>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <ExerciseAttribute label="Video" />
+                    </Col>
+                </Row>
+            </FormContext.Provider>
+
+            {id === 'create' ? <Button variant="primary" type="submit">Create</Button>
+                :
+                <>
+                    {editMode ?
+                        <>
+                            <Button variant="primary" type="submit" key="saveChangesButton">Save changes</Button>
+                            <Button variant="warning" onClick={handleDiscardButton} key="discardButton">Discard changes</Button>
+                        </>
+                        :
+                        <>
+                            <Button variant="primary" onClick={handleEditButton} key="editButton">Edit</Button>
+                            <Button variant="danger" onClick={handleDeleteButton} key="deleteButton">Delete</Button>
+                        </>
+                    }
+                </>
+            }
+        </Form>
+    )
 }
