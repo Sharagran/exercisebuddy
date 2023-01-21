@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import Table from 'react-bootstrap/Table';
 import Spinner from 'react-bootstrap/Spinner';
+import Button from 'react-bootstrap/Button';
 
 import MyPagination from '../components/MyPagination';
 import Search from '../components/Search';
@@ -65,6 +66,7 @@ export default function Overview() {
 
             <hr />
             <h3>Exercises</h3>
+            <Button onClick={() => {navigate('/exercise/create')}}>Create new exercise</Button>
             <Table hover striped>
                 <thead>
                     <tr>

@@ -7,13 +7,12 @@ import ExerciseContext from '../components/ExerciseProvider';
 
 const FormContext = createContext();
 
-function ExerciseAttribute({ label, attrKey = label.toLowerCase(), type = 'text' }) {
+function ExerciseAttribute({ label, attrKey = label.toLowerCase(), type = 'text', required = false }) {
     const { exercise, setExercise, editMode } = useContext(FormContext);
     return (
         <Form.Group className="mb-3" controlId={`form${label}`}>
             <Form.Label>{label}</Form.Label>
-            <Form.Control disabled={!editMode} type={type} value={exercise[attrKey]} onChange={e => {
-                // TODO: case for tpye === 'date' etc.
+            <Form.Control required={required} disabled={!editMode} type={type} value={exercise[attrKey]} onChange={e => {
                 setExercise({
                     ...exercise,
                     [attrKey]: type === 'number' ? Number(e.target.value) : e.target.value
@@ -35,31 +34,82 @@ function ExerciseAttributePlaceholder({ label }) {
 export default function Exercise() {
     const { id } = useParams();
     const naivgate = useNavigate();
-    const { exercises, reloadExercise, getExercise, updateExercise, deleteExercise } = React.useContext(ExerciseContext);
+    const { exercises, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise } = React.useContext(ExerciseContext);
     const [exercise, setExercise] = useState();
     const [editMode, setEditMode] = useState(false);
 
+    // TODO: split this into createExercise and editExercise to improve readability
+
     useEffect(() => {
         setExercise(getExercise(id));
-    }, [exercises]);
 
-    function handleEditButton() {
-        if (editMode) {
-            toast.promise(updateExercise(exercise), {
-                loading: 'Updating exercise...',
-                success: (res) => {
-                    reloadExercise(id);
-                    setEditMode(false);
-                    return 'Exercise updated!';
-                },
-                error: (err) => {
-                    console.error(err.response.data, err);
-                    return 'Failed to update exercise';
-                }
-            });
-        } else {
+        if (id === 'create') {
+            setExercise(clearForm);
             setEditMode(true);
         }
+    }, [exercises]);
+
+    function clearForm() {
+        setExercise({
+            title: '',
+            description: '',
+            difficulty: 0,
+            set: 0,
+            repetition: 0,
+            duration: 0,
+            pause: 0,
+            diagnoses: '',
+            equipment: '',
+            link: '',
+            image: '',
+            video: ''
+        });
+    }
+
+    function handleCreateButton(e) {
+        e.preventDefault();
+
+        // set created at and updated at
+        exercise.createdAt = new Date();
+        exercise.updatedAt = new Date();
+        console.log(exercise);
+
+        toast.promise(createExercise(exercise), {
+            loading: 'Creating exercise...',
+            success: (res) => {
+                setEditMode(false);
+                naivgate(`/exercise/${res.data._id}`);
+                return 'Exercise created!';
+            },
+            error: (err) => {
+                console.error(err.response.data, err);
+                return 'Failed to create exercise';
+            }
+        });
+    }
+
+    function handleSaveButton(e) {
+        e.preventDefault();
+
+        // update exercise updatedAt
+        exercise.updatedAt = new Date();
+
+        toast.promise(updateExercise(exercise), {
+            loading: 'Updating exercise...',
+            success: (res) => {
+                reloadExercise(id);
+                setEditMode(false);
+                return 'Exercise updated!';
+            },
+            error: (err) => {
+                console.error(err.response.data, err);
+                return 'Failed to update exercise';
+            }
+        });
+    }
+
+    function handleEditButton() {
+        setEditMode(true);
     }
 
     function handleDeleteButton() {
@@ -68,7 +118,7 @@ export default function Exercise() {
             success: (res) => {
                 naivgate('/');
                 return 'Exercise deleted!';
-                },
+            },
             error: (err) => {
                 console.error(err.response.data, err);
                 return 'Failed to delete exercise';
@@ -82,22 +132,23 @@ export default function Exercise() {
 
         toast('Changes discarded', {
             icon: '❕',
-          });
+        });
     }
 
     if (exercise) {
-        const FormAttributes = {
+        // Display exercise
+        var FormAttributes = {
             exercise,
             setExercise,
             editMode
         };
 
         return (
-            <Form>
+            <Form onSubmit={id === "create" ? handleCreateButton : handleSaveButton }>
                 <FormContext.Provider value={FormAttributes}>
                     <Row>
                         <Col>
-                            <ExerciseAttribute label="Title" />
+                            <ExerciseAttribute label="Title" required />
                         </Col>
                     </Row>
                     <Row>
@@ -107,19 +158,19 @@ export default function Exercise() {
                     </Row>
                     <Row>
                         <Col>
-                            <ExerciseAttribute label="Difficulty" type="number" />
+                            <ExerciseAttribute label="Difficulty" type="number" required />
                         </Col>
                         <Col>
-                            <ExerciseAttribute label="Set" type="number" />
+                            <ExerciseAttribute label="Set" type="number" required />
                         </Col>
                         <Col>
-                            <ExerciseAttribute label="Repetition" type="number" />
+                            <ExerciseAttribute label="Repetition" type="number" required />
                         </Col>
                         <Col>
-                            <ExerciseAttribute label="Duration" type="number" />
+                            <ExerciseAttribute label="Duration" type="number" required />
                         </Col>
                         <Col>
-                            <ExerciseAttribute label="Pause" type="number" />
+                            <ExerciseAttribute label="Pause" type="number" required />
                         </Col>
                     </Row>
                     <Row>
@@ -132,20 +183,22 @@ export default function Exercise() {
                     </Row>
                     <Row>
                         <Col>
-                            <ExerciseAttribute label="createdAt" attrKey="createdAt" />
-                        </Col>
-                        <Col>
-                            <ExerciseAttribute label="updatedAt" attrKey="updatedAt" />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
                             <ExerciseAttribute label="Link" />
                         </Col>
                     </Row>
                     <Row>
                         <Col>
-                            <ExerciseAttribute label="Image" />
+                            {/* <ExerciseAttribute label="Image" type='file' /> */}
+                            <Form.Group className="mb-3" controlId={`formImage`}>
+                                <Form.Label>Image</Form.Label>
+                                <Form.Control disabled={!editMode} type='file' onChange={e => {
+                                    console.log(e.target.files[0]);
+                                    setExercise({
+                                        ...exercise,
+                                        image: e.target.value
+                                    });
+                                }} />
+                            </Form.Group>
                         </Col>
                     </Row>
                     <Row>
@@ -155,11 +208,21 @@ export default function Exercise() {
                     </Row>
                 </FormContext.Provider>
 
-                <Button variant="primary" onClick={handleEditButton}>{editMode ? "Save changes" : "Edit"}</Button>
-                {editMode ?
-                    <Button variant="warning" onClick={handleDiscardButton}>Discard changes</Button>
+                {id === 'create' ? <Button variant="primary" type="submit">Create</Button>
                     :
-                    <Button variant="danger" onClick={handleDeleteButton}>Delete</Button>
+                    <>
+                        {editMode ?
+                            <>
+                                <Button variant="primary" type="submit" key="saveChangesButton">Save changes</Button>
+                                <Button variant="warning" onClick={handleDiscardButton} key="discardButton">Discard changes</Button>
+                            </>
+                            :
+                            <>
+                                <Button variant="primary" onClick={handleEditButton} key="editButton">Edit</Button>
+                                <Button variant="danger" onClick={handleDeleteButton} key="deleteButton">Delete</Button>
+                            </>
+                        }
+                    </>
                 }
             </Form>
         )
@@ -167,68 +230,61 @@ export default function Exercise() {
         // Placeholder during loading
         return (
             <Form>
-                    <Row>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="Title" />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="Description" />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="Difficulty" />
-                        </Col>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="Set" />
-                        </Col>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="Repetition" />
-                        </Col>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="Duration" />
-                        </Col>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="Pause" />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="Diagnoses" />
-                        </Col>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="Equipment" />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="createdAt" />
-                        </Col>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="updatedAt" />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="Link" />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="Image" />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <ExerciseAttributePlaceholder label="Video" />
-                        </Col>
-                    </Row>
+                <Row>
+                    <Col>
+                        <ExerciseAttributePlaceholder label="Title" />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <ExerciseAttributePlaceholder label="Description" />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <ExerciseAttributePlaceholder label="Difficulty" />
+                    </Col>
+                    <Col>
+                        <ExerciseAttributePlaceholder label="Set" />
+                    </Col>
+                    <Col>
+                        <ExerciseAttributePlaceholder label="Repetition" />
+                    </Col>
+                    <Col>
+                        <ExerciseAttributePlaceholder label="Duration" />
+                    </Col>
+                    <Col>
+                        <ExerciseAttributePlaceholder label="Pause" />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <ExerciseAttributePlaceholder label="Diagnoses" />
+                    </Col>
+                    <Col>
+                        <ExerciseAttributePlaceholder label="Equipment" />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <ExerciseAttributePlaceholder label="Link" />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <ExerciseAttributePlaceholder label="Image" />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <ExerciseAttributePlaceholder label="Video" />
+                    </Col>
+                </Row>
 
                 <Placeholder.Button variant="primary">Edit</Placeholder.Button>
                 <Placeholder.Button variant="danger">Delete</Placeholder.Button>
             </Form>
         )
     }
+
 }

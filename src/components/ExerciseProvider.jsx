@@ -12,6 +12,7 @@ function ExerciseProvider() {
     function fetchExercises() {
         console.log('fetching exercises');
         axios.get('/exercises').then(res => {
+            console.log(res);
             console.log(`fetched ${res.data.length} exercises`); //FIXME: debug only, toast notifications instead?
             setExercises(res.data);
         }).catch(err => {
@@ -29,6 +30,12 @@ function ExerciseProvider() {
             // override old exercise with new one
             setExercises(exercises.map(e => e._id === id ? res.data : e));
         })
+    }
+
+    function createExercise(exercise) {
+        return new Promise((resolve, reject) => {
+            axios.post('/exercises', exercise).then(resolve).catch(reject);
+        });
     }
 
     function updateExercise(exercise) {
@@ -63,6 +70,7 @@ function ExerciseProvider() {
         reloadExercises: fetchExercises,
         reloadExercise,
 
+        createExercise,
         updateExercise,
         deleteExercise
     };
