@@ -9,6 +9,8 @@ import MyPagination from '../components/MyPagination';
 import Search from '../components/Search';
 import ExerciseContext from '../components/ExerciseProvider';
 
+const PAGE_SIZE = 20;
+
 export default function Overview() {
     let navigate = useNavigate();
     let location = useLocation();
@@ -80,7 +82,7 @@ export default function Overview() {
                     </tr>
                 </thead>
                 <tbody>
-                    {exercises.slice((searchParams.page - 1) * 10, (searchParams.page - 1) * 10 + 10).map(exercise => (
+                    {exercises.slice((searchParams.page - 1) * PAGE_SIZE, (searchParams.page - 1) * PAGE_SIZE + PAGE_SIZE).map(exercise => (
                         <tr key={exercise._id} onClick={(args) => {
                             if (args.target.tagName !== 'A') {
                                 navigate(`/exercise/${exercise._id}`);
@@ -104,7 +106,7 @@ export default function Overview() {
                 textAlign: "center"
             }}>
                 {exercises.length !== 0 || <Spinner animation="border" />}
-                <MyPagination dataSize={exercises.length} currentPage={searchParams.page} changePage={setPage} />
+                <MyPagination dataSize={exercises.length} currentPage={searchParams.page} changePage={setPage} PAGE_SIZE={PAGE_SIZE} />
             </div>
         </>
     )
