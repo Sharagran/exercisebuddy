@@ -13,27 +13,38 @@ import DatePicker from './DateRangePickerWrapper';
 // controlId: fügt eine id allen relevanten child elementen hinzu (zB. Label, Input)
 
 export default function Search({ search }) {
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
 
     const [createdAt, setCreatedAt] = useState(new Date(), new Date());
     const [updatedAt, setUpdatedAt] = useState(new Date(), new Date());
+
     const [difficulty, setDifficulty] = useState(0);
     const [set, setSet] = useState(0);
     const [repetition, setRepetition] = useState(0);
     const [duration, setDuration] = useState(0);
     const [pause, setPause] = useState(0);
+
+    const [diagnoses, setDiagnoses] = useState([]);
     const [equipment, SetEquipment] = useState([]);
 
     function submit(e) {
         e.preventDefault();
 
         search({
+            title,
+            description,
+
             createdAt,
             updatedAt,
+
             difficulty,
             set,
             repetition,
             duration,
             pause,
+
+            diagnoses,
             equipment
         });
     }
@@ -42,7 +53,9 @@ export default function Search({ search }) {
         <div className='search'>
             <Form onSubmit={submit}>
                 <Form.Group className="mb-3" controlId="formTitle">
-                    <Form.Control type="search" placeholder="Enter Title" />
+                    <FloatingLabel label="Title">
+                        <Form.Control type="search" placeholder="Title" onChange={(e) => setTitle(e.target.value)} />
+                    </FloatingLabel>
                 </Form.Group>
 
                 {/* Advanced search */}
@@ -52,32 +65,41 @@ export default function Search({ search }) {
                     <Accordion.Body>
                         <Row>
                             <Col>
+                                <Form.Group className="mb-3" controlId="formDescription">
+                                    <FloatingLabel label="Description">
+                                        <Form.Control type="search" placeholder="Description" onChange={(e) => setDescription(e.target.value)} />
+                                    </FloatingLabel>
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
                                 <Form.Group className="mb-3" controlId="formCreated">
                                     <FloatingLabel label="Created At">
-                                         <DatePicker
+                                        <DatePicker
                                             initalStartDate={createdAt[0]}
                                             initalEndDate={createdAt[1]}
                                             refDate={setCreatedAt}
                                             includeTime={true}
-                                         >
+                                        >
                                             <Form.Control type="text" placeholder="Created At" />
                                         </DatePicker>
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
                             <Col>
-                            <Form.Group className="mb-3" controlId="formUpdated">
+                                <Form.Group className="mb-3" controlId="formUpdated">
                                     <FloatingLabel label="Updated At">
-                                            <DatePicker
-                                                initalStartDate={updatedAt[0]}
-                                                initalEndDate={updatedAt[1]}
-                                                refDate={setUpdatedAt}
-                                                includeTime={true}
-                                            >
-                                                <Form.Control type="text" placeholder="Updated At" />
-                                            </DatePicker>
+                                        <DatePicker
+                                            initalStartDate={updatedAt[0]}
+                                            initalEndDate={updatedAt[1]}
+                                            refDate={setUpdatedAt}
+                                            includeTime={true}
+                                        >
+                                            <Form.Control type="text" placeholder="Updated At" />
+                                        </DatePicker>
                                     </FloatingLabel>
-                            </Form.Group>
+                                </Form.Group>
                             </Col>
                         </Row>
                         {/* TODO: limit number ranges */}
@@ -120,6 +142,13 @@ export default function Search({ search }) {
                         </Row>
                         {/* Find a system to add multiple items to array (tag list from CloudNein?) */}
                         <Row>
+                            <Col>
+                                <Form.Group className="mb-3" controlId="formDiagnoses">
+                                    <FloatingLabel label="Diagnoses">
+                                        <Form.Control type="text" placeholder="Diagnoses" onChange={(e) => setDiagnoses(e.target.value)} />
+                                    </FloatingLabel>
+                                </Form.Group>
+                            </Col>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formEquipment">
                                     <FloatingLabel label="Equipment">
