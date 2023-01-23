@@ -12,26 +12,28 @@ import DatePicker from './DateRangePickerWrapper';
 
 // controlId: fügt eine id allen relevanten child elementen hinzu (zB. Label, Input)
 
-export default function Search({ search }) {
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
+export default function Search({ searchFunction, searchParams }) {
+    const [title, setTitle] = useState(searchParams.title);
+    const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
+    const [description, setDescription] = useState(searchParams.description);
 
-    const [createdAt, setCreatedAt] = useState(new Date(), new Date());
-    const [updatedAt, setUpdatedAt] = useState(new Date(), new Date());
+    const [createdAt, setCreatedAt] = useState(searchParams.createdAt);
+    const [updatedAt, setUpdatedAt] = useState(searchParams.updatedAt);
 
-    const [difficulty, setDifficulty] = useState(0);
-    const [set, setSet] = useState(0);
-    const [repetition, setRepetition] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [pause, setPause] = useState(0);
+    const [difficulty, setDifficulty] = useState(searchParams.difficulty);
+    const [set, setSet] = useState(searchParams.set);
+    const [repetition, setRepetition] = useState(searchParams.repetition);
+    const [duration, setDuration] = useState(searchParams.duration);
+    const [pause, setPause] = useState(searchParams.pause);
 
-    const [diagnoses, setDiagnoses] = useState([]);
-    const [equipment, SetEquipment] = useState([]);
+    const [diagnoses, setDiagnoses] = useState(searchParams.diagnoses);
+    const [equipment, SetEquipment] = useState(searchParams.equipment);
 
     function submit(e) {
         e.preventDefault();
 
-        search({
+        // remove search query from url and do live search instead
+        searchFunction({
             title,
             description,
 
@@ -49,25 +51,45 @@ export default function Search({ search }) {
         });
     }
 
+    function clear() {
+        setTitle('');
+        setDescription('');
+
+        setCreatedAt((new Date(), new Date()));
+        setUpdatedAt((new Date(), new Date()));
+
+        setDifficulty(0);
+        setSet(0);
+        setRepetition(0);
+        setDuration(0);
+        setPause(0);
+
+        setDiagnoses([]);
+        SetEquipment([]);
+    }
+
     return (
         <div className='search'>
             <Form onSubmit={submit}>
                 <Form.Group className="mb-3" controlId="formTitle">
                     <FloatingLabel label="Title">
-                        <Form.Control type="search" placeholder="Title" onChange={(e) => setTitle(e.target.value)} />
+                        <Form.Control type="search" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
                     </FloatingLabel>
                 </Form.Group>
 
                 {/* Advanced search */}
                 {/* TODO: datalist statt Select? https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist */}
-                <Accordion defaultActiveKey="0">
+                <Accordion defaultActiveKey="0" onClick={(e) => {
+                    var isExpended = e.target.classList.contains('collapsed');
+                    setUseAdvancedSearch(isExpended);
+                }}>
                     <Accordion.Header>Advanced search options</Accordion.Header>
                     <Accordion.Body>
                         <Row>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formDescription">
                                     <FloatingLabel label="Description">
-                                        <Form.Control type="search" placeholder="Description" onChange={(e) => setDescription(e.target.value)} />
+                                        <Form.Control type="search" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
@@ -107,35 +129,35 @@ export default function Search({ search }) {
                             <Col>
                                 <Form.Group className="mb-3" controlId="formDifficulty">
                                     <FloatingLabel label="Difficulty">
-                                        <Form.Control type="number" placeholder="Difficulty" onChange={(e) => setDifficulty(e.target.value)} />
+                                        <Form.Control type="number" placeholder="Difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formSet">
                                     <FloatingLabel label="Set">
-                                        <Form.Control type="number" placeholder="Set" onChange={(e) => setSet(e.target.value)} />
+                                        <Form.Control type="number" placeholder="Set" value={set} onChange={(e) => setSet(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formRepetition">
                                     <FloatingLabel label="Repetition">
-                                        <Form.Control type="number" placeholder="Repetition" onChange={(e) => setRepetition(e.target.value)} />
+                                        <Form.Control type="number" placeholder="Repetition" value={repetition} onChange={(e) => setRepetition(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formDuration">
                                     <FloatingLabel label="Duration">
-                                        <Form.Control type="number" placeholder="Duration" onChange={(e) => setDuration(e.target.value)} />
+                                        <Form.Control type="number" placeholder="Duration" value={duration} onChange={(e) => setDuration(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formPause">
                                     <FloatingLabel label="Pause">
-                                        <Form.Control type="number" placeholder="Pause" onChange={(e) => setPause(e.target.value)} />
+                                        <Form.Control type="number" placeholder="Pause" value={pause} onChange={(e) => setPause(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
@@ -145,14 +167,14 @@ export default function Search({ search }) {
                             <Col>
                                 <Form.Group className="mb-3" controlId="formDiagnoses">
                                     <FloatingLabel label="Diagnoses">
-                                        <Form.Control type="text" placeholder="Diagnoses" onChange={(e) => setDiagnoses(e.target.value)} />
+                                        <Form.Control type="text" placeholder="Diagnoses" value={diagnoses} onChange={(e) => setDiagnoses(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formEquipment">
                                     <FloatingLabel label="Equipment">
-                                        <Form.Control type="text" placeholder="Equipment" onChange={(e) => SetEquipment(e.target.value)} />
+                                        <Form.Control type="text" placeholder="Equipment" value={equipment} onChange={(e) => SetEquipment(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
@@ -161,6 +183,7 @@ export default function Search({ search }) {
                 </Accordion>
 
                 <Button variant="primary" type="submit">Search</Button>
+                <Button variant="secondary" onClick={clear}>Clear</Button>
             </Form>
         </div>
     )
