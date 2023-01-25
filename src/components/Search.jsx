@@ -9,31 +9,50 @@ import Accordion from 'react-bootstrap/Accordion';
 import { useState } from 'react';
 
 import DatePicker from './DateRangePickerWrapper';
+import { useEffect } from 'react';
 
-// controlId: fügt eine id allen relevanten child elementen hinzu (zB. Label, Input)
 
-export default function Search({ searchFunction, searchParams }) {
-    const [title, setTitle] = useState(searchParams.title);
+const defaultSearchParams = {
+    title: '',
+    description: '',
+
+    createdAt: (new Date(), new Date()),
+    updatedAt: (new Date(), new Date()),
+
+    difficulty: 0,
+    set: 0,
+    repetition: 0,
+    duration: 0,
+    pause: 0,
+
+    diagnoses: [],
+    equipment: []
+}
+
+export default function Search({ searchFunction }) {
+    const [title, setTitle] = useState(defaultSearchParams.title);
     const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
-    const [description, setDescription] = useState(searchParams.description);
+    const [description, setDescription] = useState(defaultSearchParams.description);
 
-    const [createdAt, setCreatedAt] = useState(searchParams.createdAt);
-    const [updatedAt, setUpdatedAt] = useState(searchParams.updatedAt);
+    const [createdAt, setCreatedAt] = useState(defaultSearchParams.createdAt);
+    const [updatedAt, setUpdatedAt] = useState(defaultSearchParams.updatedAt);
 
-    const [difficulty, setDifficulty] = useState(searchParams.difficulty);
-    const [set, setSet] = useState(searchParams.set);
-    const [repetition, setRepetition] = useState(searchParams.repetition);
-    const [duration, setDuration] = useState(searchParams.duration);
-    const [pause, setPause] = useState(searchParams.pause);
+    const [difficulty, setDifficulty] = useState(defaultSearchParams.difficulty);
+    const [set, setSet] = useState(defaultSearchParams.set);
+    const [repetition, setRepetition] = useState(defaultSearchParams.repetition);
+    const [duration, setDuration] = useState(defaultSearchParams.duration);
+    const [pause, setPause] = useState(defaultSearchParams.pause);
 
-    const [diagnoses, setDiagnoses] = useState(searchParams.diagnoses);
-    const [equipment, SetEquipment] = useState(searchParams.equipment);
+    const [diagnoses, setDiagnoses] = useState(defaultSearchParams.diagnoses);
+    const [equipment, SetEquipment] = useState(defaultSearchParams.equipment);
+    useEffect(() => {
+        loadLastSearch();
+    }, []);
 
     function submit(e) {
         e.preventDefault();
 
-        // remove search query from url and do live search instead
-        searchFunction({
+        var searchParams = {
             title,
             description,
 
@@ -48,29 +67,62 @@ export default function Search({ searchFunction, searchParams }) {
 
             diagnoses,
             equipment
-        });
+        };
+
+        searchFunction(searchParams);
+        saveLastSearch(searchParams);
+    }
+
+    function loadLastSearch() {
+        var lastSearch = JSON.parse(window.localStorage.getItem('searchParams'));
+
+        if (lastSearch) {
+            setTitle(lastSearch.title);
+            setDescription(lastSearch.description);
+
+            setCreatedAt(lastSearch.createdAt);
+            setUpdatedAt(lastSearch.updatedAt);
+
+            setDifficulty(lastSearch.difficulty);
+            setSet(lastSearch.set);
+            setRepetition(lastSearch.repetition);
+            setDuration(lastSearch.duration);
+            setPause(lastSearch.pause);
+
+            setDiagnoses(lastSearch.diagnoses);
+            SetEquipment(lastSearch.equipment);
+
+            searchFunction(lastSearch);
+        }
+    }
+
+    function saveLastSearch(lastSearch) {
+        window.localStorage.setItem('searchParams', JSON.stringify(lastSearch));
     }
 
     function clear() {
-        setTitle('');
-        setDescription('');
+        setTitle(defaultSearchParams.title);
+        setDescription(defaultSearchParams.description);
 
-        setCreatedAt((new Date(), new Date()));
-        setUpdatedAt((new Date(), new Date()));
+        setCreatedAt(defaultSearchParams.createdAt);
+        setUpdatedAt(defaultSearchParams.updatedAt);
 
-        setDifficulty(0);
-        setSet(0);
-        setRepetition(0);
-        setDuration(0);
-        setPause(0);
+        setDifficulty(defaultSearchParams.difficulty);
+        setSet(defaultSearchParams.set);
+        setRepetition(defaultSearchParams.repetition);
+        setDuration(defaultSearchParams.duration);
+        setPause(defaultSearchParams.pause);
 
-        setDiagnoses([]);
-        SetEquipment([]);
+        setDiagnoses(defaultSearchParams.diagnoses);
+        SetEquipment(defaultSearchParams.equipment);
+
+        window.localStorage.removeItem('searchParams');
     }
 
+    // controlId= fügt eine id allen relevanten child elementen hinzu (zB. Label, Input)
     return (
         <div className='search'>
-            <Form onSubmit={submit}>
+            <Form onSubmit={submit} onKeyUp={submit}>
                 <Form.Group className="mb-3" controlId="formTitle">
                     <FloatingLabel label="Title">
                         <Form.Control type="search" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />

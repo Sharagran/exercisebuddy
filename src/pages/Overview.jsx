@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import Table from 'react-bootstrap/Table';
 import Spinner from 'react-bootstrap/Spinner';
@@ -13,83 +13,25 @@ const PAGE_SIZE = 20;
 
 export default function Overview() {
     let navigate = useNavigate();
-    let location = useLocation();
     const { exercises, finishedLoading } = React.useContext(ExerciseContext);
     const [searchResult, setSearchResult] = useState(exercises);
-    const [searchParams, setSearchParams] = useState(getSearchParams());
-
-    function getSearchParams() {
-        var params = new URLSearchParams(location.search);
-        var searchParams = {
-            page: Number(params.get('page')) || 1,
-
-            title: params.get('title') || '',
-            description: params.get('description') || '',
-
-            createdAt: params.get('createdAt') || (new Date(), new Date()), // is tuple the right data type?
-            updatedAt: params.get('updatedAt') || (new Date(), new Date()),
-
-            difficulty: Number(params.get('difficulty')) || 0,
-            set: Number(params.get('set')) || 0,
-            repetition: Number(params.get('repetition')) || 0,
-            duration: Number(params.get('duration')) || 0,
-            pause: Number(params.get('pause')) || 0,
-
-            diagnoses: params.get('diagnoses') || [],
-            equipment: params.get('equipment') || []
-        }
-        return searchParams;
-    }
+    const [page, setPage] = useState(1);
 
     useEffect(() => {
         setSearchResult(exercises);
-    }, [finishedLoading])
-    
+    }, [finishedLoading, exercises])
 
-    useEffect(() => {
-        console.log("Overview: useEffect location.search");
-        setSearchParams(getSearchParams());
-    }, [location.search])
-
-    function setPage(page) {
-        // var newSearchParams = { ...searchParams, page };
-        // setSearchParams(newSearchParams);
-
-        // //FIXME: page swap in url history? (replace property)
-        // //TODO: delte url params if empty (custom hook for url params?)
-        // // remove empty properties from url
-        // var urlParams = { ...newSearchParams };
-        // for (const key in urlParams) {
-        //     if (urlParams[key] === "") {
-        //         delete urlParams[key];
-        //     }
-        // }
-
-        navigate(`/?${new URLSearchParams({ ...searchParams, page }, { replace: true })}`);
-    }
-
-    function search(params) {
-        // TODO: construct search query dynamically from params
-        // var newSearchParams = { page: searchParams.page, ...params };
-        // setSearchParams(newSearchParams);
-
-        // remove empty properties from url
-        // var urlParams = { ...newSearchParams };
-        // for (const key in urlParams) {
-        //     if (urlParams[key] === "") {
-        //         delete urlParams[key];
-        //     }
-        // }
-
+    // TODO: in search component auslagern
+    function search(searchParam) {
         // apply filter
         var filteredExercises = exercises.filter(exercise => {
             var matches = true;
-            for (const key in params) {
-                if (params[key] !== "") {
+            for (const key in searchParam) {
+                if (searchParam[key] !== "") {
                     if (key === "title") {
-                        matches = matches && exercise[key].toLowerCase().includes(params[key].toLowerCase());
+                        matches = matches && exercise[key].toLowerCase().includes(searchParam[key].toLowerCase());
                     } else if (key === "description") {
-                        matches = matches && exercise[key].toLowerCase().includes(params[key].toLowerCase());
+                        matches = matches && exercise[key].toLowerCase().includes(searchParam[key].toLowerCase());
                         // } else if (key === "createdAt") {
                         //     matches = matches && exercise[key] >= params[key][0] && exercise[key] <= params[key][1];
                         // } else if (key === "updatedAt") {
@@ -114,16 +56,77 @@ export default function Overview() {
             return matches;
         });
 
-        setSearchResult(filteredExercises);
+        // sort by best match
+        filteredExercises.sort((a, b) => {
+            var aMatches = 0;
+            var bMatches = 0;
+            for (const key in searchParam) {
+                if (searchParam[key] !== "") {
+                    if ([
+                        "title",
+                        "description"
+                    ].includes(key)) {
+                        var searchStringLower = searchParam[key].toLowerCase();
 
-        // search
-        navigate(`/?${new URLSearchParams({ page: searchParams.page, ...params })}`);
+                        // single words
+                        var words = searchStringLower.split(" ");
+                        for (var i = 0; i < words.length; i++) {
+                            if (a[key].toLowerCase().startsWith(words[i])) {
+                                aMatches += words.length - i;
+                            }
+                            if (a[key].toLowerCase().endsWith(words[i])) {
+                                aMatches += words.length - i;
+                            }
+                            if (b[key].toLowerCase().startsWith(words[i])) {
+                                bMatches += words.length - i;
+                            }
+                            if (b[key].toLowerCase().endsWith(words[i])) {
+                                bMatches += words.length - i;
+                            }
+                        }
+
+                        // whole string
+                        if (a[key].toLowerCase().startsWith(searchStringLower)) {
+                            aMatches++;
+                        }
+                        if (a[key].toLowerCase().endsWith(searchStringLower)) {
+                            aMatches++;
+                        }
+                        if (b[key].toLowerCase().startsWith(searchStringLower)) {
+                            bMatches++;
+                        }
+                        if (b[key].toLowerCase().endsWith(searchStringLower)) {
+                            bMatches++;
+                        }
+
+                        // calculate how much percent of the string is matched
+                        var aMatchPercent = 0;
+                        var bMatchPercent = 0;
+                        for (var i = 0; i < searchStringLower.length; i++) {
+                            if (a[key].toLowerCase().includes(searchStringLower[i])) {
+                                aMatchPercent++;
+                            }
+                            if (b[key].toLowerCase().includes(searchStringLower[i])) {
+                                bMatchPercent++;
+                            }
+                        }
+                        aMatchPercent = aMatchPercent / a[key].length;
+                        bMatchPercent = bMatchPercent / b[key].length;
+                        aMatches *= aMatchPercent;
+                        bMatches *= bMatchPercent;
+                    }
+                }
+            }
+            return bMatches - aMatches;
+        });
+
+        setSearchResult(filteredExercises);
     }
 
     return (
         <>
             <h3>Search</h3>
-            <Search searchFunction={search} searchParams={searchParams} setSearchParams={setSearchParams} />
+            <Search searchFunction={search} />
 
             <hr />
             <h3>Exercises</h3>
@@ -141,7 +144,7 @@ export default function Overview() {
                     </tr>
                 </thead>
                 <tbody>
-                    {searchResult.slice((searchParams.page - 1) * PAGE_SIZE, (searchParams.page - 1) * PAGE_SIZE + PAGE_SIZE).map(exercise => (
+                    {searchResult.slice((page - 1) * PAGE_SIZE, (page - 1) * PAGE_SIZE + PAGE_SIZE).map(exercise => (
                         <tr key={exercise._id} onClick={(args) => {
                             if (args.target.tagName !== 'A') {
                                 navigate(`/exercise/${exercise._id}`);
@@ -165,7 +168,7 @@ export default function Overview() {
                 textAlign: "center"
             }}>
                 {!finishedLoading && <Spinner animation="border" />}
-                <MyPagination dataSize={searchResult.length} currentPage={searchParams.page} changePage={setPage} PAGE_SIZE={PAGE_SIZE} />
+                <MyPagination dataSize={searchResult.length} currentPage={page} changePage={setPage} PAGE_SIZE={PAGE_SIZE} />
             </div>
         </>
     )
