@@ -1,15 +1,8 @@
-import React from 'react'
-
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
-import Accordion from 'react-bootstrap/Accordion';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react'
+import { Button, Form, Col, Row, FloatingLabel, Accordion } from 'react-bootstrap';
+import Fuse from 'fuse.js'
 
 import DatePicker from './DateRangePickerWrapper';
-import { useEffect } from 'react';
 
 
 const defaultSearchParams = {
@@ -28,8 +21,9 @@ const defaultSearchParams = {
     diagnoses: [],
     equipment: []
 }
+const ASC = 1, DESC = -1;
 
-export default function Search({ searchFunction }) {
+export default function Search({ exercises, setExerciseView }) {
     const [title, setTitle] = useState(defaultSearchParams.title);
     const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
     const [description, setDescription] = useState(defaultSearchParams.description);
@@ -45,9 +39,10 @@ export default function Search({ searchFunction }) {
 
     const [diagnoses, setDiagnoses] = useState(defaultSearchParams.diagnoses);
     const [equipment, SetEquipment] = useState(defaultSearchParams.equipment);
+
     useEffect(() => {
         loadLastSearch();
-    }, []);
+    }, [exercises]);
 
     function submit(e) {
         e.preventDefault();
@@ -69,8 +64,129 @@ export default function Search({ searchFunction }) {
             equipment
         };
 
-        searchFunction(searchParams);
+        search(searchParams);
         saveLastSearch(searchParams);
+    }
+
+    function search(searchParams) {
+        // apply filter
+        // var filteredExercises = exercises.filter(exercise => {
+        //     var matches = true;
+        //     for (const key in searchParam) {
+        //         if (searchParam[key] !== "") {
+        //             if (key === "title") {
+        //                 matches = matches && exercise[key].toLowerCase().includes(searchParam[key].toLowerCase());
+        //             } else if (key === "description") {
+        //                 matches = matches && exercise[key].toLowerCase().includes(searchParam[key].toLowerCase());
+        //                 // } else if (key === "createdAt") {
+        //                 //     matches = matches && exercise[key] >= params[key][0] && exercise[key] <= params[key][1];
+        //                 // } else if (key === "updatedAt") {
+        //                 //     matches = matches && exercise[key] >= params[key][0] && exercise[key] <= params[key][1];
+        //                 // } else if (key === "difficulty") {
+        //                 //     matches = matches && exercise[key] === params[key];
+        //                 // } else if (key === "set") {
+        //                 //     matches = matches && exercise[key] === params[key];
+        //                 // } else if (key === "repetition") {
+        //                 //     matches = matches && exercise[key] === params[key];
+        //                 // } else if (key === "duration") {
+        //                 //     matches = matches && exercise[key] === params[key];
+        //                 // } else if (key === "pause") {
+        //                 //     matches = matches && exercise[key] === params[key];
+        //                 // } else if (key === "diagnoses") {
+        //                 //     matches = matches && exercise[key].some(diagnosis => params[key].includes(diagnosis));
+        //                 // } else if (key === "equipment") {
+        //                 //     matches = matches && exercise[key].some(equipment => params[key].includes(equipment));
+        //             }
+        //         }
+        //     }
+        //     return matches;
+        // });
+
+        // search for title and description
+        // docs: https://fusejs.io/api/options.html
+        // https://fusejs.io/concepts/scoring-theory.html#scoring-theory
+        var fuse = new Fuse(exercises, {
+            keys: [
+                {
+                    name: 'title',
+                    weight: 0.3
+                },
+                {
+                    name: 'description',
+                    weight: 0.7
+                }
+            ],
+            shouldSort: false,
+            includeScore: true,
+            threshold: 0.6,
+
+            // includeMatches: true
+        });
+
+        // search for created at and updated at
+
+        var result = fuse.search(title);
+        // console.clear();
+        // console.log(result);
+
+        // sort
+        console.log(result[0]);
+        var searchFunction = generateSearchFunction('title');
+        console.log(searchFunction);
+        result.sort(searchFunction);
+        var filteredExercises = result.map(item => item.item);
+
+        // FIXME: display all exercises if no search params are set
+        // TODO: combine title and description search in one search field
+        setExerciseView(filteredExercises);
+    }
+
+    function sortByScore(a, b) {
+        if (a.score < b.score) {
+            return -1;
+        } else if (a.score > b.score) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Generates a search function for the given key.
+     * @param {string} key The key to sort by.
+     * @param {boolean} ascending Whether to sort ascending or descending (default: true / ascending).
+     * @returns {function} The search function.
+     * @example
+     * var searchFunction = generateSearchFunction('title');
+     * var result = exercises.sort(searchFunction);
+     * console.log(result);
+     * // [
+     * //     { title: 'A', description: 'A' },
+     * //     { title: 'B', description: 'B' },
+     * //     { title: 'C', description: 'C' }
+     * // ]
+     * @example
+     * var searchFunction = generateSearchFunction('title', false);
+     * var result = exercises.sort(searchFunction);
+     * console.log(result);
+     * // [
+     * //     { title: 'C', description: 'C' },
+     * //     { title: 'B', description: 'B' },
+     * //     { title: 'A', description: 'A' }
+     * // ]
+     */
+    function generateSearchFunction(key, ascending = true) {
+        const lessThanA = ascending ? -1 : 1;
+        const greaterThanA = ascending ? 1 : -1;
+        return function(a, b) {
+            if (a.item[key] < b.item[key]) {
+                return lessThanA;
+            } else if (a.item[key] > b.item[key]) {
+                return greaterThanA;
+            } else {
+                return sortByScore(a, b);
+            }
+        }
     }
 
     function loadLastSearch() {
@@ -92,7 +208,7 @@ export default function Search({ searchFunction }) {
             setDiagnoses(lastSearch.diagnoses);
             SetEquipment(lastSearch.equipment);
 
-            searchFunction(lastSearch);
+            search(lastSearch);
         }
     }
 
