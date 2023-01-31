@@ -37,11 +37,19 @@ export default function Exercise() {
     const { finishedLoading, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise } = React.useContext(ExerciseContext);
     const [exercise, setExercise] = useState();
     const [editMode, setEditMode] = useState(false);
+    const [notFound, setNotFound] = useState(false);
 
     // TODO: split this into createExercise and editExercise to improve readability
 
     useEffect(() => {
-        setExercise(getExercise(id));
+        var exercise = getExercise(id);
+        if (exercise) {
+            setExercise(exercise);
+            setNotFound(false);
+        } else {
+            console.log('Exercise not found');
+            setNotFound(true);
+        }
 
         if (id === 'create') {
             setExercise(clearForm);
@@ -135,7 +143,7 @@ export default function Exercise() {
         });
     }
 
-    if (!finishedLoading) {
+    if (!finishedLoading || !exercise) {
         // Placeholder during loading
         return (
             <Form>
@@ -196,7 +204,7 @@ export default function Exercise() {
         )
     }
 
-    if (!exercise) {
+    if (notFound) {
         // Exercise not found
         return (
             <Alert variant="danger">
@@ -204,7 +212,6 @@ export default function Exercise() {
             </Alert>
         );
     }
-
 
     // Display exercise
     var FormAttributes = {
