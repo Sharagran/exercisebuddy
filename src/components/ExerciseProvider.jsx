@@ -41,6 +41,13 @@ function ExerciseProvider() {
     }
 
     function createExercise(exercise) {
+        // remove empty strings from exercise to prevent validation errors on server
+        Object.keys(exercise).forEach(key => {
+            if (exercise[key] === '') {
+                delete exercise[key];
+            }
+        });
+
         return new Promise((resolve, reject) => {
             axios.post('/exercises', exercise).then(resolve).catch(reject);
         });
