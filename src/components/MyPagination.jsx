@@ -1,16 +1,14 @@
 import React from 'react'
-import { useState } from 'react';
 import { useEffect } from 'react';
 import Pagination from 'react-bootstrap/Pagination';
 
-export default function MyPagination({ dataSize, currentPage, changePage, PAGE_SIZE }) {
-    const [page, setPage] = useState(currentPage);
+export default function MyPagination({ dataSize, currentPage: page, setPage, PAGE_SIZE }) {
 
     const pageCount = Math.ceil(dataSize / PAGE_SIZE);
 
     useEffect(() => {
         var params = new URLSearchParams(window.location.search);
-        setPage(Number(params.get('page')) || currentPage);
+        setPage(Number(params.get('currentPage')) || page);
     }, [window.location.search])
 
     function renderPaginationItems() {
@@ -24,23 +22,23 @@ export default function MyPagination({ dataSize, currentPage, changePage, PAGE_S
     function renderReducedPageItems() {
         return (
             <>
-                <Pagination.First disabled={page === 1} onClick={() => changePage(1)} />
-                <Pagination.Prev disabled={page === 1} onClick={() => changePage(page - 1)} />
-                {page > 3 && <Pagination.Item onClick={() => changePage(1)}>{1}</Pagination.Item>}
+                <Pagination.First disabled={page === 1} onClick={() => setPage(1)} />
+                <Pagination.Prev disabled={page === 1} onClick={() => setPage(page - 1)} />
+                {page > 3 && <Pagination.Item onClick={() => setPage(1)}>{1}</Pagination.Item>}
                 {page > 4 && <Pagination.Ellipsis disabled />}
 
 
-                {page > 2 && <Pagination.Item onClick={() => changePage(page - 2)}>{page - 2}</Pagination.Item>}
-                {page > 1 && <Pagination.Item onClick={() => changePage(page - 1)}>{page - 1}</Pagination.Item>}
+                {page > 2 && <Pagination.Item onClick={() => setPage(page - 2)}>{page - 2}</Pagination.Item>}
+                {page > 1 && <Pagination.Item onClick={() => setPage(page - 1)}>{page - 1}</Pagination.Item>}
                 <Pagination.Item active>{page}</Pagination.Item>
-                {page < pageCount && <Pagination.Item onClick={() => changePage(page + 1)}>{page + 1}</Pagination.Item>}
-                {page < pageCount - 1 && <Pagination.Item onClick={() => changePage(page + 2)}>{page + 2}</Pagination.Item>}
+                {page < pageCount && <Pagination.Item onClick={() => setPage(page + 1)}>{page + 1}</Pagination.Item>}
+                {page < pageCount - 1 && <Pagination.Item onClick={() => setPage(page + 2)}>{page + 2}</Pagination.Item>}
 
                 {page < pageCount - 3 && <Pagination.Ellipsis disabled />}
-                {page < pageCount - 2 && <Pagination.Item onClick={() => changePage(pageCount)}>{pageCount}</Pagination.Item>}
+                {page < pageCount - 2 && <Pagination.Item onClick={() => setPage(pageCount)}>{pageCount}</Pagination.Item>}
 
-                <Pagination.Next disabled={page === pageCount} onClick={() => changePage(page + 1)} />
-                <Pagination.Last disabled={page === pageCount} onClick={() => changePage(pageCount)} />
+                <Pagination.Next disabled={page === pageCount} onClick={() => setPage(page + 1)} />
+                <Pagination.Last disabled={page === pageCount} onClick={() => setPage(pageCount)} />
             </>
         )
     }
@@ -49,7 +47,7 @@ export default function MyPagination({ dataSize, currentPage, changePage, PAGE_S
         return (
             <>
                 {[...Array(pageCount)].map((_, i) => (
-                    <Pagination.Item active={i === page - 1} key={i} onClick={() => changePage(i + 1)}>{i + 1}</Pagination.Item>
+                    <Pagination.Item active={i === page - 1} key={i} onClick={() => setPage(i + 1)}>{i + 1}</Pagination.Item>
                 ))}
             </>
         )
