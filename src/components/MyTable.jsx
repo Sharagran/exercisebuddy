@@ -1,0 +1,61 @@
+import React from 'react'
+import { Table } from 'react-bootstrap';
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+export default function MyTable({ data, tableKeys, page, itemsPerPage, onClick, sortOptions }) {
+
+  function displaySortIcon(key) {
+    if (sortOptions.sortKey === key) {
+      return sortOptions.sortAsc ? <i className="bi bi-sort-up"></i> : <i className="bi bi-sort-down"></i>;
+    }
+    return null;
+  }
+
+  function handleSort(key) {
+    // FIXME: remove debug logs
+    if (sortOptions.sortKey === key) {
+      console.log(key, !sortOptions.sortAsc ? "Ascending" : "Descending");
+      sortOptions.setSortAsc(!sortOptions.sortAsc);
+    } else {
+      console.log(key, "Ascending");
+      sortOptions.setSortKey(key);
+      sortOptions.setSortAsc(true);
+    }
+  }
+
+  function getPageExercises() {
+    return data.slice((page - 1) * itemsPerPage, (page - 1) * itemsPerPage + itemsPerPage);
+  }
+
+  return (
+    <Table hover striped>
+      <thead>
+        <tr>
+          <th>#</th>
+          {tableKeys.map(key => (
+            <th key={key}
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                handleSort(key);
+              }}>{capitalizeFirstLetter(key)} {displaySortIcon(key)}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {getPageExercises().map(exercise => (
+          <tr id={exercise._id} key={exercise._id} onClick={onClick}>
+            {/* TODO: fix match index & sort by match index */}
+            {/* {console.log(exercise)} */}
+            <td>{exercise.matchIndex}</td>
+            {tableKeys.map(key => (
+              <td key={key}>{exercise[key]}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  )
+}

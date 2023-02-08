@@ -9,8 +9,9 @@ const defaultSearchParams = {
     title: '',
     description: '',
 
-    createdAt: (new Date(), new Date()),
-    updatedAt: (new Date(), new Date()),
+    // date is last compile date?
+    createdAt: [new Date(), new Date()],
+    updatedAt: [new Date(), new Date()],
 
     difficulty: 0,
     set: 0,
@@ -19,11 +20,20 @@ const defaultSearchParams = {
     pause: 0,
 
     diagnoses: [],
-    equipment: []
-}
-const ASC = 1, DESC = -1;
+    equipment: [],
 
-export default function Search({ exercises, setExerciseView }) {
+    isDefault(params) {
+        return Object.keys(params).every(key => {
+            if (Array.isArray(params[key])) {
+                // ignore createdAt, updatedAt, diagnoses and equipment
+                return true;
+            }
+            return params[key] === defaultSearchParams[key];
+        });
+    }
+}
+
+export default function Search({ exercises, setExerciseView, sortOptions }) {
     const [title, setTitle] = useState(defaultSearchParams.title);
     const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
     const [description, setDescription] = useState(defaultSearchParams.description);
@@ -40,14 +50,8 @@ export default function Search({ exercises, setExerciseView }) {
     const [diagnoses, setDiagnoses] = useState(defaultSearchParams.diagnoses);
     const [equipment, SetEquipment] = useState(defaultSearchParams.equipment);
 
-    useEffect(() => {
-        loadLastSearch();
-    }, [exercises]);
-
-    function submit(e) {
-        e.preventDefault();
-
-        var searchParams = {
+    function getSearchParams() {
+        return {
             title,
             description,
 
@@ -63,39 +67,69 @@ export default function Search({ exercises, setExerciseView }) {
             diagnoses,
             equipment
         };
+    }
+
+    useEffect(() => {
+        loadLastSearch();
+    }, [exercises]);
+
+    useEffect(() => {
+        search(getSearchParams());
+    }, [sortOptions.sortKey, sortOptions.sortAsc]);
+
+    function submit(e) {
+        e.preventDefault();
+
+        var searchParams = getSearchParams();
 
         search(searchParams);
         saveLastSearch(searchParams);
     }
 
+    function sort(exercises) { //FIXME: sort funktioniert erst nach zweitem klick
+        console.log(exercises[0]);
+        console.log(sortOptions);
+        var sortFunction = generateSortFunction(sortOptions.sortKey, sortOptions.sortAsc);
+        return exercises.sort(sortFunction);
+    }
+
     function search(searchParams) {
-        // apply filter
+        // check if default search parameters are set
+        if (defaultSearchParams.isDefault(searchParams)) {
+            // display all exercises
+            var sortedExercises = sort(exercises);
+            setExerciseView(sortedExercises);
+            return sortedExercises;
+        }
+
+
+        // search for created at and updated at
         // var filteredExercises = exercises.filter(exercise => {
         //     var matches = true;
-        //     for (const key in searchParam) {
-        //         if (searchParam[key] !== "") {
+        //     for (const key in searchParams) {
+        //         if (searchParams[key] !== "") {
         //             if (key === "title") {
-        //                 matches = matches && exercise[key].toLowerCase().includes(searchParam[key].toLowerCase());
+        //                 matches = matches && exercise[key].toLowerCase().includes(searchParams[key].toLowerCase());
         //             } else if (key === "description") {
-        //                 matches = matches && exercise[key].toLowerCase().includes(searchParam[key].toLowerCase());
-        //                 // } else if (key === "createdAt") {
-        //                 //     matches = matches && exercise[key] >= params[key][0] && exercise[key] <= params[key][1];
-        //                 // } else if (key === "updatedAt") {
-        //                 //     matches = matches && exercise[key] >= params[key][0] && exercise[key] <= params[key][1];
-        //                 // } else if (key === "difficulty") {
-        //                 //     matches = matches && exercise[key] === params[key];
-        //                 // } else if (key === "set") {
-        //                 //     matches = matches && exercise[key] === params[key];
-        //                 // } else if (key === "repetition") {
-        //                 //     matches = matches && exercise[key] === params[key];
-        //                 // } else if (key === "duration") {
-        //                 //     matches = matches && exercise[key] === params[key];
-        //                 // } else if (key === "pause") {
-        //                 //     matches = matches && exercise[key] === params[key];
-        //                 // } else if (key === "diagnoses") {
-        //                 //     matches = matches && exercise[key].some(diagnosis => params[key].includes(diagnosis));
-        //                 // } else if (key === "equipment") {
-        //                 //     matches = matches && exercise[key].some(equipment => params[key].includes(equipment));
+        //                 matches = matches && exercise[key].toLowerCase().includes(searchParams[key].toLowerCase());
+        //                 } else if (key === "createdAt") {
+        //                     matches = matches && exercise[key] >= searchParams[key][0] && exercise[key] <= searchParams[key][1];
+        //                 } else if (key === "updatedAt") {
+        //                     matches = matches && exercise[key] >= searchParams[key][0] && exercise[key] <= searchParams[key][1];
+        //                 } else if (key === "difficulty") {
+        //                     matches = matches && exercise[key] === searchParams[key];
+        //                 } else if (key === "set") {
+        //                     matches = matches && exercise[key] === searchParams[key];
+        //                 } else if (key === "repetition") {
+        //                     matches = matches && exercise[key] === searchParams[key];
+        //                 } else if (key === "duration") {
+        //                     matches = matches && exercise[key] === searchParams[key];
+        //                 } else if (key === "pause") {
+        //                     matches = matches && exercise[key] === searchParams[key];
+        //                 } else if (key === "diagnoses") {
+        //                     matches = matches && exercise[key].some(diagnosis => searchParams[key].includes(diagnosis));
+        //                 } else if (key === "equipment") {
+        //                     matches = matches && exercise[key].some(equipment => searchParams[key].includes(equipment));
         //             }
         //         }
         //     }
@@ -109,36 +143,46 @@ export default function Search({ exercises, setExerciseView }) {
             keys: [
                 {
                     name: 'title',
-                    weight: 0.3
+                    weight: 0.7
                 },
                 {
                     name: 'description',
-                    weight: 0.7
+                    weight: 0.3
                 }
             ],
             shouldSort: false,
             includeScore: true,
-            threshold: 0.6,
+            threshold: 0.3,
 
             // includeMatches: true
         });
 
-        // search for created at and updated at
-
+        // TODO: combine title and description search in one search field
         var result = fuse.search(title);
         // console.clear();
         // console.log(result);
 
-        // sort
-        console.log(result[0]);
-        var searchFunction = generateSearchFunction('title');
-        console.log(searchFunction);
-        result.sort(searchFunction);
-        var filteredExercises = result.map(item => item.item);
+        // apply best match index
+        // FIXME: wrong index
+        var i = 0;
+        result = result.map(item => {;
+            item.matchIndex = i;
+            i++;
+            return item;
+        });
 
-        // FIXME: display all exercises if no search params are set
-        // TODO: combine title and description search in one search field
+        result = sort(result);
+
+        // FIXME: return raw result & later address exercise (result.item)
+        var filteredExercises = result.map(item => {
+            var exerciseWithMatchIndex = item.item;
+            exerciseWithMatchIndex.matchIndex = item.matchIndex;
+            return exerciseWithMatchIndex;
+        });
+
+
         setExerciseView(filteredExercises);
+        return filteredExercises;
     }
 
     function sortByScore(a, b) {
@@ -175,13 +219,13 @@ export default function Search({ exercises, setExerciseView }) {
      * //     { title: 'A', description: 'A' }
      * // ]
      */
-    function generateSearchFunction(key, ascending = true) {
+    function generateSortFunction(key, ascending = true) {
         const lessThanA = ascending ? -1 : 1;
         const greaterThanA = ascending ? 1 : -1;
-        return function(a, b) {
-            if (a.item[key] < b.item[key]) {
+        return function (a, b) {
+            if (a[key] < b[key]) {
                 return lessThanA;
-            } else if (a.item[key] > b.item[key]) {
+            } else if (a[key] > b[key]) {
                 return greaterThanA;
             } else {
                 return sortByScore(a, b);
@@ -238,6 +282,7 @@ export default function Search({ exercises, setExerciseView }) {
     // controlId= fügt eine id allen relevanten child elementen hinzu (zB. Label, Input)
     return (
         <div className='search'>
+            <h3>Search</h3>
             <Form onSubmit={submit} onKeyUp={submit}>
                 <Form.Group className="mb-3" controlId="formTitle">
                     <FloatingLabel label="Title">
@@ -254,10 +299,11 @@ export default function Search({ exercises, setExerciseView }) {
                     <Accordion.Header>Advanced search options</Accordion.Header>
                     <Accordion.Body>
                         <Row>
+                            {/* TODO: remove this (combining title & description into fuzzy search) */}
                             <Col>
                                 <Form.Group className="mb-3" controlId="formDescription">
                                     <FloatingLabel label="Description">
-                                        <Form.Control type="search" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+                                        <Form.Control type="search" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} disabled/>
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
