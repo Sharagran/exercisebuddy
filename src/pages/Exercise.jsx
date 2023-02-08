@@ -54,6 +54,7 @@ export default function Exercise() {
         if (id === 'create') {
             setExercise(clearForm);
             setEditMode(true);
+            setNotFound(false);
         }
     }, [finishedLoading]);
 
