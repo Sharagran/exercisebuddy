@@ -21,7 +21,7 @@ function AuthProvider({ children }) {
                 email: email,
                 password: password
             }).then(res => {
-                setToken(res.data);
+                setToken(res.data.token);
                 resolve({
                     status: res.status,
                     statusText: res.statusText
