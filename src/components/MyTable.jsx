@@ -26,7 +26,7 @@ export default function MyTable({ data, tableKeys, page, itemsPerPage, onClick, 
     }
   }
 
-  function getPageExercises() {
+  function getPageResults() {
     return data.slice((page - 1) * itemsPerPage, (page - 1) * itemsPerPage + itemsPerPage);
   }
 
@@ -45,16 +45,17 @@ export default function MyTable({ data, tableKeys, page, itemsPerPage, onClick, 
         </tr>
       </thead>
       <tbody>
-        {getPageExercises().map(exercise => (
-          <tr id={exercise._id} key={exercise._id} onClick={onClick}>
+        {getPageResults().map(result => {
+          let exercise = result.item;
+          return (<tr id={exercise._id} key={exercise._id} onClick={onClick}>
             {/* TODO: fix match index & sort by match index */}
             {/* {console.log(exercise)} */}
-            <td>{exercise.matchIndex}</td>
+            <td>{result.matchIndex}</td>
             {tableKeys.map(key => (
               <td key={key}>{exercise[key]}</td>
             ))}
-          </tr>
-        ))}
+          </tr>)
+        })}
       </tbody>
     </Table>
   )

@@ -150,7 +150,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                     weight: 0.3
                 }
             ],
-            shouldSort: false,
+            shouldSort: true,
             includeScore: true,
             threshold: 0.3,
 
@@ -163,7 +163,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         // console.log(result);
 
         // apply best match index
-        // FIXME: wrong index
         var i = 0;
         result = result.map(item => {;
             item.matchIndex = i;
@@ -181,6 +180,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         });
 
 
+        filteredExercises = result;
         setExerciseView(filteredExercises);
         return filteredExercises;
     }

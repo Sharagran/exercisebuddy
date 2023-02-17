@@ -21,8 +21,19 @@ export default function Overview() {
     const [sortAsc, setSortAsc] = useState(true);
 
     useEffect(() => {
-        setExerciseView(exercises);
+        setExerciseView(exercisesToViewData(exercises));
     }, [finishedLoading])
+
+    function exercisesToViewData(exercises) {
+        return exercises.map((exercise, index) => {
+            return {
+                item: exercise,
+                matchIndex: index,
+                refIndex: index,
+                score: 1
+            }
+        })
+    }
 
 
     return (
