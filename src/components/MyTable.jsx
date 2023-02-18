@@ -30,31 +30,39 @@ export default function MyTable({ data, tableKeys, page, itemsPerPage, onClick, 
     return data.slice((page - 1) * itemsPerPage, (page - 1) * itemsPerPage + itemsPerPage);
   }
 
+  function TableHeader({ colName, label = capitalizeFirstLetter(colName) }) {
+    return (
+      <th
+        style={{ cursor: 'pointer', userSelect: 'none' }}
+        onClick={() => {
+          handleSort(colName);
+        }}>{label} {displaySortIcon(colName)}</th>
+    )
+  }
+
   return (
     <Table hover striped>
       <thead>
-        <tr>
-          <th>#</th>
+        <tr style={{
+          whiteSpace: 'nowrap',
+        }}>
+          <TableHeader key='matchIndex' colName='matchIndex' label='#' />
           {tableKeys.map(key => (
-            <th key={key}
-              style={{ cursor: 'pointer' }}
-              onClick={() => {
-                handleSort(key);
-              }}>{capitalizeFirstLetter(key)} {displaySortIcon(key)}</th>
+            <TableHeader key={key} colName={key} />
           ))}
         </tr>
       </thead>
       <tbody>
         {getPageResults().map(result => {
           let exercise = result.item;
-          return (<tr id={exercise._id} key={exercise._id} onClick={onClick}>
-            {/* TODO: fix match index & sort by match index */}
-            {/* {console.log(exercise)} */}
-            <td>{result.matchIndex}</td>
-            {tableKeys.map(key => (
-              <td key={key}>{exercise[key]}</td>
-            ))}
-          </tr>)
+          return (
+            <tr id={exercise._id} key={exercise._id} onClick={onClick}>
+              <td>{result.matchIndex}</td>
+              {tableKeys.map(key => (
+                <td key={key}>{exercise[key]}</td>
+              ))}
+            </tr>
+          )
         })}
       </tbody>
     </Table>

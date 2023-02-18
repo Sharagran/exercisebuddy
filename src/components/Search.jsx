@@ -96,6 +96,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     function search(searchParams) {
         // check if default search parameters are set
         if (defaultSearchParams.isDefault(searchParams)) {
+            console.log("default search");
             // display all exercises
             var sortedExercises = sort(exercises);
             setExerciseView(sortedExercises);
@@ -222,10 +223,23 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     function generateSortFunction(key, ascending = true) {
         const lessThanA = ascending ? -1 : 1;
         const greaterThanA = ascending ? 1 : -1;
+
+        if (key === 'matchIndex') {
+            return function (a, b) {
+                if (a.matchIndex < b.matchIndex) {
+                    return lessThanA;
+                } else if (a.matchIndex > b.matchIndex) {
+                    return greaterThanA;
+                } else {
+                    return 0;
+                }
+            }
+        }
+
         return function (a, b) {
-            if (a[key] < b[key]) {
+            if (a.item[key] < b.item[key]) {
                 return lessThanA;
-            } else if (a[key] > b[key]) {
+            } else if (a.item[key] > b.item[key]) {
                 return greaterThanA;
             } else {
                 return sortByScore(a, b);
