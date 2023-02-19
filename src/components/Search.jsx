@@ -86,21 +86,33 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         saveLastSearch(searchParams);
     }
 
-    function sort(exercises) { //FIXME: sort funktioniert erst nach zweitem klick
-        console.log(exercises[0]);
-        console.log(sortOptions);
+    function sort(exercises) {
+        // console.log(exercises[0]);
+        // console.log(sortOptions);
         var sortFunction = generateSortFunction(sortOptions.sortKey, sortOptions.sortAsc);
         return exercises.sort(sortFunction);
     }
 
     function search(searchParams) {
-        // check if default search parameters are set
+        // if default search parameters are set, display all exercises
         if (defaultSearchParams.isDefault(searchParams)) {
-            console.log("default search");
-            // display all exercises
-            var sortedExercises = sort(exercises);
-            setExerciseView(sortedExercises);
-            return sortedExercises;
+            if (exercises.length > 0 && exercises[0].hasOwnProperty('item')) {
+                var sortedExercises = sort(exercises);
+                setExerciseView(sortedExercises);
+                return sortedExercises;
+            } else {
+                var transformedExercises = exercises.map((exercise, index) => {
+                    return {
+                        item: exercise,
+                        matchIndex: index,
+                        refIndex: index,
+                        score: 1
+                    }
+                });
+                var sortedExercises = sort(transformedExercises);
+                setExerciseView(sortedExercises);
+                return sortedExercises;
+            }
         }
 
 
@@ -160,8 +172,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
 
         // TODO: combine title and description search in one search field
         var result = fuse.search(title);
-        // console.clear();
-        // console.log(result);
 
         // apply best match index
         var i = 0;
@@ -173,17 +183,8 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
 
         result = sort(result);
 
-        // FIXME: return raw result & later address exercise (result.item)
-        var filteredExercises = result.map(item => {
-            var exerciseWithMatchIndex = item.item;
-            exerciseWithMatchIndex.matchIndex = item.matchIndex;
-            return exerciseWithMatchIndex;
-        });
-
-
-        filteredExercises = result;
-        setExerciseView(filteredExercises);
-        return filteredExercises;
+        setExerciseView(result);
+        return result;
     }
 
     function sortByScore(a, b) {

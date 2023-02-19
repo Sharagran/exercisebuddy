@@ -17,10 +17,8 @@ export default function MyTable({ data, tableKeys, page, itemsPerPage, onClick, 
   function handleSort(key) {
     // FIXME: remove debug logs
     if (sortOptions.sortKey === key) {
-      console.log(key, !sortOptions.sortAsc ? "Ascending" : "Descending");
       sortOptions.setSortAsc(!sortOptions.sortAsc);
     } else {
-      console.log(key, "Ascending");
       sortOptions.setSortKey(key);
       sortOptions.setSortAsc(true);
     }
