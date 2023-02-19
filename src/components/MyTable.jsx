@@ -1,5 +1,6 @@
 import React from 'react'
 import { Table } from 'react-bootstrap';
+import moment from 'moment';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -38,6 +39,10 @@ export default function MyTable({ data, tableKeys, page, itemsPerPage, onClick, 
     )
   }
 
+  function formatDate(date) {
+    return moment(date).format('DD.MM.YYYY HH:mm');
+  }
+
   return (
     <Table hover striped>
       <thead>
@@ -56,9 +61,14 @@ export default function MyTable({ data, tableKeys, page, itemsPerPage, onClick, 
           return (
             <tr id={exercise._id} key={exercise._id} onClick={onClick}>
               <td>{result.matchIndex}</td>
-              {tableKeys.map(key => (
-                <td key={key}>{exercise[key]}</td>
-              ))}
+              {tableKeys.map(key => {
+                if (key === 'createdAt' || key === 'updatedAt') {
+                  return <td key={key}>{formatDate(exercise[key])}</td>;
+                } else {
+                  return <td key={key}>{exercise[key]}</td>;
+                }
+              }
+              )}
             </tr>
           )
         })}
