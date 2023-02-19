@@ -39,6 +39,20 @@ export default function DatePicker({ initalStartDate, initalEndDate, refDate, in
           'This Month': [moment().startOf('month'), moment().endOf('month')],
           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         },
+
+        locale: {
+          format: 'DD.MM.YYYY' + (includeTime ? ' HH:mm' : ''),
+          separator: ' - ',
+          applyLabel: 'Apply',
+          cancelLabel: 'Cancel',
+          fromLabel: 'From',
+          toLabel: 'To',
+          customRangeLabel: 'Custom',
+          weekLabel: 'W',
+          daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+          monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+          firstDay: 1
+        }
       }}>
       {children}
     </DateRangePicker>
