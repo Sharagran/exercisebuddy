@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Button, Form, Col, Row, FloatingLabel, Accordion } from 'react-bootstrap';
 import Fuse from 'fuse.js'
+import moment from 'moment';
 
 import DatePicker from './DateRangePickerWrapper';
 
@@ -117,42 +118,31 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
 
 
         // search for created at and updated at
-        // var filteredExercises = exercises.filter(exercise => {
-        //     var matches = true;
-        //     for (const key in searchParams) {
-        //         if (searchParams[key] !== "") {
-        //             if (key === "title") {
-        //                 matches = matches && exercise[key].toLowerCase().includes(searchParams[key].toLowerCase());
-        //             } else if (key === "description") {
-        //                 matches = matches && exercise[key].toLowerCase().includes(searchParams[key].toLowerCase());
-        //                 } else if (key === "createdAt") {
-        //                     matches = matches && exercise[key] >= searchParams[key][0] && exercise[key] <= searchParams[key][1];
-        //                 } else if (key === "updatedAt") {
-        //                     matches = matches && exercise[key] >= searchParams[key][0] && exercise[key] <= searchParams[key][1];
-        //                 } else if (key === "difficulty") {
-        //                     matches = matches && exercise[key] === searchParams[key];
-        //                 } else if (key === "set") {
-        //                     matches = matches && exercise[key] === searchParams[key];
-        //                 } else if (key === "repetition") {
-        //                     matches = matches && exercise[key] === searchParams[key];
-        //                 } else if (key === "duration") {
-        //                     matches = matches && exercise[key] === searchParams[key];
-        //                 } else if (key === "pause") {
-        //                     matches = matches && exercise[key] === searchParams[key];
-        //                 } else if (key === "diagnoses") {
-        //                     matches = matches && exercise[key].some(diagnosis => searchParams[key].includes(diagnosis));
-        //                 } else if (key === "equipment") {
-        //                     matches = matches && exercise[key].some(equipment => searchParams[key].includes(equipment));
-        //             }
-        //         }
-        //     }
-        //     return matches;
-        // });
+        var filteredExercises = exercises.filter(exercise => {
+            var matches = true;
+            for (const key in searchParams) {
+                if (searchParams[key] !== "") {
+                    console.log(key);
+                    if (key === "createdAt" || key === "updatedAt") {
+                            let exerciseDate = moment(exercise[key]);
+                            let searchStartDate = moment(searchParams[key][0]);
+                            let searchEndDate = moment(searchParams[key][1]);
+                            let isBetween = exerciseDate.isBetween(searchStartDate, searchEndDate, null, '[]');
+                            matches = matches && isBetween;
+                    } else if (key === "difficulty" || key === "set" || key === "repetition" || key === "duration" || key === "pause") {
+                        matches = matches && exercise[key] === searchParams[key];
+                    } else if (key === "diagnoses" || key === "equipment") {
+                        matches = matches && exercise[key].some(item => searchParams[key].includes(item));
+                    }
+                }
+            }
+            return matches;
+        });
 
         // search for title and description
         // docs: https://fusejs.io/api/options.html
         // https://fusejs.io/concepts/scoring-theory.html#scoring-theory
-        var fuse = new Fuse(exercises, {
+        var fuse = new Fuse(filteredExercises, {
             keys: [
                 {
                     name: 'title',

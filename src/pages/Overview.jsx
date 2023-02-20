@@ -27,32 +27,37 @@ export default function Overview() {
 
     return (
         <>
-            <Search exercises={exercises} setExerciseView={setViewData} sortOptions={{sortKey, sortAsc}} />
-            {/* TODO: display applied filter & reduction of search results */}
+            <Search exercises={exercises} setExerciseView={setViewData} sortOptions={{ sortKey, sortAsc }} />
             <span>Search parameters reduced result by {Math.abs(viewData.length - exercises.length)} exercises</span>
 
             <hr />
             <h3>Exercises</h3>
             <Button onClick={() => { navigate('/exercise/create') }}>Create new exercise</Button>
-            <MyTable data={viewData} tableKeys={['title', 'description', 'createdAt', 'updatedAt', 'link', 'repetition', 'duration']}
-            page={page} itemsPerPage={PAGE_SIZE} onClick={(args) => {
-                if (args.target.tagName !== 'A') {
-                    navigate(`/exercise/${args.target.parentElement.id}`);
-                }
-            }} sortOptions={
-                {
-                    sortKey,
-                    sortAsc,
-                    setSortKey,
-                    setSortAsc
-                }
-            } />
+            <MyTable data={viewData}
+                tableKeys={['title', 'description', 'createdAt', 'updatedAt', 'link', 'repetition', 'duration']}
+                page={page}
+                itemsPerPage={PAGE_SIZE}
+                onClick={(args) => {
+                    if (args.target.tagName !== 'A') {
+                        navigate(`/exercise/${args.target.parentElement.id}`);
+                    }
+                }}
+                sortOptions={
+                    {
+                        sortKey,
+                        sortAsc,
+                        setSortKey,
+                        setSortAsc
+                    }
+                } />
+
             <div style={{
                 margin: "auto",
                 width: "50%",
                 textAlign: "center"
             }}>
                 {!finishedLoading && <Spinner animation="border" />}
+
                 <MyPagination dataSize={viewData.length} currentPage={page} setPage={setPage} PAGE_SIZE={PAGE_SIZE} />
             </div>
         </>
