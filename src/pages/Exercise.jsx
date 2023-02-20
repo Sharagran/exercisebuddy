@@ -67,7 +67,7 @@ export default function Exercise() {
             repetition: 0,
             duration: 0,
             pause: 0,
-            diagnoses: '',
+            complaintsAreas: '',
             equipment: '',
             link: '',
             image: '',
@@ -177,7 +177,7 @@ export default function Exercise() {
                 </Row>
                 <Row>
                     <Col>
-                        <ExerciseAttributePlaceholder label="Diagnoses" />
+                        <ExerciseAttributePlaceholder label="Complaints Areas" />
                     </Col>
                     <Col>
                         <ExerciseAttributePlaceholder label="Equipment" />
@@ -253,7 +253,7 @@ export default function Exercise() {
                 </Row>
                 <Row>
                     <Col>
-                        <ExerciseAttribute label="Diagnoses" />
+                        <ExerciseAttribute label="Complaints Areas" attrKey="complaintsAreas" />
                     </Col>
                     <Col>
                         <ExerciseAttribute label="Equipment" />

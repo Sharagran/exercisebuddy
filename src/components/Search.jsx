@@ -20,13 +20,13 @@ const defaultSearchParams = {
     duration: 0,
     pause: 0,
 
-    diagnoses: [],
+    complaintsAreas: [],
     equipment: [],
 
     isDefault(params) {
         return Object.keys(params).every(key => {
             if (Array.isArray(params[key])) {
-                // ignore createdAt, updatedAt, diagnoses and equipment
+                // ignore createdAt, updatedAt, complaintsAreas and equipment
                 return true;
             }
             return params[key] === defaultSearchParams[key];
@@ -48,7 +48,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     const [duration, setDuration] = useState(defaultSearchParams.duration);
     const [pause, setPause] = useState(defaultSearchParams.pause);
 
-    const [diagnoses, setDiagnoses] = useState(defaultSearchParams.diagnoses);
+    const [complaintsAreas, setcomplaintsAreas] = useState(defaultSearchParams.complaintsAreas);
     const [equipment, SetEquipment] = useState(defaultSearchParams.equipment);
 
     function getSearchParams() {
@@ -65,7 +65,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
             duration,
             pause,
 
-            diagnoses,
+            complaintsAreas,
             equipment
         };
     }
@@ -122,7 +122,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
             var matches = true;
             for (const key in searchParams) {
                 if (searchParams[key] !== "") {
-                    console.log(key);
                     if (key === "createdAt" || key === "updatedAt") {
                             let exerciseDate = moment(exercise[key]);
                             let searchStartDate = moment(searchParams[key][0]);
@@ -131,7 +130,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                             matches = matches && isBetween;
                     } else if (key === "difficulty" || key === "set" || key === "repetition" || key === "duration" || key === "pause") {
                         matches = matches && exercise[key] === searchParams[key];
-                    } else if (key === "diagnoses" || key === "equipment") {
+                    } else if (key === "complaintsAreas" || key === "equipment") {
                         matches = matches && exercise[key].some(item => searchParams[key].includes(item));
                     }
                 }
@@ -254,7 +253,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
             setDuration(lastSearch.duration);
             setPause(lastSearch.pause);
 
-            setDiagnoses(lastSearch.diagnoses);
+            setcomplaintsAreas(lastSearch.complaintsAreas);
             SetEquipment(lastSearch.equipment);
 
             search(lastSearch);
@@ -278,7 +277,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         setDuration(defaultSearchParams.duration);
         setPause(defaultSearchParams.pause);
 
-        setDiagnoses(defaultSearchParams.diagnoses);
+        setcomplaintsAreas(defaultSearchParams.complaintsAreas);
         SetEquipment(defaultSearchParams.equipment);
 
         window.localStorage.removeItem('searchParams');
@@ -384,9 +383,9 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                         {/* Find a system to add multiple items to array (tag list from CloudNein?) */}
                         <Row>
                             <Col>
-                                <Form.Group className="mb-3" controlId="formDiagnoses">
-                                    <FloatingLabel label="Diagnoses">
-                                        <Form.Control type="text" placeholder="Diagnoses" value={diagnoses} onChange={(e) => setDiagnoses(e.target.value)} />
+                                <Form.Group className="mb-3" controlId="formcomplaintsAreas">
+                                    <FloatingLabel label="Complaints Areas">
+                                        <Form.Control type="text" placeholder="Complaints Areas" value={complaintsAreas} onChange={(e) => setcomplaintsAreas(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
