@@ -69,6 +69,13 @@ export default function ExerciseTable({ data, dataKeys, page, itemsPerPage, onCl
                   return <td key={key} className='text-center'>{value}</td>;
                 } else if (key === 'link') {
                   return <td key={key}><a href={value}>{value}</a></td>;
+                } else if (key === 'complaintsAreas' || key === 'equipment') {
+                  // return <td key={key}>{value.join(',')}</td>;
+                  return <td key={key}>{value.map(
+                    (item, index) => {
+                      return <><span key={index}>{item}</span> <br /></>
+                    }
+                  )}</td>;
                 } else {
                   return <td key={key}>{value}</td>;
                 }
