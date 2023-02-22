@@ -60,12 +60,16 @@ export default function MyTable({ data, tableKeys, page, itemsPerPage, onClick, 
           let exercise = result.item;
           return (
             <tr id={exercise._id} key={exercise._id} onClick={onClick}>
-              <td>{result.matchIndex}</td>
+              <td className='text-center'>{result.matchIndex}</td>
               {tableKeys.map(key => {
-                if (key === 'createdAt' || key === 'updatedAt') {
-                  return <td key={key}>{formatDate(exercise[key])}</td>;
+                var value = (key === 'createdAt' || key === 'updatedAt') ? formatDate(exercise[key]) : exercise[key];
+
+                if (typeof value === 'number' || key === 'createdAt' || key === 'updatedAt') {
+                  return <td key={key} className='text-center'>{value}</td>;
+                } else if (key === 'link') {
+                  return <td key={key}><a href={value}>{value}</a></td>;
                 } else {
-                  return <td key={key}>{exercise[key]}</td>;
+                  return <td key={key}>{value}</td>;
                 }
               }
               )}
