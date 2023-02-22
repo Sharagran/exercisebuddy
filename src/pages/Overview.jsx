@@ -6,7 +6,7 @@ import { Spinner, Button } from 'react-bootstrap';
 import MyPagination from '../components/MyPagination';
 import Search from '../components/Search';
 import ExerciseContext from '../components/ExerciseProvider';
-import MyTable from '../components/MyTable';
+import ExerciseTable from '../components/ExerciseTable';
 import ViewData from '../components/ViewData';
 
 
@@ -27,14 +27,16 @@ export default function Overview() {
 
     return (
         <>
-            <Search exercises={exercises} setExerciseView={setViewData} sortOptions={{ sortKey, sortAsc }} />
-            <span>Search parameters reduced result by {Math.abs(viewData.length - exercises.length)} exercises</span>
-
+            <div>
+                <Search exercises={exercises} setExerciseView={setViewData} sortOptions={{ sortKey, sortAsc }} />
+                <span>Search parameters reduced result by {Math.abs(viewData.length - exercises.length)} exercises</span>
+            </div>
             <hr />
             <h3>Exercises</h3>
             <Button onClick={() => { navigate('/exercise/create') }}>Create new exercise</Button>
-            <MyTable data={viewData}
-                tableKeys={['title', 'description', 'createdAt', 'updatedAt', 'link', 'difficulty', 'set', 'repetition']}
+            <ExerciseTable
+                data={viewData}
+                dataKeys={['title', 'description', 'createdAt', 'updatedAt', 'link', 'difficulty', 'set', 'repetition']}
                 page={page}
                 itemsPerPage={PAGE_SIZE}
                 onClick={(args) => {

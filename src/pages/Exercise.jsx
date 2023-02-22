@@ -42,6 +42,12 @@ export default function Exercise() {
     // TODO: split this into createExercise and editExercise to improve readability
 
     useEffect(() => {
+        if (id === 'create') {
+            clearForm();
+            setEditMode(true);
+            return;
+        }
+
         var exercise = getExercise(id);
         if (exercise) {
             setExercise(exercise);
@@ -49,12 +55,6 @@ export default function Exercise() {
         } else {
             console.log('Exercise not found');
             setNotFound(true);
-        }
-
-        if (id === 'create') {
-            setExercise(clearForm);
-            setEditMode(true);
-            setNotFound(false);
         }
     }, [finishedLoading]);
 
@@ -282,6 +282,12 @@ export default function Exercise() {
                 <Row>
                     <Col>
                         <ExerciseAttribute label="Video" />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                    {/* TODO: implement pose editor */}
+                        <div>Pose editor</div>
                     </Col>
                 </Row>
             </FormContext.Provider>

@@ -6,7 +6,7 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export default function MyTable({ data, tableKeys, page, itemsPerPage, onClick, sortOptions }) {
+export default function ExerciseTable({ data, dataKeys, page, itemsPerPage, onClick, sortOptions }) {
 
   function displaySortIcon(key) {
     if (sortOptions.sortKey === key) {
@@ -44,13 +44,14 @@ export default function MyTable({ data, tableKeys, page, itemsPerPage, onClick, 
   }
 
   return (
+    <div className='table-responsive'>
     <Table hover striped>
       <thead>
         <tr style={{
           whiteSpace: 'nowrap',
         }}>
           <TableHeader key='matchIndex' colName='matchIndex' label='#' />
-          {tableKeys.map(key => (
+          {dataKeys.map(key => (
             <TableHeader key={key} colName={key} />
           ))}
         </tr>
@@ -61,7 +62,7 @@ export default function MyTable({ data, tableKeys, page, itemsPerPage, onClick, 
           return (
             <tr id={exercise._id} key={exercise._id} onClick={onClick}>
               <td className='text-center'>{result.matchIndex}</td>
-              {tableKeys.map(key => {
+              {dataKeys.map(key => {
                 var value = (key === 'createdAt' || key === 'updatedAt') ? formatDate(exercise[key]) : exercise[key];
 
                 if (typeof value === 'number' || key === 'createdAt' || key === 'updatedAt') {
@@ -78,5 +79,6 @@ export default function MyTable({ data, tableKeys, page, itemsPerPage, onClick, 
         })}
       </tbody>
     </Table>
+    </div>
   )
 }
