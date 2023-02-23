@@ -41,7 +41,8 @@ export default function Overview() {
                 itemsPerPage={PAGE_SIZE}
                 onClick={(args) => {
                     if (args.target.tagName !== 'A') {
-                        navigate(`/exercise/${args.target.parentElement.id}`);
+                        let id = args.target.closest('tr').id;
+                        navigate(`/exercise/${id}`);
                     }
                 }}
                 sortOptions={

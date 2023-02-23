@@ -1,10 +1,14 @@
 import React from 'react'
+import moment from 'moment';
 
 import DateRangePicker from 'react-bootstrap-daterangepicker';
-import moment from 'moment';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 
 export default function DatePicker({ initalStartDate, initalEndDate, refDate, includeTime, children }) {
+
+  function getFormat() {
+    return 'DD.MM.YYYY' + (includeTime ? ' HH:mm' : '');
+  }
 
   function parseDateTime(date) {
     if (date === undefined) {
@@ -21,19 +25,31 @@ export default function DatePicker({ initalStartDate, initalEndDate, refDate, in
 
   return (
     <DateRangePicker
-      onCallback={(start, end) => {
-        console.log(parseDateTime(start), parseDateTime(end));
-        refDate([parseDateTime(start), parseDateTime(end)]);
+
+      onApply={(event, picker) => {
+        console.log(parseDateTime(picker.startDate), parseDateTime(picker.endDate));
+
+        picker.element.val(picker.startDate.format(getFormat()) + ' - ' + picker.endDate.format(getFormat()));
+        refDate([parseDateTime(picker.startDate), parseDateTime(picker.endDate)]);
       }}
+
+      onCancel={(event, picker) => {
+        picker.element.val('');
+        refDate([null, null]);
+      }}
+
       initialSettings={{
-        startDate: initalStartDate,
-        endDate: initalEndDate,
+        autoUpdateInput: false,
+
+        // startDate: initalStartDate,
+        // endDate: initalEndDate,
+        
         timePicker: includeTime,
         timePicker24Hour: includeTime,
 
         ranges: {
-          'Today': [moment(), moment()],
-          'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Today': [moment().startOf('day'), moment().endOf('day')],
+          'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').startOf('day')],
           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
           'This Month': [moment().startOf('month'), moment().endOf('month')],
@@ -41,10 +57,10 @@ export default function DatePicker({ initalStartDate, initalEndDate, refDate, in
         },
 
         locale: {
-          format: 'DD.MM.YYYY' + (includeTime ? ' HH:mm' : ''),
+          format: getFormat(),
           separator: ' - ',
           applyLabel: 'Apply',
-          cancelLabel: 'Cancel',
+          cancelLabel: 'Clear',
           fromLabel: 'From',
           toLabel: 'To',
           customRangeLabel: 'Custom',

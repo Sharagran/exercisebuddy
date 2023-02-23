@@ -6,6 +6,8 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+//TODO: pass function to this component, filter by clicked value
+// on 'a' click, open link, else filter by clicked value, (extra button to view exericse)
 export default function ExerciseTable({ data, dataKeys, page, itemsPerPage, onClick, sortOptions }) {
 
   function displaySortIcon(key) {
