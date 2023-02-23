@@ -17,14 +17,12 @@ const defaultSearchParams = {
     duration: '',
     pause: '',
 
-    complaintsAreas: [],
-    equipment: [],
+    complaintsAreas: '',
+    equipment: '',
 
     isDefault(key, value) {
         if (key === "createdAt" || key === "updatedAt") {
             return value[0] === defaultSearchParams[key][0] && value[1] === defaultSearchParams[key][1];
-        } else if (key === "complaintsAreas" || key === "equipment") {
-            return value.length === 0;
         } else {
             return value === defaultSearchParams[key];
         }
@@ -161,7 +159,8 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                 } else if (key === "duration" || key === "pause") {
 
                 } else if (key === "complaintsAreas" || key === "equipment") {
-                    matches = matches && exercise[key].some(item => searchParams[key].includes(item));
+                    matches = matches && exercise[key].includes(searchParams[key]);
+                    // matches = matches && exercise[key].some(item => searchParams[key].includes(item));
                 }
             }
 
@@ -420,7 +419,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                                     <FloatingLabel label="Complaints Areas">
                                         {/* <Form.Control type="text" placeholder="Complaints Areas" value={complaintsAreas} onChange={(e) => setcomplaintsAreas(e.target.value)} /> */}
                                         <Form.Select value={complaintsAreas} onChange={(e) => setcomplaintsAreas(e.target.value)}>
-                                            <option key='none' value=""></option>
+                                            <option value=""></option>
                                             {
                                                 complaintsAreasList.map((item, index) => {
                                                     return <option key={index} value={item}>{item}</option>
@@ -435,7 +434,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                                     <FloatingLabel label="Equipment">
                                         {/* <Form.Control type="text" placeholder="Equipment" value={equipment} onChange={(e) => SetEquipment(e.target.value)} /> */}
                                         <Form.Select value={equipment} onChange={(e) => SetEquipment(e.target.value)}>
-                                            <option key='none' value=""></option>
+                                            <option value=""></option>
                                             {
                                                 equipmentList.map((item, index) => {
                                                     return <option key={index} value={item}>{item}</option>
