@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Button, Form, Col, Row, FloatingLabel, Accordion } from 'react-bootstrap';
 import Fuse from 'fuse.js'
 import moment from 'moment';
 
 import DatePicker from './DateRangePickerWrapper';
+
+import { useLocation, useNavigate } from "react-router-dom";
 
 const defaultSearchParams = {
     title: '',
@@ -36,6 +38,7 @@ const defaultSearchParams = {
 }
 // TODO: fix default search params (unset search params & array searchs)
 export default function Search({ exercises, setExerciseView, sortOptions }) {
+    // search parameters
     const [title, setTitle] = useState(defaultSearchParams.title);
     const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
 
@@ -51,8 +54,19 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     const [complaintsAreas, setcomplaintsAreas] = useState(defaultSearchParams.complaintsAreas);
     const [equipment, SetEquipment] = useState(defaultSearchParams.equipment);
 
+    const [searchParams, setSearchParams] = useState(defaultSearchParams);
+
+    // lists for search parameters
     const [complaintsAreasList, setComplaintsAreasList] = useState([]);
     const [equipmentList, setEquipmentList] = useState([]);
+
+
+    const navigate = useNavigate();
+
+    function handleInputChange(e) {
+        const { name, value } = e.target;
+        setSearchParams({ ...searchParams, [name]: value });
+    }
 
     function getSearchParams() {
         return {
@@ -72,17 +86,26 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         };
     }
 
+    // TODO: save search parameters to history state     instead of using local storage
+    // get title from history state
+    // const { state } = useLocation();
+    // console.log(state);
+
     useEffect(() => {
         loadLastSearch();
-        getLists();
+        getSelectOptions();
     }, [exercises]);
 
     useEffect(() => {
         search(getSearchParams());
     }, [sortOptions.sortKey, sortOptions.sortAsc]);
 
+    useEffect(() => {
+        console.log("search params changed");
+        search(getSearchParams());
+    }, [title, createdAt, updatedAt, difficulty, set, repetition, duration, pause, complaintsAreas, equipment]);
 
-    function getLists() {
+    function getSelectOptions() {
         var complaintsAreas = [];
         var equipment = [];
         exercises.forEach(exercise => {
@@ -98,10 +121,19 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         setComplaintsAreasList(complaintsAreas);
         setEquipmentList(equipment);
     }
+
     function submit(e) {
         e.preventDefault();
 
+        // TODO: save search parameters to history state     instead of using local storage
+        // save search parameters to history state
+        // navigate("/", {
+        //     state: getSearchParams(),
+        //     replace: true
+        // });
+
         var searchParams = getSearchParams();
+        console.log(searchParams);
 
         search(searchParams);
         saveLastSearch(searchParams);
@@ -160,7 +192,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
 
                 } else if (key === "complaintsAreas" || key === "equipment") {
                     matches = matches && exercise[key].includes(searchParams[key]);
-                    // matches = matches && exercise[key].some(item => searchParams[key].includes(item));
                 }
             }
 
@@ -325,10 +356,12 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     return (
         <div className='search'>
             <h3>Search</h3>
-            <Form onSubmit={submit} onKeyUp={submit}>
+            {/* <Form onSubmit={submit} onKeyUp={submit} onClick={submit} onInput={submit} onChange={submit}> */}
+
+            <Form onSubmit={submit} onChange={submit}>
                 <Form.Group className="mb-3" controlId="formTitle">
                     <FloatingLabel label="Title">
-                        <Form.Control type="search" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                        <Form.Control name='title' type="search" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
                     </FloatingLabel>
                 </Form.Group>
 
@@ -345,12 +378,10 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                                 <Form.Group className="mb-3" controlId="formCreated">
                                     <FloatingLabel label="Created At">
                                         <DatePicker
-                                            initalStartDate={createdAt[0]}
-                                            initalEndDate={createdAt[1]}
-                                            refDate={setCreatedAt}
+                                            setDate={setCreatedAt}
                                             includeTime={true}
                                         >
-                                            <Form.Control type="text" placeholder="Created At" />
+                                            <Form.Control name='createdAt' type="text" placeholder="Created At" />
                                         </DatePicker>
                                     </FloatingLabel>
                                 </Form.Group>
@@ -359,12 +390,10 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                                 <Form.Group className="mb-3" controlId="formUpdated">
                                     <FloatingLabel label="Updated At">
                                         <DatePicker
-                                            initalStartDate={updatedAt[0]}
-                                            initalEndDate={updatedAt[1]}
-                                            refDate={setUpdatedAt}
+                                            setDate={setUpdatedAt}
                                             includeTime={true}
                                         >
-                                            <Form.Control type="text" placeholder="Updated At" />
+                                            <Form.Control name='updatedAt' type="text" placeholder="Updated At" />
                                         </DatePicker>
                                     </FloatingLabel>
                                 </Form.Group>
@@ -375,21 +404,21 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                             <Col>
                                 <Form.Group className="mb-3" controlId="formDifficulty">
                                     <FloatingLabel label="Difficulty">
-                                        <Form.Control type="number" placeholder="Difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} />
+                                        <Form.Control name='difficulty' type="number" placeholder="Difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formSet">
                                     <FloatingLabel label="Set">
-                                        <Form.Control type="number" placeholder="Set" value={set} onChange={(e) => setSet(e.target.value)} />
+                                        <Form.Control name='set' type="number" placeholder="Set" value={set} onChange={(e) => setSet(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formRepetition">
                                     <FloatingLabel label="Repetition">
-                                        <Form.Control type="number" placeholder="Repetition" value={repetition} onChange={(e) => setRepetition(e.target.value)} />
+                                        <Form.Control name='repetition' type="number" placeholder="Repetition" value={repetition} onChange={(e) => setRepetition(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
@@ -400,14 +429,14 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                                     </FloatingLabel> */}
                                     {/* https://stackoverflow.com/questions/65875721/ho-can-i-add-two-values-in-bootstrap-range-slider */}
                                     <Form.Label>Duration</Form.Label>
-                                    <Form.Range />
+                                    <Form.Range name='duration' />
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formPause">
                                     <FloatingLabel label="Pause">
                                         {/* TODO: remove this filter option */}
-                                        <Form.Control type="number" placeholder="Pause" value={pause} onChange={(e) => setPause(e.target.value)} />
+                                        <Form.Control name='pause' type="number" placeholder="Pause" value={pause} onChange={(e) => setPause(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
@@ -418,7 +447,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                                 <Form.Group className="mb-3" controlId="formcomplaintsAreas">
                                     <FloatingLabel label="Complaints Areas">
                                         {/* <Form.Control type="text" placeholder="Complaints Areas" value={complaintsAreas} onChange={(e) => setcomplaintsAreas(e.target.value)} /> */}
-                                        <Form.Select value={complaintsAreas} onChange={(e) => setcomplaintsAreas(e.target.value)}>
+                                        <Form.Select name='complaintsAreas' value={complaintsAreas} onChange={(e) => setcomplaintsAreas(e.target.value)}>
                                             <option value=""></option>
                                             {
                                                 complaintsAreasList.map((item, index) => {
@@ -433,7 +462,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                                 <Form.Group className="mb-3" controlId="formEquipment">
                                     <FloatingLabel label="Equipment">
                                         {/* <Form.Control type="text" placeholder="Equipment" value={equipment} onChange={(e) => SetEquipment(e.target.value)} /> */}
-                                        <Form.Select value={equipment} onChange={(e) => SetEquipment(e.target.value)}>
+                                        <Form.Select name='equipment' value={equipment} onChange={(e) => SetEquipment(e.target.value)}>
                                             <option value=""></option>
                                             {
                                                 equipmentList.map((item, index) => {
