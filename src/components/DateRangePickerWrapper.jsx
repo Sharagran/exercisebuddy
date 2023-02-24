@@ -4,7 +4,7 @@ import moment from 'moment';
 import DateRangePicker from 'react-bootstrap-daterangepicker';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 
-export default function DatePicker({ initalStartDate, initalEndDate, refDate, includeTime, children }) {
+export default function DatePicker({ setDate, includeTime, children }) {
 
   function getFormat() {
     return 'DD.MM.YYYY' + (includeTime ? ' HH:mm' : '');
@@ -30,12 +30,12 @@ export default function DatePicker({ initalStartDate, initalEndDate, refDate, in
         console.log(parseDateTime(picker.startDate), parseDateTime(picker.endDate));
 
         picker.element.val(picker.startDate.format(getFormat()) + ' - ' + picker.endDate.format(getFormat()));
-        refDate([parseDateTime(picker.startDate), parseDateTime(picker.endDate)]);
+        setDate([parseDateTime(picker.startDate), parseDateTime(picker.endDate)]);
       }}
 
       onCancel={(event, picker) => {
         picker.element.val('');
-        refDate([null, null]);
+        setDate([null, null]);
       }}
 
       initialSettings={{
@@ -49,9 +49,9 @@ export default function DatePicker({ initalStartDate, initalEndDate, refDate, in
 
         ranges: {
           'Today': [moment().startOf('day'), moment().endOf('day')],
-          'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').startOf('day')],
-          'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+          'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+          'Last 7 Days': [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')],
+          'Last 30 Days': [moment().subtract(29, 'days').startOf('day'), moment().endOf('day')],
           'This Month': [moment().startOf('month'), moment().endOf('month')],
           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         },
