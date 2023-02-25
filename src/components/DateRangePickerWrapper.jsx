@@ -4,7 +4,7 @@ import moment from 'moment';
 import DateRangePicker from 'react-bootstrap-daterangepicker';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 
-export default function DatePicker({ setDate, includeTime, children }) {
+export default function DatePicker({ setDate, setInputValue, includeTime, children }) {
 
   function getFormat() {
     return 'DD.MM.YYYY' + (includeTime ? ' HH:mm' : '');
@@ -29,20 +29,19 @@ export default function DatePicker({ setDate, includeTime, children }) {
       onApply={(event, picker) => {
         console.log(parseDateTime(picker.startDate), parseDateTime(picker.endDate));
 
-        picker.element.val(picker.startDate.format(getFormat()) + ' - ' + picker.endDate.format(getFormat()));
+        // picker.element.val(picker.startDate.format(getFormat()) + ' - ' + picker.endDate.format(getFormat()));
+        setInputValue(picker.startDate.format(getFormat()) + ' - ' + picker.endDate.format(getFormat()));
         setDate([parseDateTime(picker.startDate), parseDateTime(picker.endDate)]);
       }}
 
       onCancel={(event, picker) => {
-        picker.element.val('');
+        // picker.element.val('');
+        setInputValue('');
         setDate([null, null]);
       }}
 
       initialSettings={{
         autoUpdateInput: false,
-
-        // startDate: initalStartDate,
-        // endDate: initalEndDate,
         
         timePicker: includeTime,
         timePicker24Hour: includeTime,

@@ -45,6 +45,9 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     const [createdAt, setCreatedAt] = useState(defaultSearchParams.createdAt);
     const [updatedAt, setUpdatedAt] = useState(defaultSearchParams.updatedAt);
 
+    const [createdAtInput, setCreatedAtInput] = useState("");
+    const [updatedAtInput, setUpdatedAtInput] = useState("");
+
     const [difficulty, setDifficulty] = useState(defaultSearchParams.difficulty);
     const [set, setSet] = useState(defaultSearchParams.set);
     const [repetition, setRepetition] = useState(defaultSearchParams.repetition);
@@ -58,8 +61,11 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     const [complaintsAreasList, setComplaintsAreasList] = useState([]);
     const [equipmentList, setEquipmentList] = useState([]);
 
-
+    // other hooks
     const navigate = useNavigate();
+    const location = useLocation();
+
+
 
     function getSearchParams() {
         return {
@@ -79,23 +85,20 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         };
     }
 
-    // TODO: save search parameters to history state     instead of using local storage
-    // get title from history state
-    // const { state } = useLocation();
-    // console.log(state);
-
     useEffect(() => {
         loadLastSearch();
         getSelectOptions();
     }, [exercises]);
 
     useEffect(() => {
+        // TODO: save sort options to history state
         search(getSearchParams());
     }, [sortOptions.sortKey, sortOptions.sortAsc]);
 
     useEffect(() => {
-        console.log("search params changed");
-        search(getSearchParams());
+        let searchParams = getSearchParams();
+        search(searchParams);
+        saveLastSearch(searchParams);
     }, [title, createdAt, updatedAt, difficulty, set, repetition, duration, pause, complaintsAreas, equipment]);
 
     function getSelectOptions() {
@@ -118,13 +121,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     function submit(e) {
         e.preventDefault();
 
-        // TODO: save search parameters to history state     instead of using local storage
-        // save search parameters to history state
-        // navigate("/", {
-        //     state: getSearchParams(),
-        //     replace: true
-        // });
-
         var searchParams = getSearchParams();
         console.log(searchParams);
 
@@ -143,7 +139,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
 
         // if default search parameters are set, display all exercises
         if (defaultSearchParams.areDefault(searchParams)) {
-            console.log("default search params");
             if (exercises.length > 0 && exercises[0].hasOwnProperty('item')) {
                 var sortedExercises = sort(exercises);
                 setExerciseView(sortedExercises);
@@ -302,7 +297,8 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     }
 
     function loadLastSearch() {
-        var lastSearch = JSON.parse(window.localStorage.getItem('searchParams'));
+        var lastSearch = location.state;
+        console.log(lastSearch);
 
         if (lastSearch) {
             setTitle(lastSearch.title);
@@ -324,14 +320,20 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     }
 
     function saveLastSearch(lastSearch) {
-        window.localStorage.setItem('searchParams', JSON.stringify(lastSearch));
+        // save search parameters to history state
+        navigate("/", {
+            state: lastSearch,
+            replace: true
+        });
     }
 
     function clear() {
         setTitle(defaultSearchParams.title);
 
         setCreatedAt(defaultSearchParams.createdAt);
+        setCreatedAtInput("");
         setUpdatedAt(defaultSearchParams.updatedAt);
+        setUpdatedAtInput("");
 
         setDifficulty(defaultSearchParams.difficulty);
         setSet(defaultSearchParams.set);
@@ -341,8 +343,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
 
         setcomplaintsAreas(defaultSearchParams.complaintsAreas);
         SetEquipment(defaultSearchParams.equipment);
-
-        // window.localStorage.removeItem('searchParams');
     }
 
     // controlId= fügt eine id allen relevanten child elementen hinzu (zB. Label, Input)
@@ -370,9 +370,10 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                                     <FloatingLabel label="Created At">
                                         <DatePicker
                                             setDate={setCreatedAt}
+                                            setInputValue={setCreatedAtInput}
                                             includeTime={true}
                                         >
-                                            <Form.Control type="text" placeholder="Created At" />
+                                            <Form.Control type="text" placeholder="Created At" value={createdAtInput} onChange={(e) => setCreatedAtInput(e.target.value)} />
                                         </DatePicker>
                                     </FloatingLabel>
                                 </Form.Group>
@@ -382,9 +383,10 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                                     <FloatingLabel label="Updated At">
                                         <DatePicker
                                             setDate={setUpdatedAt}
+                                            setInputValue={setUpdatedAtInput}
                                             includeTime={true}
                                         >
-                                            <Form.Control type="text" placeholder="Updated At" />
+                                            <Form.Control type="text" placeholder="Updated At" value={updatedAtInput} onChange={(e) => setUpdatedAtInput(e.target.value)} />
                                         </DatePicker>
                                     </FloatingLabel>
                                 </Form.Group>
