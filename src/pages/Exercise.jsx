@@ -231,7 +231,7 @@ export default function Exercise() {
                 </Row>
                 <Row>
                     <Col>
-                        <ExerciseAttribute label="Description" />
+                        <ExerciseAttribute label="Description" required />
                     </Col>
                 </Row>
                 <Row>
@@ -261,7 +261,7 @@ export default function Exercise() {
                 </Row>
                 <Row>
                     <Col>
-                        <ExerciseAttribute label="Link" />
+                        <ExerciseAttribute label="Link" required />
                     </Col>
                 </Row>
                 <Row>

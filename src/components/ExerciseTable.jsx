@@ -75,7 +75,7 @@ export default function ExerciseTable({ data, dataKeys, page, itemsPerPage, onCl
                   // return <td key={key}>{value.join(',')}</td>;
                   return <td key={key}>{value.map(
                     (item, index) => {
-                      return <><span key={index}>{item}</span> <br /></>
+                      return <span key={index}>{item}<br /></span>
                     }
                   )}</td>;
                 } else {

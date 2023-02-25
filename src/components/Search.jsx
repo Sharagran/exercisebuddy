@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Form, Col, Row, FloatingLabel, Accordion } from 'react-bootstrap';
+
 import Fuse from 'fuse.js'
 import moment from 'moment';
 
 import DatePicker from './DateRangePickerWrapper';
 
-import { useLocation, useNavigate } from "react-router-dom";
 
 const defaultSearchParams = {
     title: '',
@@ -36,17 +37,15 @@ const defaultSearchParams = {
         });
     }
 }
-// TODO: fix default search params (unset search params & array searchs)
+
 export default function Search({ exercises, setExerciseView, sortOptions }) {
     // search parameters
+    // TODO: change title to queryString
     const [title, setTitle] = useState(defaultSearchParams.title);
     const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
 
     const [createdAt, setCreatedAt] = useState(defaultSearchParams.createdAt);
     const [updatedAt, setUpdatedAt] = useState(defaultSearchParams.updatedAt);
-
-    const [createdAtInput, setCreatedAtInput] = useState("");
-    const [updatedAtInput, setUpdatedAtInput] = useState("");
 
     const [difficulty, setDifficulty] = useState(defaultSearchParams.difficulty);
     const [set, setSet] = useState(defaultSearchParams.set);
@@ -61,41 +60,32 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     const [complaintsAreasList, setComplaintsAreasList] = useState([]);
     const [equipmentList, setEquipmentList] = useState([]);
 
+    // additional states for input fields which values differ from the search parameters
+    const [createdAtInput, setCreatedAtInput] = useState("");
+    const [updatedAtInput, setUpdatedAtInput] = useState("");
+
     // other hooks
     const navigate = useNavigate();
     const location = useLocation();
 
 
-
-    function getSearchParams() {
-        return {
-            title,
-
-            createdAt,
-            updatedAt,
-
-            difficulty,
-            set,
-            repetition,
-            duration,
-            pause,
-
-            complaintsAreas,
-            equipment
-        };
-    }
+    useEffect(() => {
+        // Load last search parameters on page load
+        loadLastSearch();
+    }, []);
 
     useEffect(() => {
-        loadLastSearch();
+        // exercises changed
         getSelectOptions();
     }, [exercises]);
 
     useEffect(() => {
-        // TODO: save sort options to history state
+        // Sort options changed
         search(getSearchParams());
     }, [sortOptions.sortKey, sortOptions.sortAsc]);
 
     useEffect(() => {
+        // Search parameters changed
         let searchParams = getSearchParams();
         search(searchParams);
         saveLastSearch(searchParams);
@@ -118,6 +108,73 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         setEquipmentList(equipment);
     }
 
+    function getSearchParams() {
+        return {
+            title,
+
+            createdAt,
+            updatedAt,
+
+            difficulty,
+            set,
+            repetition,
+            duration,
+            pause,
+
+            complaintsAreas,
+            equipment
+        };
+    }
+
+    function clear() {
+        setTitle(defaultSearchParams.title);
+
+        setCreatedAt(defaultSearchParams.createdAt);
+        setCreatedAtInput("");
+        setUpdatedAt(defaultSearchParams.updatedAt);
+        setUpdatedAtInput("");
+
+        setDifficulty(defaultSearchParams.difficulty);
+        setSet(defaultSearchParams.set);
+        setRepetition(defaultSearchParams.repetition);
+        setDuration(defaultSearchParams.duration);
+        setPause(defaultSearchParams.pause);
+
+        setcomplaintsAreas(defaultSearchParams.complaintsAreas);
+        SetEquipment(defaultSearchParams.equipment);
+    }
+
+    function saveLastSearch(lastSearch) {
+        // save search parameters to history state
+        navigate("/", {
+            state: lastSearch,
+            replace: true
+        });
+    }
+
+    function loadLastSearch() {
+        var lastSearch = location.state;
+        console.log(lastSearch);
+
+        if (lastSearch) {
+            setTitle(lastSearch.title);
+
+            setCreatedAt(lastSearch.createdAt);
+            setUpdatedAt(lastSearch.updatedAt);
+
+            setDifficulty(lastSearch.difficulty);
+            setSet(lastSearch.set);
+            setRepetition(lastSearch.repetition);
+            setDuration(lastSearch.duration);
+            setPause(lastSearch.pause);
+
+            setcomplaintsAreas(lastSearch.complaintsAreas);
+            SetEquipment(lastSearch.equipment);
+
+            search(lastSearch);
+        }
+    }
+
     function submit(e) {
         e.preventDefault();
 
@@ -126,13 +183,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
 
         search(searchParams);
         saveLastSearch(searchParams);
-    }
-
-    function sort(exercises) {
-        // console.log(exercises[0]);
-        // console.log(sortOptions);
-        var sortFunction = generateSortFunction(sortOptions.sortKey, sortOptions.sortAsc);
-        return exercises.sort(sortFunction);
     }
 
     function search(searchParams) {
@@ -177,7 +227,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                 } else if (key === "difficulty" || key === "set" || key === "repetition") {
                     matches = matches && exercise[key] == searchParams[key];
                 } else if (key === "duration" || key === "pause") {
-
+                    // TODO: implement
                 } else if (key === "complaintsAreas" || key === "equipment") {
                     matches = matches && exercise[key].includes(searchParams[key]);
                 }
@@ -233,6 +283,13 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
 
         setExerciseView(result);
         return result;
+    }
+
+    function sort(exercises) {
+        // console.log(exercises[0]);
+        // console.log(sortOptions);
+        var sortFunction = generateSortFunction(sortOptions.sortKey, sortOptions.sortAsc);
+        return exercises.sort(sortFunction);
     }
 
     function sortByScore(a, b) {
@@ -296,56 +353,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         }
     }
 
-    function loadLastSearch() {
-        var lastSearch = location.state;
-        console.log(lastSearch);
-
-        if (lastSearch) {
-            setTitle(lastSearch.title);
-
-            setCreatedAt(lastSearch.createdAt);
-            setUpdatedAt(lastSearch.updatedAt);
-
-            setDifficulty(lastSearch.difficulty);
-            setSet(lastSearch.set);
-            setRepetition(lastSearch.repetition);
-            setDuration(lastSearch.duration);
-            setPause(lastSearch.pause);
-
-            setcomplaintsAreas(lastSearch.complaintsAreas);
-            SetEquipment(lastSearch.equipment);
-
-            search(lastSearch);
-        }
-    }
-
-    function saveLastSearch(lastSearch) {
-        // save search parameters to history state
-        navigate("/", {
-            state: lastSearch,
-            replace: true
-        });
-    }
-
-    function clear() {
-        setTitle(defaultSearchParams.title);
-
-        setCreatedAt(defaultSearchParams.createdAt);
-        setCreatedAtInput("");
-        setUpdatedAt(defaultSearchParams.updatedAt);
-        setUpdatedAtInput("");
-
-        setDifficulty(defaultSearchParams.difficulty);
-        setSet(defaultSearchParams.set);
-        setRepetition(defaultSearchParams.repetition);
-        setDuration(defaultSearchParams.duration);
-        setPause(defaultSearchParams.pause);
-
-        setcomplaintsAreas(defaultSearchParams.complaintsAreas);
-        SetEquipment(defaultSearchParams.equipment);
-    }
-
-    // controlId= fügt eine id allen relevanten child elementen hinzu (zB. Label, Input)
     return (
         <div className='search'>
             <h3>Search</h3>
@@ -397,21 +404,21 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                             <Col>
                                 <Form.Group className="mb-3" controlId="formDifficulty">
                                     <FloatingLabel label="Difficulty">
-                                        <Form.Control type="number" placeholder="Difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} />
+                                        <Form.Control type="number" placeholder="Difficulty" min={0} value={difficulty} onChange={(e) => setDifficulty(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formSet">
                                     <FloatingLabel label="Set">
-                                        <Form.Control type="number" placeholder="Set" value={set} onChange={(e) => setSet(e.target.value)} />
+                                        <Form.Control type="number" placeholder="Set" min={0} value={set} onChange={(e) => setSet(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formRepetition">
                                     <FloatingLabel label="Repetition">
-                                        <Form.Control type="number" placeholder="Repetition" value={repetition} onChange={(e) => setRepetition(e.target.value)} />
+                                        <Form.Control type="number" placeholder="Repetition" min={0} value={repetition} onChange={(e) => setRepetition(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
@@ -428,18 +435,16 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                             <Col>
                                 <Form.Group className="mb-3" controlId="formPause">
                                     <FloatingLabel label="Pause">
-                                        {/* TODO: remove this filter option */}
+                                        {/* TODO: remove this filter option? */}
                                         <Form.Control type="number" placeholder="Pause" value={pause} onChange={(e) => setPause(e.target.value)} />
                                     </FloatingLabel>
                                 </Form.Group>
                             </Col>
                         </Row>
-                        {/* Find a system to add multiple items to array (tag list from CloudNein?) */}
                         <Row>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formcomplaintsAreas">
                                     <FloatingLabel label="Complaints Areas">
-                                        {/* <Form.Control type="text" placeholder="Complaints Areas" value={complaintsAreas} onChange={(e) => setcomplaintsAreas(e.target.value)} /> */}
                                         <Form.Select value={complaintsAreas} onChange={(e) => setcomplaintsAreas(e.target.value)}>
                                             <option value=""></option>
                                             {
@@ -454,7 +459,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                             <Col>
                                 <Form.Group className="mb-3" controlId="formEquipment">
                                     <FloatingLabel label="Equipment">
-                                        {/* <Form.Control type="text" placeholder="Equipment" value={equipment} onChange={(e) => SetEquipment(e.target.value)} /> */}
                                         <Form.Select value={equipment} onChange={(e) => SetEquipment(e.target.value)}>
                                             <option value=""></option>
                                             {
