@@ -55,7 +55,7 @@ function ExerciseProvider() {
 
     function updateExercise(exercise) {
         return new Promise((resolve, reject) => {
-            axios.patch(`/exercises`, exercise).then(resolve).catch(reject);
+            axios.put(`/exercises`, exercise).then(resolve).catch(reject);
         });
     }
 

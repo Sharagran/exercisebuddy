@@ -42,6 +42,12 @@ export default function Exercise() {
     // TODO: split this into createExercise and editExercise to improve readability
 
     useEffect(() => {
+        if (id === 'create') {
+            clearForm();
+            setEditMode(true);
+            return;
+        }
+
         var exercise = getExercise(id);
         if (exercise) {
             setExercise(exercise);
@@ -49,12 +55,6 @@ export default function Exercise() {
         } else {
             console.log('Exercise not found');
             setNotFound(true);
-        }
-
-        if (id === 'create') {
-            setExercise(clearForm);
-            setEditMode(true);
-            setNotFound(false);
         }
     }, [finishedLoading]);
 
@@ -67,7 +67,7 @@ export default function Exercise() {
             repetition: 0,
             duration: 0,
             pause: 0,
-            diagnoses: '',
+            complaintsAreas: '',
             equipment: '',
             link: '',
             image: '',
@@ -177,7 +177,7 @@ export default function Exercise() {
                 </Row>
                 <Row>
                     <Col>
-                        <ExerciseAttributePlaceholder label="Diagnoses" />
+                        <ExerciseAttributePlaceholder label="Complaints Areas" />
                     </Col>
                     <Col>
                         <ExerciseAttributePlaceholder label="Equipment" />
@@ -231,7 +231,7 @@ export default function Exercise() {
                 </Row>
                 <Row>
                     <Col>
-                        <ExerciseAttribute label="Description" />
+                        <ExerciseAttribute label="Description" required />
                     </Col>
                 </Row>
                 <Row>
@@ -253,7 +253,7 @@ export default function Exercise() {
                 </Row>
                 <Row>
                     <Col>
-                        <ExerciseAttribute label="Diagnoses" />
+                        <ExerciseAttribute label="Complaints Areas" attrKey="complaintsAreas" />
                     </Col>
                     <Col>
                         <ExerciseAttribute label="Equipment" />
@@ -261,7 +261,7 @@ export default function Exercise() {
                 </Row>
                 <Row>
                     <Col>
-                        <ExerciseAttribute label="Link" />
+                        <ExerciseAttribute label="Link" required />
                     </Col>
                 </Row>
                 <Row>
@@ -282,6 +282,12 @@ export default function Exercise() {
                 <Row>
                     <Col>
                         <ExerciseAttribute label="Video" />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                    {/* TODO: implement pose editor */}
+                        <div>Pose editor</div>
                     </Col>
                 </Row>
             </FormContext.Provider>
