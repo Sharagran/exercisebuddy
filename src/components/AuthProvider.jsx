@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import axios from 'axios';
 
 import useToken from './useToken';
-import Login from "../pages/Login";
+import LoginPage from "../pages/LoginPage";
 
 
 const AuthContext = createContext();
@@ -64,7 +64,7 @@ function ProtectedRoutes() {
     if (token) {
         return <Outlet />;
     } else {
-        return <Login />
+        return <LoginPage />
     }
 };
 
