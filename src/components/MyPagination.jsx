@@ -12,7 +12,7 @@ export default function MyPagination({ dataSize, currentPage: page, setPage, PAG
     }, [window.location.search])
 
     function renderPaginationItems() {
-        if (pageCount > 5 || true) {
+        if (pageCount > 5) {
             return renderReducedPageItems();
         } else {
             return renderEachPageItems();
