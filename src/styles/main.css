@@ -4,3 +4,8 @@
   width: 60%;
   padding: 10px;
 }
+
+body {
+  /* required to prevent rangeslider drag & drop from working when the scrollbar disappears */
+  overflow-y: scroll; /* always show vertical scrollbar */
+}

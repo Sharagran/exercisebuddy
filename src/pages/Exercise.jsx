@@ -87,11 +87,11 @@ export default function Exercise() {
             loading: 'Creating exercise...',
             success: (res) => {
                 setEditMode(false);
-                naivgate(`/exercise/${res.data._id}`);
+                naivgate(`/exercise/${res._id}`);
                 return 'Exercise created!';
             },
             error: (err) => {
-                console.error(err.response.data, err);
+                console.error(err.response?.data, err);
                 return 'Failed to create exercise';
             }
         });

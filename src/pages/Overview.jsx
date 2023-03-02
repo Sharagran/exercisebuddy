@@ -25,6 +25,16 @@ export default function Overview() {
         setViewData(exercises);
     }, [finishedLoading])
 
+    useEffect(() => {
+        // prevent page from being set higher than the max page
+        let page_count = Math.ceil(viewData.length / PAGE_SIZE);
+        if (viewData.length < PAGE_SIZE) {
+            setPage(1);
+        } else if (page > page_count) {
+            setPage(page_count);
+        }
+    }, [viewData]);
+
     return (
         <>
             <div>
@@ -36,7 +46,7 @@ export default function Overview() {
             <Button onClick={() => { navigate('/exercise/create') }}>Create new exercise</Button>
             <ExerciseTable
                 data={viewData}
-                dataKeys={['title', 'description', 'createdAt', 'updatedAt', 'link', 'difficulty', 'set', 'repetition', 'complaintsAreas', 'equipment']}
+                dataKeys={['title', 'description', 'createdAt', 'updatedAt', 'link', 'difficulty', 'set', 'repetition', 'duration', 'pause', 'complaintsAreas', 'equipment']}
                 page={page}
                 itemsPerPage={PAGE_SIZE}
                 onClick={(args) => {
