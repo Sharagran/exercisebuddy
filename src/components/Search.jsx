@@ -6,9 +6,9 @@ import Fuse from 'fuse.js'
 import moment from 'moment';
 
 import DatePicker from './DateRangePickerWrapper';
+import RangeSlider from './RangeSlider';
 
-
-const defaultSearchParams = {
+var defaultSearchParams = {
     title: '',
 
     createdAt: [null, null],
@@ -17,8 +17,8 @@ const defaultSearchParams = {
     difficulty: '',
     set: '',
     repetition: '',
-    duration: '',
-    pause: '',
+    duration: [null, null],
+    pause: [null, null],
 
     complaintsAreas: '',
     equipment: '',
@@ -59,6 +59,14 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     // lists for search parameters
     const [complaintsAreasList, setComplaintsAreasList] = useState([]);
     const [equipmentList, setEquipmentList] = useState([]);
+    const [durationRange, setDurationRange] = useState({
+        min: 0,
+        max: 0
+    });
+    const [pauseRange, setPauseRange] = useState({
+        min: 0,
+        max: 0
+    });
 
     // additional states for input fields which values differ from the search parameters
     const [createdAtInput, setCreatedAtInput] = useState("");
@@ -77,6 +85,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     useEffect(() => {
         // exercises changed
         getSelectOptions();
+        getRanges();
     }, [exercises]);
 
     useEffect(() => {
@@ -106,6 +115,43 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         equipment = [...new Set(equipment)];
         setComplaintsAreasList(complaintsAreas);
         setEquipmentList(equipment);
+    }
+
+    function getRanges() {
+        var durationRange = {
+            min: 0,
+            max: 0
+        }
+        exercises.forEach(exercise => {
+            if (exercise.duration) {
+                if (exercise.duration < durationRange.min) {
+                    durationRange.min = exercise.duration;
+                }
+                if (exercise.duration > durationRange.max) {
+                    durationRange.max = exercise.duration;
+                }
+            }
+        });
+        setDurationRange(durationRange);
+
+        var pauseRange = {
+            min: 0,
+            max: 0
+        }
+        exercises.forEach(exercise => {
+            if (exercise.pause) {
+                if (exercise.pause < pauseRange.min) {
+                    pauseRange.min = exercise.pause;
+                }
+                if (exercise.pause > pauseRange.max) {
+                    pauseRange.max = exercise.pause;
+                }
+            }
+        });
+        setPauseRange(pauseRange);
+
+        defaultSearchParams.duration = [durationRange.min, durationRange.max];
+        defaultSearchParams.pause = [pauseRange.min, pauseRange.max];
     }
 
     function getSearchParams() {
@@ -228,6 +274,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                     matches = matches && exercise[key] == searchParams[key];
                 } else if (key === "duration" || key === "pause") {
                     // TODO: implement
+                    matches = matches && exercise[key] >= searchParams[key][0] && exercise[key] <= searchParams[key][1];
                 } else if (key === "complaintsAreas" || key === "equipment") {
                     matches = matches && exercise[key].includes(searchParams[key]);
                 }
@@ -399,7 +446,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                                 </Form.Group>
                             </Col>
                         </Row>
-                        {/* TODO: limit number ranges */}
                         <Row>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formDifficulty">
@@ -423,21 +469,15 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                                 </Form.Group>
                             </Col>
                             <Col>
-                                <Form.Group className="mb-3" controlId="formDuration">
-                                    {/* <FloatingLabel label="Duration">
-                                        <Form.Control type="number" placeholder="Duration" value={duration} onChange={(e) => setDuration(e.target.value)} />
-                                    </FloatingLabel> */}
-                                    {/* https://stackoverflow.com/questions/65875721/ho-can-i-add-two-values-in-bootstrap-range-slider */}
+                                <Form.Group className="mb-3 text-center" controlId="formDuration">
+                                    <RangeSlider id="formDurationSlider" type="double" skin="round" min={durationRange.min} max={durationRange.max} grid={true} setValue={setDuration} />
                                     <Form.Label>Duration</Form.Label>
-                                    <Form.Range />
                                 </Form.Group>
                             </Col>
                             <Col>
-                                <Form.Group className="mb-3" controlId="formPause">
-                                    <FloatingLabel label="Pause">
-                                        {/* TODO: remove this filter option? */}
-                                        <Form.Control type="number" placeholder="Pause" value={pause} onChange={(e) => setPause(e.target.value)} />
-                                    </FloatingLabel>
+                                <Form.Group className="mb-3 text-center" controlId="formPause">
+                                    <RangeSlider id="formPauseSlider" type="double" skin="round" min={pauseRange.min} max={pauseRange.max} grid={true} setValue={setPause} />
+                                    <Form.Label>Pause</Form.Label>
                                 </Form.Group>
                             </Col>
                         </Row>

@@ -36,7 +36,7 @@ export default function Overview() {
             <Button onClick={() => { navigate('/exercise/create') }}>Create new exercise</Button>
             <ExerciseTable
                 data={viewData}
-                dataKeys={['title', 'description', 'createdAt', 'updatedAt', 'link', 'difficulty', 'set', 'repetition', 'complaintsAreas', 'equipment']}
+                dataKeys={['title', 'description', 'createdAt', 'updatedAt', 'link', 'difficulty', 'set', 'repetition', 'duration', 'pause', 'complaintsAreas', 'equipment']}
                 page={page}
                 itemsPerPage={PAGE_SIZE}
                 onClick={(args) => {
