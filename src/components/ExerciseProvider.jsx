@@ -49,7 +49,11 @@ function ExerciseProvider() {
         });
 
         return new Promise((resolve, reject) => {
-            axios.post('/exercises', exercise).then(resolve).catch(reject);
+            axios.post('/exercises', exercise).then((res) => {
+                // add created exercise to state
+                setExercises([...exercises, res.data]);
+                resolve(res.data);
+            }).catch(reject);
         });
     }
 
