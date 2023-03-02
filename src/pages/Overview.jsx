@@ -25,6 +25,16 @@ export default function Overview() {
         setViewData(exercises);
     }, [finishedLoading])
 
+    useEffect(() => {
+        // prevent page from being set higher than the max page
+        let page_count = Math.ceil(viewData.length / PAGE_SIZE);
+        if (viewData.length < PAGE_SIZE) {
+            setPage(1);
+        } else if (page > page_count) {
+            setPage(page_count);
+        }
+    }, [viewData]);
+
     return (
         <>
             <div>
