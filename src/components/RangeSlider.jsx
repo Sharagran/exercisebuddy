@@ -16,7 +16,7 @@ export default function RangeSlider(params) {
         prettify: secondsToTime,
 
         // FIXME: filter cant find exercise with exact 14ms pause (too unprecise)
-        step: 1000, // 1 ms
+        // step: 1000, // 1 ms
         from: params.min,
         to: params.max,
         onChange: (data) => {
@@ -28,7 +28,7 @@ export default function RangeSlider(params) {
 
   function secondsToTime(microseconds) {
     let secs = microseconds / 1000000;
-    // secs *= 10; // FIXME: modifying range for testing purposes only
+    // secs *= 500; // FIXME: modifying range for testing purposes only
     let hours = Math.floor(secs / (60 * 60));
 
     let divisor_for_minutes = secs % (60 * 60);
@@ -54,16 +54,19 @@ export default function RangeSlider(params) {
     if (duration.m > 0) {
       durationString += duration.m + "m";
     }
-    if (duration.s > 0) {
-      durationString += duration.s + "s";
+    if (duration.s > 0 && duration.h < 1) {
+      durationString += duration.s;
+      if (duration.ms > 0 && duration.m < 1) {
+        durationString += "," + Math.floor(duration.ms / 100);
+      }
+      durationString += "s";
     }
-    // FIXME: probably not nessessary in production
-    if (params.max < 1000000 && duration.ms > 0) {
+    if (duration.ms > 0 && secs < 1) {
       durationString += duration.ms + "ms";
     }
 
     if (durationString === "") {
-      durationString = "0s";
+      durationString = "0";
     }
 
     return durationString;
