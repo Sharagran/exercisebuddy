@@ -21,7 +21,7 @@ function App() {
   axios.defaults.baseURL = process.env.REACT_APP_EXERCISEBUDDY_API_URL;
 
   return (
-    <>
+    <div className='p-3'>
       <Toaster position="bottom-right" />
       <h1>Exercisebuddy</h1>
       <BrowserRouter>
@@ -47,7 +47,7 @@ function App() {
           </Routes>
         </AuthProvider>
       </BrowserRouter>
-    </>
+    </div>
   );
 }
 

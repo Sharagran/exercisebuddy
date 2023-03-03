@@ -403,7 +403,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     return (
         <div className='search'>
             <h3>Search</h3>
-            <Form onSubmit={submit}>
+            <Form onSubmit={submit} className='border'>
                 <Form.Group className="mb-3" controlId="formTitle">
                     <FloatingLabel label="Title">
                         <Form.Control type="search" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
