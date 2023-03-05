@@ -29,8 +29,15 @@ function ExerciseProvider() {
         return exercises.find(e => e._id === id);
     }
 
+    function fetchExercise(id) {
+        return new Promise((resolve, reject) => {
+            axios.get(`/exercises/${id}`).then(res => {
+                resolve(res.data);
+            }).catch(reject);
+        });
+    }
+
     function reloadExercise(id) {
-        console.log('reloading exercise');
         return new Promise((resolve, reject) => {
             axios.get(`/exercises/${id}`).then(res => {
                 // override old exercise with new one
@@ -52,6 +59,34 @@ function ExerciseProvider() {
             axios.post('/exercises', exercise).then((res) => {
                 // add created exercise to state
                 setExercises([...exercises, res.data]);
+                resolve(res.data);
+            }).catch(reject);
+        });
+    }
+
+    function uploadExerciseMedia(id, formData) {
+        return new Promise((resolve, reject) => {
+            axios.put(`/exercises/${id}/media`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(res => {
+                // override old exercise with new one
+                setExercises(exercises.map(e => e._id === id ? res.data : e));
+                resolve(res.data);
+            }).catch(reject);
+        });
+    }
+
+    function deleteExerciseMedia(id, mediaSelection) {
+        return new Promise((resolve, reject) => {
+            axios.delete(`/exercises/${id}/media`, {
+                data: {
+                    ...mediaSelection
+                }
+            }).then(res => {
+                // override old exercise with new one
+                setExercises(exercises.map(e => e._id === id ? res.data : e));
                 resolve(res.data);
             }).catch(reject);
         });
@@ -88,10 +123,13 @@ function ExerciseProvider() {
         finishedLoading,
 
         getExercise,
+        fetchExercise,
         reloadExercises: fetchExercises,
         reloadExercise,
 
         createExercise,
+        uploadExerciseMedia,
+        deleteExerciseMedia,
         updateExercise,
         deleteExercise
     };

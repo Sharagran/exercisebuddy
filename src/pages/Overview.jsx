@@ -42,7 +42,7 @@ export default function Overview() {
                 <span>Search parameters reduced result by {Math.abs(viewData.length - exercises.length)} exercises</span>
             </div>
             <hr />
-            <div class="d-flex justify-content-between align-items-start">
+            <div className="d-flex justify-content-between align-items-start">
                 <h3>Exercises</h3>
                 {/* <MyPagination dataSize={viewData.length} currentPage={page} setPage={setPage} PAGE_SIZE={PAGE_SIZE} /> */}
                 <Button onClick={() => { navigate('/exercise/create') }}>Create new exercise</Button>
