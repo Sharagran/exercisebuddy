@@ -102,6 +102,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         saveLastSearch(searchParams);
     }, [title, createdAt, updatedAt, difficulty, set, repetition, duration, pause, complaintsAreas, equipment]);
 
+    // TODO: use function from ExerciseProvider.jsx instead
     function getSelectOptions(exerciseList = exercises) {
         // check if exerciseList is a fuse result (view data)
         if(exerciseList[0] && exerciseList[0].item) {

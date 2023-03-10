@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, createContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Row, Col, Form, Button, Placeholder, Alert, Image, ButtonGroup } from 'react-bootstrap';
-import Select from 'react-select'
+import CreatableSelect from 'react-select/creatable';
 import toast from 'react-hot-toast';
 
 import ExerciseContext from '../components/ExerciseProvider';
@@ -54,10 +54,12 @@ function ExerciseAttributePlaceholder({ label }) {
 export default function Exercise() {
     const { id } = useParams();
     const naivgate = useNavigate();
-    const { finishedLoading, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise, uploadExerciseMedia, fetchExercise, deleteExerciseMedia } = React.useContext(ExerciseContext);
+    const { finishedLoading, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise, uploadExerciseMedia, fetchExercise, deleteExerciseMedia, getSelectOptions } = React.useContext(ExerciseContext);
     const [exercise, setExercise] = useState();
     const [editMode, setEditMode] = useState(false);
     const [notFound, setNotFound] = useState(false);
+
+    const selectOptions = getSelectOptions();
 
     // TODO: split this into createExercise and editExercise to improve readability
 
@@ -322,10 +324,44 @@ export default function Exercise() {
                 <Row>
                     {/* TODO: use react-select here */}
                     <Col>
-                        <ExerciseAttribute label="Complaints Areas" attrKey="complaintsAreas" />
+                        <ExerciseAttribute label="Complaints Areas">
+                            <CreatableSelect
+                                isMulti
+                                isDisabled={!editMode}
+                                options={selectOptions.complaintsAreas}
+                                defaultValue={selectOptions.complaintsAreas.filter((option) => exercise.complaintsAreas.includes(option.value))}
+                                onChange={(value) => {
+                                    var rawValues = [];
+                                    value.forEach((option) => {
+                                        rawValues.push(option.value);
+                                    });
+                                    setExercise({
+                                        ...exercise,
+                                        complaintsAreas: rawValues
+                                    });
+                                }}
+                            />
+                        </ExerciseAttribute>
                     </Col>
                     <Col>
-                        <ExerciseAttribute label="Equipment" />
+                        <ExerciseAttribute label="Equipment">
+                            <CreatableSelect
+                                isMulti
+                                isDisabled={!editMode}
+                                options={selectOptions.equipment}
+                                defaultValue={selectOptions.equipment.filter((option) => exercise.equipment.includes(option.value))}
+                                onChange={(value) => {
+                                    var rawValues = [];
+                                    value.forEach((option) => {
+                                        rawValues.push(option.value);
+                                    });
+                                    setExercise({
+                                        ...exercise,
+                                        equipment: rawValues
+                                    });
+                                }}
+                            />
+                        </ExerciseAttribute>
                     </Col>
                 </Row>
                 <Row>
