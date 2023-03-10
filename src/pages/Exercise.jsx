@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, createContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Row, Col, Form, Button, Placeholder, Alert, Image, ButtonGroup } from 'react-bootstrap';
+import Select from 'react-select'
 import toast from 'react-hot-toast';
 
 import ExerciseContext from '../components/ExerciseProvider';
@@ -8,28 +9,37 @@ import ExerciseContext from '../components/ExerciseProvider';
 const FormContext = createContext();
 
 function ExerciseAttribute(props) {
-    let { label, attrKey = label.toLowerCase(), type = 'text', ...rest } = props;
-
+    let { label, attrKey = label.toLowerCase(), type = 'text', children, ...rest } = props;
     const { exercise, setExercise, editMode } = useContext(FormContext);
-    return (
-        <Form.Group className="mb-3" controlId={`form${label}`}>
-            <Form.Label>{label}</Form.Label>
-            <Form.Control name={attrKey} disabled={!editMode} type={type} {...rest} value={exercise[attrKey]} onChange={e => {
-                var value;
-                if (type === 'number') {
-                    value = Number(e.target.value);
-                } else if (attrKey === 'complaintsAreas' || attrKey === 'equipment') {
-                    value = e.target.value.split(',').map(s => s.trim());
-                } else {
-                    value = e.target.value;
-                }
-                setExercise({
-                    ...exercise,
-                    [attrKey]: value
-                });
-            }} />
-        </Form.Group>
-    );
+
+    if (children) {
+        return (
+            <Form.Group className="mb-3" controlId={`form${label}`}>
+                <Form.Label>{label}</Form.Label>
+                {children}
+            </Form.Group>
+        );
+    } else {
+        return (
+            <Form.Group className="mb-3" controlId={`form${label}`}>
+                <Form.Label>{label}</Form.Label>
+                <Form.Control name={attrKey} disabled={!editMode} type={type} {...rest} value={exercise[attrKey]} onChange={e => {
+                    var value;
+                    if (type === 'number') {
+                        value = Number(e.target.value);
+                    } else if (attrKey === 'complaintsAreas' || attrKey === 'equipment') {
+                        value = e.target.value.split(',').map(s => s.trim());
+                    } else {
+                        value = e.target.value;
+                    }
+                    setExercise({
+                        ...exercise,
+                        [attrKey]: value
+                    });
+                }} />
+            </Form.Group>
+        );
+    }
 }
 
 function ExerciseAttributePlaceholder({ label }) {
@@ -310,6 +320,7 @@ export default function Exercise() {
                     </Col>
                 </Row>
                 <Row>
+                    {/* TODO: use react-select here */}
                     <Col>
                         <ExerciseAttribute label="Complaints Areas" attrKey="complaintsAreas" />
                     </Col>
@@ -324,9 +335,8 @@ export default function Exercise() {
                 </Row>
                 <Row>
                     <Col>
-                        {id !== 'create' && (
-                            <Form.Group className="mb-3" controlId={`formImage`}>
-                                <Form.Label>Image</Form.Label>
+                        {id !== "create" && (
+                            <ExerciseAttribute label="Image">
                                 <div hidden={exercise.image === undefined}>
                                     <Image crossOrigin="anonymous" src={exercise.image} alt="Exercise image" fluid onError={(e) => {
                                         console.log("Image token expired, reloading exercise...");
@@ -334,35 +344,36 @@ export default function Exercise() {
                                             setExercise(exercise);
                                         });
                                     }}
-                                    style={{ maxHeight: "256px" }} />
+                                        style={{ maxHeight: "256px" }} />
                                 </div>
                                 <Form.Control name="image" disabled={!editMode} type="file" accept="image/*" />
                                 <ButtonGroup className="mt-2">
                                     <Button name="Image" disabled={!editMode} variant="primary" onClick={handleMediaUpload}>Upload media</Button>
                                     <Button name="Image" disabled={!editMode} variant="danger" hidden={exercise.image === undefined} onClick={handleMediaDelete}>Delete media</Button>
                                 </ButtonGroup>
-                            </Form.Group>
+                            </ExerciseAttribute>
                         )}
                     </Col>
                 </Row>
                 <Row>
                     <Col>
                         {id !== 'create' && (
-                            <Form.Group className="mb-3" controlId={`formVideo`}>
-                                <Form.Label>Video</Form.Label>
+                            <ExerciseAttribute label="Video">
                                 <Form.Control name="video" disabled={!editMode} type="file" accept="video/*" />
                                 <ButtonGroup className="mt-2">
                                     <Button name="Video" disabled={!editMode} variant="primary" onClick={handleMediaUpload}>Upload media</Button>
                                     <Button name="Video" disabled={!editMode} variant="danger" hidden={exercise.video === undefined} onClick={handleMediaDelete}>Delete media</Button>
                                 </ButtonGroup>
-                            </Form.Group>
+                            </ExerciseAttribute>
                         )}
                     </Col>
                 </Row>
                 <Row>
                     <Col>
-                        {/* TODO: implement pose editor */}
-                        <div>Pose editor</div>
+                        <ExerciseAttribute label="Poses">
+                            {/* TODO: implement pose editor */}
+                            <div>Pose editor</div>
+                        </ExerciseAttribute>
                     </Col>
                 </Row>
             </FormContext.Provider>
