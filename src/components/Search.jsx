@@ -99,7 +99,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         let searchParams = getSearchParams();
         let filteredExercises = search(searchParams);
         getSelectOptions(filteredExercises);
-        getRanges();
         saveLastSearch(searchParams);
     }, [title, createdAt, updatedAt, difficulty, set, repetition, duration, pause, complaintsAreas, equipment]);
 
