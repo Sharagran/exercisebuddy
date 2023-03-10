@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useContext, createContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Row, Col, Form, Button, Placeholder, Alert } from 'react-bootstrap';
+import { Row, Col, Form, Button, Placeholder, Alert, Image, ButtonGroup } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 
 import ExerciseContext from '../components/ExerciseProvider';
 
 const FormContext = createContext();
 
-function ExerciseAttribute({ label, attrKey = label.toLowerCase(), type = 'text', required = false }) {
+function ExerciseAttribute(props) {
+    let { label, attrKey = label.toLowerCase(), type = 'text', ...rest } = props;
+
     const { exercise, setExercise, editMode } = useContext(FormContext);
     return (
         <Form.Group className="mb-3" controlId={`form${label}`}>
             <Form.Label>{label}</Form.Label>
-            <Form.Control required={required} disabled={!editMode} type={type} value={exercise[attrKey]} onChange={e => {
+            <Form.Control name={attrKey} disabled={!editMode} type={type} {...rest} value={exercise[attrKey]} onChange={e => {
                 setExercise({
                     ...exercise,
                     [attrKey]: type === 'number' ? Number(e.target.value) : e.target.value
@@ -34,7 +36,7 @@ function ExerciseAttributePlaceholder({ label }) {
 export default function Exercise() {
     const { id } = useParams();
     const naivgate = useNavigate();
-    const { finishedLoading, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise } = React.useContext(ExerciseContext);
+    const { finishedLoading, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise, uploadExerciseMedia, fetchExercise, deleteExerciseMedia } = React.useContext(ExerciseContext);
     const [exercise, setExercise] = useState();
     const [editMode, setEditMode] = useState(false);
     const [notFound, setNotFound] = useState(false);
@@ -93,6 +95,51 @@ export default function Exercise() {
             error: (err) => {
                 console.error(err.response?.data, err);
                 return 'Failed to create exercise';
+            }
+        });
+    }
+
+    function handleMediaUpload(e) {
+        var mediaType = e.target.name;
+        var file = document.getElementById(`form${mediaType}`).files[0];
+
+        var formData = new FormData();
+        formData.append(mediaType.toLowerCase(), file);
+
+        toast.promise(uploadExerciseMedia(id, formData), {
+            loading: 'Uploading media...',
+            success: (res) => {
+                setExercise(res);
+                return 'Media uploaded!';
+            },
+            error: (err) => {
+                console.error(err.response.data, err);
+                return 'Failed to upload media';
+            }
+        });
+    }
+
+    function handleMediaDelete(e) {
+        var mediaType = e.target.name;
+        // var mediaElement = document.getElementById(`form${mediaType}`);
+
+        var deleteMediaOptions = {
+            image: false,
+            video: false
+        }
+        deleteMediaOptions[mediaType.toLowerCase()] = true;
+        console.log(deleteMediaOptions);
+
+        toast.promise(deleteExerciseMedia(id, deleteMediaOptions), {
+            loading: 'Deleting media...',
+            success: (res) => {
+                setExercise(res);
+                // mediaElement.value = '';
+                return 'Media deleted!';
+            },
+            error: (err) => {
+                console.error(err.response.data, err);
+                return 'Failed to delete media';
             }
         });
     }
@@ -188,17 +235,20 @@ export default function Exercise() {
                         <ExerciseAttributePlaceholder label="Link" />
                     </Col>
                 </Row>
-                <Row>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Image" />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Video" />
-                    </Col>
-                </Row>
-
+                {id !== "create" && (
+                    <>
+                        <Row>
+                            <Col>
+                                <ExerciseAttributePlaceholder label="Image" />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <ExerciseAttributePlaceholder label="Video" />
+                            </Col>
+                        </Row>
+                    </>
+                )}
                 <Placeholder.Button variant="primary">Edit</Placeholder.Button>
                 <Placeholder.Button variant="danger">Delete</Placeholder.Button>
             </Form>
@@ -266,27 +316,42 @@ export default function Exercise() {
                 </Row>
                 <Row>
                     <Col>
-                        {/* <ExerciseAttribute label="Image" type='file' /> */}
-                        <Form.Group className="mb-3" controlId={`formImage`}>
-                            <Form.Label>Image</Form.Label>
-                            <Form.Control disabled={!editMode} type='file' onChange={e => {
-                                console.log(e.target.files[0]);
-                                setExercise({
-                                    ...exercise,
-                                    image: e.target.value
-                                });
-                            }} />
-                        </Form.Group>
+                        {id !== 'create' && (
+                            <Form.Group className="mb-3" controlId={`formImage`}>
+                                <Form.Label>Image</Form.Label>
+                                <Image crossOrigin="anonymous" src={exercise.image} alt="Exercise image" onError={(e) => {
+                                    console.log("Image token expired, reloading exercise...");
+                                    fetchExercise(id).then((exercise) => {
+                                        setExercise(exercise);
+                                    });
+                                }} />
+
+                                <Form.Control name="image" disabled={!editMode} type="file" accept="image/*" />
+                                <ButtonGroup className="mt-2">
+                                    <Button name="Image" disabled={!editMode} variant="primary" onClick={handleMediaUpload}>Upload media</Button>
+                                    <Button name="Image" disabled={!editMode} variant="danger" onClick={handleMediaDelete}>Delete media</Button>
+                                </ButtonGroup>
+                            </Form.Group>
+                        )}
                     </Col>
                 </Row>
                 <Row>
                     <Col>
-                        <ExerciseAttribute label="Video" />
+                        {id !== 'create' && (
+                            <Form.Group className="mb-3" controlId={`formVideo`}>
+                                <Form.Label>Video</Form.Label>
+                                <Form.Control name="video" disabled={!editMode} type="file" accept="video/*" />
+                                <ButtonGroup className="mt-2">
+                                    <Button name="Video" disabled={!editMode} variant="primary" onClick={handleMediaUpload}>Upload media</Button>
+                                    <Button name="Video" disabled={!editMode} variant="danger" onClick={handleMediaDelete}>Delete media</Button>
+                                </ButtonGroup>
+                            </Form.Group>
+                        )}
                     </Col>
                 </Row>
                 <Row>
                     <Col>
-                    {/* TODO: implement pose editor */}
+                        {/* TODO: implement pose editor */}
                         <div>Pose editor</div>
                     </Col>
                 </Row>

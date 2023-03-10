@@ -42,8 +42,11 @@ export default function Overview() {
                 <span>Search parameters reduced result by {Math.abs(viewData.length - exercises.length)} exercises</span>
             </div>
             <hr />
-            <h3>Exercises</h3>
-            <Button onClick={() => { navigate('/exercise/create') }}>Create new exercise</Button>
+            <div className="d-flex justify-content-between align-items-start">
+                <h3>Exercises</h3>
+                {/* <MyPagination dataSize={viewData.length} currentPage={page} setPage={setPage} PAGE_SIZE={PAGE_SIZE} /> */}
+                <Button onClick={() => { navigate('/exercise/create') }}>Create new exercise</Button>
+            </div>
             <ExerciseTable
                 data={viewData}
                 dataKeys={['title', 'description', 'createdAt', 'updatedAt', 'link', 'difficulty', 'set', 'repetition', 'duration', 'pause', 'complaintsAreas', 'equipment']}
@@ -64,15 +67,10 @@ export default function Overview() {
                     }
                 } />
 
-            <div style={{
-                margin: "auto",
-                width: "50%",
-                textAlign: "center"
-            }}>
+            <div className='d-flex justify-content-center'>
                 {!finishedLoading && <Spinner animation="border" />}
-
-                <MyPagination dataSize={viewData.length} currentPage={page} setPage={setPage} PAGE_SIZE={PAGE_SIZE} />
             </div>
+            <MyPagination dataSize={viewData.length} currentPage={page} setPage={setPage} PAGE_SIZE={PAGE_SIZE} />
         </>
     )
 }

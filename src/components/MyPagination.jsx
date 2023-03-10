@@ -55,13 +55,11 @@ export default function MyPagination({ dataSize, currentPage: page, setPage, PAG
 
 
     return (
-        <>
-            <Pagination style={{
-                alignSelf: "center"
-            }}>
+        <div className='text-center'>
+            <Pagination className='justify-content-center'>
                 {renderPaginationItems()}
             </Pagination>
             {page * PAGE_SIZE - PAGE_SIZE + 1} - {page * PAGE_SIZE > dataSize ? dataSize : page * PAGE_SIZE} of {dataSize}
-        </>
+        </div>
     )
 }
