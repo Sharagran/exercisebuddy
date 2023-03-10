@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, createContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Row, Col, Form, Button, Placeholder, Alert, Image, ButtonGroup } from 'react-bootstrap';
+import CreatableSelect from 'react-select/creatable';
 import toast from 'react-hot-toast';
 
 import ExerciseContext from '../components/ExerciseProvider';
@@ -8,20 +9,37 @@ import ExerciseContext from '../components/ExerciseProvider';
 const FormContext = createContext();
 
 function ExerciseAttribute(props) {
-    let { label, attrKey = label.toLowerCase(), type = 'text', ...rest } = props;
-
+    let { label, attrKey = label.toLowerCase(), type = 'text', children, ...rest } = props;
     const { exercise, setExercise, editMode } = useContext(FormContext);
-    return (
-        <Form.Group className="mb-3" controlId={`form${label}`}>
-            <Form.Label>{label}</Form.Label>
-            <Form.Control name={attrKey} disabled={!editMode} type={type} {...rest} value={exercise[attrKey]} onChange={e => {
-                setExercise({
-                    ...exercise,
-                    [attrKey]: type === 'number' ? Number(e.target.value) : e.target.value
-                });
-            }} />
-        </Form.Group>
-    );
+
+    if (children) {
+        return (
+            <Form.Group className="mb-3" controlId={`form${label}`}>
+                <Form.Label>{label}</Form.Label>
+                {children}
+            </Form.Group>
+        );
+    } else {
+        return (
+            <Form.Group className="mb-3" controlId={`form${label}`}>
+                <Form.Label>{label}</Form.Label>
+                <Form.Control name={attrKey} disabled={!editMode} type={type} {...rest} value={exercise[attrKey]} onChange={e => {
+                    var value;
+                    if (type === 'number') {
+                        value = Number(e.target.value);
+                    } else if (attrKey === 'complaintsAreas' || attrKey === 'equipment') {
+                        value = e.target.value.split(',').map(s => s.trim());
+                    } else {
+                        value = e.target.value;
+                    }
+                    setExercise({
+                        ...exercise,
+                        [attrKey]: value
+                    });
+                }} />
+            </Form.Group>
+        );
+    }
 }
 
 function ExerciseAttributePlaceholder({ label }) {
@@ -36,10 +54,12 @@ function ExerciseAttributePlaceholder({ label }) {
 export default function Exercise() {
     const { id } = useParams();
     const naivgate = useNavigate();
-    const { finishedLoading, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise, uploadExerciseMedia, fetchExercise, deleteExerciseMedia } = React.useContext(ExerciseContext);
+    const { finishedLoading, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise, uploadExerciseMedia, fetchExercise, deleteExerciseMedia, getSelectOptions } = React.useContext(ExerciseContext);
     const [exercise, setExercise] = useState();
     const [editMode, setEditMode] = useState(false);
     const [notFound, setNotFound] = useState(false);
+
+    const selectOptions = getSelectOptions();
 
     // TODO: split this into createExercise and editExercise to improve readability
 
@@ -302,11 +322,46 @@ export default function Exercise() {
                     </Col>
                 </Row>
                 <Row>
+                    {/* TODO: use react-select here */}
                     <Col>
-                        <ExerciseAttribute label="Complaints Areas" attrKey="complaintsAreas" />
+                        <ExerciseAttribute label="Complaints Areas">
+                            <CreatableSelect
+                                isMulti
+                                isDisabled={!editMode}
+                                options={selectOptions.complaintsAreas}
+                                defaultValue={selectOptions.complaintsAreas.filter((option) => exercise.complaintsAreas.includes(option.value))}
+                                onChange={(value) => {
+                                    var rawValues = [];
+                                    value.forEach((option) => {
+                                        rawValues.push(option.value);
+                                    });
+                                    setExercise({
+                                        ...exercise,
+                                        complaintsAreas: rawValues
+                                    });
+                                }}
+                            />
+                        </ExerciseAttribute>
                     </Col>
                     <Col>
-                        <ExerciseAttribute label="Equipment" />
+                        <ExerciseAttribute label="Equipment">
+                            <CreatableSelect
+                                isMulti
+                                isDisabled={!editMode}
+                                options={selectOptions.equipment}
+                                defaultValue={selectOptions.equipment.filter((option) => exercise.equipment.includes(option.value))}
+                                onChange={(value) => {
+                                    var rawValues = [];
+                                    value.forEach((option) => {
+                                        rawValues.push(option.value);
+                                    });
+                                    setExercise({
+                                        ...exercise,
+                                        equipment: rawValues
+                                    });
+                                }}
+                            />
+                        </ExerciseAttribute>
                     </Col>
                 </Row>
                 <Row>
@@ -316,43 +371,45 @@ export default function Exercise() {
                 </Row>
                 <Row>
                     <Col>
-                        {id !== 'create' && (
-                            <Form.Group className="mb-3" controlId={`formImage`}>
-                                <Form.Label>Image</Form.Label>
-                                <Image crossOrigin="anonymous" src={exercise.image} alt="Exercise image" onError={(e) => {
-                                    console.log("Image token expired, reloading exercise...");
-                                    fetchExercise(id).then((exercise) => {
-                                        setExercise(exercise);
-                                    });
-                                }} />
-
+                        {id !== "create" && (
+                            <ExerciseAttribute label="Image">
+                                <div hidden={exercise.image === undefined}>
+                                    <Image crossOrigin="anonymous" src={exercise.image} alt="Exercise image" fluid onError={(e) => {
+                                        console.log("Image token expired, reloading exercise...");
+                                        fetchExercise(id).then((exercise) => {
+                                            setExercise(exercise);
+                                        });
+                                    }}
+                                        style={{ maxHeight: "256px" }} />
+                                </div>
                                 <Form.Control name="image" disabled={!editMode} type="file" accept="image/*" />
                                 <ButtonGroup className="mt-2">
                                     <Button name="Image" disabled={!editMode} variant="primary" onClick={handleMediaUpload}>Upload media</Button>
-                                    <Button name="Image" disabled={!editMode} variant="danger" onClick={handleMediaDelete}>Delete media</Button>
+                                    <Button name="Image" disabled={!editMode} variant="danger" hidden={exercise.image === undefined} onClick={handleMediaDelete}>Delete media</Button>
                                 </ButtonGroup>
-                            </Form.Group>
+                            </ExerciseAttribute>
                         )}
                     </Col>
                 </Row>
                 <Row>
                     <Col>
                         {id !== 'create' && (
-                            <Form.Group className="mb-3" controlId={`formVideo`}>
-                                <Form.Label>Video</Form.Label>
+                            <ExerciseAttribute label="Video">
                                 <Form.Control name="video" disabled={!editMode} type="file" accept="video/*" />
                                 <ButtonGroup className="mt-2">
                                     <Button name="Video" disabled={!editMode} variant="primary" onClick={handleMediaUpload}>Upload media</Button>
-                                    <Button name="Video" disabled={!editMode} variant="danger" onClick={handleMediaDelete}>Delete media</Button>
+                                    <Button name="Video" disabled={!editMode} variant="danger" hidden={exercise.video === undefined} onClick={handleMediaDelete}>Delete media</Button>
                                 </ButtonGroup>
-                            </Form.Group>
+                            </ExerciseAttribute>
                         )}
                     </Col>
                 </Row>
                 <Row>
                     <Col>
-                        {/* TODO: implement pose editor */}
-                        <div>Pose editor</div>
+                        <ExerciseAttribute label="Poses">
+                            {/* TODO: implement pose editor */}
+                            <div>Pose editor</div>
+                        </ExerciseAttribute>
                     </Col>
                 </Row>
             </FormContext.Provider>

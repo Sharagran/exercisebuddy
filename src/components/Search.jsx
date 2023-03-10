@@ -4,6 +4,7 @@ import { Button, Form, Col, Row, FloatingLabel, Accordion } from 'react-bootstra
 
 import Fuse from 'fuse.js'
 import moment from 'moment';
+import Select from 'react-select'
 
 import DatePicker from './DateRangePickerWrapper';
 import RangeSlider from './RangeSlider';
@@ -20,8 +21,8 @@ var defaultSearchParams = {
     duration: [null, null],
     pause: [null, null],
 
-    complaintsAreas: '',
-    equipment: '',
+    complaintsAreas: [],
+    equipment: [],
 
     isDefault(key, value) {
         if (key === "createdAt" || key === "updatedAt") {
@@ -96,14 +97,21 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     useEffect(() => {
         // Search parameters changed
         let searchParams = getSearchParams();
-        search(searchParams);
+        let filteredExercises = search(searchParams);
+        getSelectOptions(filteredExercises);
         saveLastSearch(searchParams);
     }, [title, createdAt, updatedAt, difficulty, set, repetition, duration, pause, complaintsAreas, equipment]);
 
-    function getSelectOptions() {
+    // TODO: use function from ExerciseProvider.jsx instead
+    function getSelectOptions(exerciseList = exercises) {
+        // check if exerciseList is a fuse result (view data)
+        if(exerciseList[0] && exerciseList[0].item) {
+            exerciseList = exerciseList.map(exercise => exercise.item);
+        }
+
         var complaintsAreas = [];
         var equipment = [];
-        exercises.forEach(exercise => {
+        exerciseList.forEach(exercise => {
             if (exercise.complaintsAreas) {
                 complaintsAreas = complaintsAreas.concat(exercise.complaintsAreas);
             }
@@ -122,6 +130,11 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
             min: 0,
             max: 0
         }
+        var pauseRange = {
+            min: 0,
+            max: 0
+        }
+
         exercises.forEach(exercise => {
             if (exercise.duration) {
                 if (exercise.duration < durationRange.min) {
@@ -131,14 +144,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                     durationRange.max = exercise.duration;
                 }
             }
-        });
-        setDurationRange(durationRange);
 
-        var pauseRange = {
-            min: 0,
-            max: 0
-        }
-        exercises.forEach(exercise => {
             if (exercise.pause) {
                 if (exercise.pause < pauseRange.min) {
                     pauseRange.min = exercise.pause;
@@ -148,6 +154,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                 }
             }
         });
+        setDurationRange(durationRange);
         setPauseRange(pauseRange);
 
         defaultSearchParams.duration = [durationRange.min, durationRange.max];
@@ -273,10 +280,10 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                 } else if (key === "difficulty" || key === "set" || key === "repetition") {
                     matches = matches && exercise[key] == searchParams[key];
                 } else if (key === "duration" || key === "pause") {
-                    // TODO: implement
                     matches = matches && exercise[key] >= searchParams[key][0] && exercise[key] <= searchParams[key][1];
                 } else if (key === "complaintsAreas" || key === "equipment") {
-                    matches = matches && exercise[key].includes(searchParams[key]);
+                    // every search param value must be included in exercise, but not every exercise value must be included in search param
+                    matches = matches && searchParams[key].every(item => exercise[key].includes(item.value));
                 }
             }
 
@@ -484,30 +491,30 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                         <Row>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formcomplaintsAreas">
-                                    <FloatingLabel label="Complaints Areas">
-                                        <Form.Select value={complaintsAreas} onChange={(e) => setcomplaintsAreas(e.target.value)}>
-                                            <option value=""></option>
-                                            {
-                                                complaintsAreasList.map((item, index) => {
-                                                    return <option key={index} value={item}>{item}</option>
-                                                })
-                                            }
-                                        </Form.Select >
-                                    </FloatingLabel>
+                                    <Form.Label>Complaints Areas</Form.Label>
+                                    <Select
+                                        isMulti
+                                        placeholder="Complaints Areas"
+                                        value={complaintsAreas}
+                                        onChange={setcomplaintsAreas}
+                                        options={complaintsAreasList.map((item, index) => {
+                                            return { value: item, label: item }
+                                        })}
+                                    />
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3" controlId="formEquipment">
-                                    <FloatingLabel label="Equipment">
-                                        <Form.Select value={equipment} onChange={(e) => SetEquipment(e.target.value)}>
-                                            <option value=""></option>
-                                            {
-                                                equipmentList.map((item, index) => {
-                                                    return <option key={index} value={item}>{item}</option>
-                                                })
-                                            }
-                                        </Form.Select >
-                                    </FloatingLabel>
+                                    <Form.Label>Equipment</Form.Label>
+                                    <Select
+                                        isMulti
+                                        placeholder="Equipment"
+                                        value={equipment}
+                                        onChange={SetEquipment}
+                                        options={equipmentList.map((item, index) => {
+                                            return { value: item, label: item }
+                                        })}
+                                    />
                                 </Form.Group>
                             </Col>
                         </Row>

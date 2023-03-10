@@ -114,6 +114,46 @@ function ExerciseProvider() {
         });
     }
 
+    function getSelectOptions(exerciseList = exercises) {
+        // check if exerciseList is a fuse result (view data)
+        if(exerciseList[0] && exerciseList[0].item) {
+            exerciseList = exerciseList.map(exercise => exercise.item);
+        }
+
+        var complaintsAreas = [];
+        var equipment = [];
+        exerciseList.forEach(exercise => {
+            if (exercise.complaintsAreas) {
+                complaintsAreas = complaintsAreas.concat(exercise.complaintsAreas);
+            }
+            if (exercise.equipment) {
+                equipment = equipment.concat(exercise.equipment);
+            }
+        });
+
+        complaintsAreas = [...new Set(complaintsAreas)];
+        equipment = [...new Set(equipment)];
+
+        complaintsAreas = complaintsAreas.map(area => {
+            return {
+                value: area,
+                label: area
+            }
+        });
+
+        equipment = equipment.map(equipment => {
+            return {
+                value: equipment,
+                label: equipment
+            }
+        });
+
+        return {
+            complaintsAreas,
+            equipment
+        }
+    }
+
     useEffect(() => {
         fetchExercises();
     }, [])
@@ -131,7 +171,9 @@ function ExerciseProvider() {
         uploadExerciseMedia,
         deleteExerciseMedia,
         updateExercise,
-        deleteExercise
+        deleteExercise,
+
+        getSelectOptions
     };
 
     return (
