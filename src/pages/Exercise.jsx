@@ -15,9 +15,17 @@ function ExerciseAttribute(props) {
         <Form.Group className="mb-3" controlId={`form${label}`}>
             <Form.Label>{label}</Form.Label>
             <Form.Control name={attrKey} disabled={!editMode} type={type} {...rest} value={exercise[attrKey]} onChange={e => {
+                var value;
+                if (type === 'number') {
+                    value = Number(e.target.value);
+                } else if (attrKey === 'complaintsAreas' || attrKey === 'equipment') {
+                    value = e.target.value.split(',').map(s => s.trim());
+                } else {
+                    value = e.target.value;
+                }
                 setExercise({
                     ...exercise,
-                    [attrKey]: type === 'number' ? Number(e.target.value) : e.target.value
+                    [attrKey]: value
                 });
             }} />
         </Form.Group>
@@ -319,17 +327,19 @@ export default function Exercise() {
                         {id !== 'create' && (
                             <Form.Group className="mb-3" controlId={`formImage`}>
                                 <Form.Label>Image</Form.Label>
-                                <Image crossOrigin="anonymous" src={exercise.image} alt="Exercise image" onError={(e) => {
-                                    console.log("Image token expired, reloading exercise...");
-                                    fetchExercise(id).then((exercise) => {
-                                        setExercise(exercise);
-                                    });
-                                }} />
-
+                                <div hidden={exercise.image === undefined}>
+                                    <Image crossOrigin="anonymous" src={exercise.image} alt="Exercise image" fluid onError={(e) => {
+                                        console.log("Image token expired, reloading exercise...");
+                                        fetchExercise(id).then((exercise) => {
+                                            setExercise(exercise);
+                                        });
+                                    }}
+                                    style={{ maxHeight: "256px" }} />
+                                </div>
                                 <Form.Control name="image" disabled={!editMode} type="file" accept="image/*" />
                                 <ButtonGroup className="mt-2">
                                     <Button name="Image" disabled={!editMode} variant="primary" onClick={handleMediaUpload}>Upload media</Button>
-                                    <Button name="Image" disabled={!editMode} variant="danger" onClick={handleMediaDelete}>Delete media</Button>
+                                    <Button name="Image" disabled={!editMode} variant="danger" hidden={exercise.image === undefined} onClick={handleMediaDelete}>Delete media</Button>
                                 </ButtonGroup>
                             </Form.Group>
                         )}
@@ -343,7 +353,7 @@ export default function Exercise() {
                                 <Form.Control name="video" disabled={!editMode} type="file" accept="video/*" />
                                 <ButtonGroup className="mt-2">
                                     <Button name="Video" disabled={!editMode} variant="primary" onClick={handleMediaUpload}>Upload media</Button>
-                                    <Button name="Video" disabled={!editMode} variant="danger" onClick={handleMediaDelete}>Delete media</Button>
+                                    <Button name="Video" disabled={!editMode} variant="danger" hidden={exercise.video === undefined} onClick={handleMediaDelete}>Delete media</Button>
                                 </ButtonGroup>
                             </Form.Group>
                         )}
