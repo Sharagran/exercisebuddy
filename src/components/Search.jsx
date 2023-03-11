@@ -27,6 +27,8 @@ var defaultSearchParams = {
     isDefault(key, value) {
         if (key === "createdAt" || key === "updatedAt") {
             return value[0] === defaultSearchParams[key][0] && value[1] === defaultSearchParams[key][1];
+        } else if (key === "complaintsAreas" || key === "equipment") {
+            return value.length === 0;
         } else {
             return value === defaultSearchParams[key];
         }
@@ -159,6 +161,13 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
 
         defaultSearchParams.duration = [durationRange.min, durationRange.max];
         defaultSearchParams.pause = [pauseRange.min, pauseRange.max];
+
+        if (duration.includes(null)) {
+            setDuration(defaultSearchParams.duration);
+        }
+        if (pause.includes(null)) {
+            setPause(defaultSearchParams.pause);
+        }
     }
 
     function getSearchParams() {
