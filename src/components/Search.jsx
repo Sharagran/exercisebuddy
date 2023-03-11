@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button, Form, Col, Row, FloatingLabel, Accordion } from 'react-bootstrap';
+import { Button, Form, Col, Row, FloatingLabel, Accordion, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import Fuse from 'fuse.js'
 import moment from 'moment';
@@ -10,7 +10,7 @@ import DatePicker from './DateRangePickerWrapper';
 import RangeSlider from './RangeSlider';
 
 var defaultSearchParams = {
-    title: '',
+    searchQuery: '',
 
     createdAt: [null, null],
     updatedAt: [null, null],
@@ -43,8 +43,7 @@ var defaultSearchParams = {
 
 export default function Search({ exercises, setExerciseView, sortOptions }) {
     // search parameters
-    // TODO: change title to queryString
-    const [title, setTitle] = useState(defaultSearchParams.title);
+    const [searchQuery, setSearchQuery] = useState(defaultSearchParams.searchQuery);
     const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
 
     const [createdAt, setCreatedAt] = useState(defaultSearchParams.createdAt);
@@ -102,12 +101,12 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         let filteredExercises = search(searchParams);
         getSelectOptions(filteredExercises);
         saveLastSearch(searchParams);
-    }, [title, createdAt, updatedAt, difficulty, set, repetition, duration, pause, complaintsAreas, equipment]);
+    }, [searchQuery, createdAt, updatedAt, difficulty, set, repetition, duration, pause, complaintsAreas, equipment]);
 
     // TODO: use function from ExerciseProvider.jsx instead
     function getSelectOptions(exerciseList = exercises) {
         // check if exerciseList is a fuse result (view data)
-        if(exerciseList[0] && exerciseList[0].item) {
+        if (exerciseList[0] && exerciseList[0].item) {
             exerciseList = exerciseList.map(exercise => exercise.item);
         }
 
@@ -162,6 +161,10 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         defaultSearchParams.duration = [durationRange.min, durationRange.max];
         defaultSearchParams.pause = [pauseRange.min, pauseRange.max];
 
+        applyDefaultRanges();
+    }
+
+    function applyDefaultRanges() {
         if (duration.includes(null)) {
             setDuration(defaultSearchParams.duration);
         }
@@ -172,7 +175,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
 
     function getSearchParams() {
         return {
-            title,
+            searchQuery,
 
             createdAt,
             updatedAt,
@@ -189,7 +192,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     }
 
     function clear() {
-        setTitle(defaultSearchParams.title);
+        setSearchQuery(defaultSearchParams.searchQuery);
 
         setCreatedAt(defaultSearchParams.createdAt);
         setCreatedAtInput("");
@@ -219,7 +222,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         console.log(lastSearch);
 
         if (lastSearch) {
-            setTitle(lastSearch.title);
+            setSearchQuery(lastSearch.searchQuery);
 
             setCreatedAt(lastSearch.createdAt);
             setUpdatedAt(lastSearch.updatedAt);
@@ -300,7 +303,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         });
 
         var result;
-        if (!defaultSearchParams.isDefault("title", searchParams.title)) {
+        if (!defaultSearchParams.isDefault("searchQuery", searchParams.searchQuery)) {
             // search for title and description
             // docs: https://fusejs.io/api/options.html
             // https://fusejs.io/concepts/scoring-theory.html#scoring-theory
@@ -322,7 +325,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                 // includeMatches: true
             });
 
-            result = fuse.search(searchParams.title);
+            result = fuse.search(searchParams.searchQuery);
 
             // apply best match index
             var i = 0;
@@ -416,14 +419,24 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         }
     }
 
+    const renderTooltip = (props) => (
+        <Tooltip id="button-tooltip" {...props}>
+            Search for title and description.
+        </Tooltip>
+    );
+
     return (
         <div className='search'>
             <h3>Search</h3>
             <Form onSubmit={submit} className='border'>
                 <Form.Group className="mb-3" controlId="formTitle">
-                    <FloatingLabel label="Title">
-                        <Form.Control type="search" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-                    </FloatingLabel>
+                    <OverlayTrigger
+                        delay={{ show: 250, hide: 400 }}
+                        overlay={renderTooltip}>
+                        <FloatingLabel label="Search query">
+                            <Form.Control type="search" placeholder="Search query" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                        </FloatingLabel>
+                    </OverlayTrigger>
                 </Form.Group>
 
                 {/* Advanced search */}
