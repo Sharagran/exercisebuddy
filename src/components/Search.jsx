@@ -29,6 +29,8 @@ var defaultSearchParams = {
             return value[0] === defaultSearchParams[key][0] && value[1] === defaultSearchParams[key][1];
         } else if (key === "complaintsAreas" || key === "equipment") {
             return value.length === 0;
+        } else if (key === "duration" || key === "pause") {
+            return value[0] === defaultSearchParams[key][0] && value[1] === defaultSearchParams[key][1];
         } else {
             return value === defaultSearchParams[key];
         }
@@ -157,20 +159,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         });
         setDurationRange(durationRange);
         setPauseRange(pauseRange);
-
-        defaultSearchParams.duration = [durationRange.min, durationRange.max];
-        defaultSearchParams.pause = [pauseRange.min, pauseRange.max];
-
-        applyDefaultRanges();
-    }
-
-    function applyDefaultRanges() {
-        if (duration.includes(null)) {
-            setDuration(defaultSearchParams.duration);
-        }
-        if (pause.includes(null)) {
-            setPause(defaultSearchParams.pause);
-        }
     }
 
     function getSearchParams() {
@@ -251,7 +239,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     }
 
     function search(searchParams) {
-
         // if default search parameters are set, display all exercises
         if (defaultSearchParams.areDefault(searchParams)) {
             if (exercises.length > 0 && exercises[0].hasOwnProperty('item')) {
@@ -292,7 +279,10 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                 } else if (key === "difficulty" || key === "set" || key === "repetition") {
                     matches = matches && exercise[key] == searchParams[key];
                 } else if (key === "duration" || key === "pause") {
-                    matches = matches && exercise[key] >= searchParams[key][0] && exercise[key] <= searchParams[key][1];
+                    let valueFrom = searchParams[key][0] || 0;
+                    let valueTo = searchParams[key][1] || 0;
+
+                    matches = matches && exercise[key] >= valueFrom && exercise[key] <= valueTo;
                 } else if (key === "complaintsAreas" || key === "equipment") {
                     // every search param value must be included in exercise, but not every exercise value must be included in search param
                     matches = matches && searchParams[key].every(item => exercise[key].includes(item.value));
@@ -499,13 +489,15 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3 text-center" controlId="formDuration">
-                                    <RangeSlider id="formDurationSlider" type="double" skin="round" min={durationRange.min} max={durationRange.max} grid={true} setValue={setDuration} />
+                                    <RangeSlider id="formDurationSlider" type="double" skin="round" min={durationRange.min} max={durationRange.max}
+                                    grid={true} setValue={setDuration} value={duration} />
                                     <Form.Label>Duration</Form.Label>
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3 text-center" controlId="formPause">
-                                    <RangeSlider id="formPauseSlider" type="double" skin="round" min={pauseRange.min} max={pauseRange.max} grid={true} setValue={setPause} />
+                                    <RangeSlider id="formPauseSlider" type="double" skin="round" min={pauseRange.min} max={pauseRange.max}
+                                    grid={true} setValue={setPause} value={pause} />
                                     <Form.Label>Pause</Form.Label>
                                 </Form.Group>
                             </Col>
