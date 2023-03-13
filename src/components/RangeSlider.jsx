@@ -25,7 +25,7 @@ export default function RangeSlider(params) {
         }
       });
     }
-  }, [params.min, params.max]);
+  }, [params.min, params.max, params.forceRerender]);
 
   function secondsToTime(microseconds) {
     let secs = microseconds / 1000000;

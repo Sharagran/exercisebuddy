@@ -75,6 +75,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     // additional states for input fields which values differ from the search parameters
     const [createdAtInput, setCreatedAtInput] = useState("");
     const [updatedAtInput, setUpdatedAtInput] = useState("");
+    const [forceSliderRerender, setForceSliderRerender] = useState(false);
 
     // other hooks
     const navigate = useNavigate();
@@ -195,6 +196,8 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
 
         setcomplaintsAreas(defaultSearchParams.complaintsAreas);
         SetEquipment(defaultSearchParams.equipment);
+
+        setForceSliderRerender(!forceSliderRerender);
     }
 
     function saveLastSearch(lastSearch) {
@@ -490,14 +493,14 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                             <Col>
                                 <Form.Group className="mb-3 text-center" controlId="formDuration">
                                     <RangeSlider id="formDurationSlider" type="double" skin="round" min={durationRange.min} max={durationRange.max}
-                                    grid={true} setValue={setDuration} value={duration} />
+                                    grid={true} setValue={setDuration} value={duration} forceRerender={forceSliderRerender} />
                                     <Form.Label>Duration</Form.Label>
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3 text-center" controlId="formPause">
                                     <RangeSlider id="formPauseSlider" type="double" skin="round" min={pauseRange.min} max={pauseRange.max}
-                                    grid={true} setValue={setPause} value={pause} />
+                                    grid={true} setValue={setPause} value={pause} forceRerender={forceSliderRerender} />
                                     <Form.Label>Pause</Form.Label>
                                 </Form.Group>
                             </Col>
