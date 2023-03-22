@@ -5,6 +5,7 @@ import CreatableSelect from 'react-select/creatable';
 import toast from 'react-hot-toast';
 
 import ExerciseContext from '../components/ExerciseProvider';
+import PoseEditor from '../components/PoseEditor/PoseEditor';
 
 const FormContext = createContext();
 
@@ -103,6 +104,9 @@ export default function Exercise() {
         // set created at and updated at
         exercise.createdAt = new Date();
         exercise.updatedAt = new Date();
+
+        // convert seconds to microseconds
+        // exercise.duration *= 1000000;
         console.log(exercise); //FIXME: debug only, remove this
 
         toast.promise(createExercise(exercise), {
@@ -408,7 +412,7 @@ export default function Exercise() {
                     <Col>
                         <ExerciseAttribute label="Poses">
                             {/* TODO: implement pose editor */}
-                            <div>Pose editor</div>
+                            <PoseEditor />
                         </ExerciseAttribute>
                     </Col>
                 </Row>
