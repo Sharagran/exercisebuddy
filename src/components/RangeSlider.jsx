@@ -15,16 +15,17 @@ export default function RangeSlider(params) {
         ...params,
         prettify: secondsToTime,
 
+        from: params.value ? params.value[0] : params.min,
+        to: params.value ? params.value[1] : params.max,
+
         // FIXME: filter cant find exercise with exact 14ms pause (too unprecise)
         // step: 1000, // 1 ms
-        from: params.min,
-        to: params.max,
         onChange: (data) => {
           params.setValue([data.from, data.to]);
         }
       });
     }
-  }, [params.min, params.max]);
+  }, [params.min, params.max, params.forceRerender]);
 
   function secondsToTime(microseconds) {
     let secs = microseconds / 1000000;

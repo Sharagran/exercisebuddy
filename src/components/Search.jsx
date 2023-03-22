@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button, Form, Col, Row, FloatingLabel, Accordion } from 'react-bootstrap';
+import { Button, Form, Col, Row, FloatingLabel, Accordion, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import Fuse from 'fuse.js'
 import moment from 'moment';
@@ -10,7 +10,7 @@ import DatePicker from './DateRangePickerWrapper';
 import RangeSlider from './RangeSlider';
 
 var defaultSearchParams = {
-    title: '',
+    searchQuery: '',
 
     createdAt: [null, null],
     updatedAt: [null, null],
@@ -27,6 +27,10 @@ var defaultSearchParams = {
     isDefault(key, value) {
         if (key === "createdAt" || key === "updatedAt") {
             return value[0] === defaultSearchParams[key][0] && value[1] === defaultSearchParams[key][1];
+        } else if (key === "complaintsAreas" || key === "equipment") {
+            return value.length === 0;
+        } else if (key === "duration" || key === "pause") {
+            return value[0] === defaultSearchParams[key][0] && value[1] === defaultSearchParams[key][1];
         } else {
             return value === defaultSearchParams[key];
         }
@@ -41,8 +45,7 @@ var defaultSearchParams = {
 
 export default function Search({ exercises, setExerciseView, sortOptions }) {
     // search parameters
-    // TODO: change title to queryString
-    const [title, setTitle] = useState(defaultSearchParams.title);
+    const [searchQuery, setSearchQuery] = useState(defaultSearchParams.searchQuery);
     const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
 
     const [createdAt, setCreatedAt] = useState(defaultSearchParams.createdAt);
@@ -72,6 +75,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     // additional states for input fields which values differ from the search parameters
     const [createdAtInput, setCreatedAtInput] = useState("");
     const [updatedAtInput, setUpdatedAtInput] = useState("");
+    const [forceSliderRerender, setForceSliderRerender] = useState(false);
 
     // other hooks
     const navigate = useNavigate();
@@ -100,12 +104,12 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         let filteredExercises = search(searchParams);
         getSelectOptions(filteredExercises);
         saveLastSearch(searchParams);
-    }, [title, createdAt, updatedAt, difficulty, set, repetition, duration, pause, complaintsAreas, equipment]);
+    }, [searchQuery, createdAt, updatedAt, difficulty, set, repetition, duration, pause, complaintsAreas, equipment]);
 
     // TODO: use function from ExerciseProvider.jsx instead
     function getSelectOptions(exerciseList = exercises) {
         // check if exerciseList is a fuse result (view data)
-        if(exerciseList[0] && exerciseList[0].item) {
+        if (exerciseList[0] && exerciseList[0].item) {
             exerciseList = exerciseList.map(exercise => exercise.item);
         }
 
@@ -156,14 +160,11 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         });
         setDurationRange(durationRange);
         setPauseRange(pauseRange);
-
-        defaultSearchParams.duration = [durationRange.min, durationRange.max];
-        defaultSearchParams.pause = [pauseRange.min, pauseRange.max];
     }
 
     function getSearchParams() {
         return {
-            title,
+            searchQuery,
 
             createdAt,
             updatedAt,
@@ -180,7 +181,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     }
 
     function clear() {
-        setTitle(defaultSearchParams.title);
+        setSearchQuery(defaultSearchParams.searchQuery);
 
         setCreatedAt(defaultSearchParams.createdAt);
         setCreatedAtInput("");
@@ -195,6 +196,8 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
 
         setcomplaintsAreas(defaultSearchParams.complaintsAreas);
         SetEquipment(defaultSearchParams.equipment);
+
+        setForceSliderRerender(!forceSliderRerender);
     }
 
     function saveLastSearch(lastSearch) {
@@ -210,7 +213,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         console.log(lastSearch);
 
         if (lastSearch) {
-            setTitle(lastSearch.title);
+            setSearchQuery(lastSearch.searchQuery);
 
             setCreatedAt(lastSearch.createdAt);
             setUpdatedAt(lastSearch.updatedAt);
@@ -239,7 +242,6 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
     }
 
     function search(searchParams) {
-
         // if default search parameters are set, display all exercises
         if (defaultSearchParams.areDefault(searchParams)) {
             if (exercises.length > 0 && exercises[0].hasOwnProperty('item')) {
@@ -280,7 +282,10 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                 } else if (key === "difficulty" || key === "set" || key === "repetition") {
                     matches = matches && exercise[key] == searchParams[key];
                 } else if (key === "duration" || key === "pause") {
-                    matches = matches && exercise[key] >= searchParams[key][0] && exercise[key] <= searchParams[key][1];
+                    let valueFrom = searchParams[key][0] || 0;
+                    let valueTo = searchParams[key][1] || 0;
+
+                    matches = matches && exercise[key] >= valueFrom && exercise[key] <= valueTo;
                 } else if (key === "complaintsAreas" || key === "equipment") {
                     // every search param value must be included in exercise, but not every exercise value must be included in search param
                     matches = matches && searchParams[key].every(item => exercise[key].includes(item.value));
@@ -291,7 +296,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         });
 
         var result;
-        if (!defaultSearchParams.isDefault("title", searchParams.title)) {
+        if (!defaultSearchParams.isDefault("searchQuery", searchParams.searchQuery)) {
             // search for title and description
             // docs: https://fusejs.io/api/options.html
             // https://fusejs.io/concepts/scoring-theory.html#scoring-theory
@@ -313,7 +318,7 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                 // includeMatches: true
             });
 
-            result = fuse.search(searchParams.title);
+            result = fuse.search(searchParams.searchQuery);
 
             // apply best match index
             var i = 0;
@@ -407,14 +412,24 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
         }
     }
 
+    const renderTooltip = (props) => (
+        <Tooltip id="button-tooltip" {...props}>
+            Search for title and description.
+        </Tooltip>
+    );
+
     return (
         <div className='search'>
             <h3>Search</h3>
             <Form onSubmit={submit} className='border'>
                 <Form.Group className="mb-3" controlId="formTitle">
-                    <FloatingLabel label="Title">
-                        <Form.Control type="search" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-                    </FloatingLabel>
+                    <OverlayTrigger
+                        delay={{ show: 250, hide: 400 }}
+                        overlay={renderTooltip}>
+                        <FloatingLabel label="Search query">
+                            <Form.Control type="search" placeholder="Search query" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                        </FloatingLabel>
+                    </OverlayTrigger>
                 </Form.Group>
 
                 {/* Advanced search */}
@@ -477,13 +492,15 @@ export default function Search({ exercises, setExerciseView, sortOptions }) {
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3 text-center" controlId="formDuration">
-                                    <RangeSlider id="formDurationSlider" type="double" skin="round" min={durationRange.min} max={durationRange.max} grid={true} setValue={setDuration} />
+                                    <RangeSlider id="formDurationSlider" type="double" skin="round" min={durationRange.min} max={durationRange.max}
+                                    grid={true} setValue={setDuration} value={duration} forceRerender={forceSliderRerender} />
                                     <Form.Label>Duration</Form.Label>
                                 </Form.Group>
                             </Col>
                             <Col>
                                 <Form.Group className="mb-3 text-center" controlId="formPause">
-                                    <RangeSlider id="formPauseSlider" type="double" skin="round" min={pauseRange.min} max={pauseRange.max} grid={true} setValue={setPause} />
+                                    <RangeSlider id="formPauseSlider" type="double" skin="round" min={pauseRange.min} max={pauseRange.max}
+                                    grid={true} setValue={setPause} value={pause} forceRerender={forceSliderRerender} />
                                     <Form.Label>Pause</Form.Label>
                                 </Form.Group>
                             </Col>
