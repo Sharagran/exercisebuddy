@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { ButtonGroup, Button, Form } from 'react-bootstrap';
+import { ButtonGroup, Button, Form, Container } from 'react-bootstrap';
 import axios from 'axios';
 
 import { useParams } from 'react-router-dom';
@@ -49,7 +49,7 @@ export default function ResetPassword() {
 
 
     return (
-        <div>
+        <Container>
             <h2>Reset Password</h2>
 
             <Form noValidate validated={formValid} onSubmit={handleSubmit}>
@@ -63,6 +63,6 @@ export default function ResetPassword() {
                 </Form.Group>
                 <Button variant="primary" type="submit">Reset Password</Button>
             </Form>
-        </div>
+        </Container>
     )
 }
