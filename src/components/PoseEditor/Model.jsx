@@ -11,38 +11,126 @@ const boneDict = {
     "mixamorigHead_06": "nose",
     "mixamorigLeftArm_09": "rightShoulder",
     "mixamorigLeftForeArm_010": "rightElbow",
+    "mixamorigLeftHand_011": "rightWrist",
+
     "mixamorigRightArm_017": "leftShoulder",
     "mixamorigRightForeArm_018": "leftElbow",
+    "mixamorigRightHand_019": "leftWrist",
+
     "mixamorigLeftUpLeg_024": "rightHip",
     "mixamorigLeftLeg_025": "rightKnee",
+    "mixamorigLeftFoot_026": "rightAnkle",
+
     "mixamorigRightUpLeg_00": "leftHip",
     "mixamorigRightLeg_029": "leftKnee",
+    "mixamorigRightFoot_030": "leftAnkle",
 
     "mixamorigSpine_02": null,
     "mixamorigSpine1_03": null,
     "mixamorigSpine2_04": null,
 };
 
+const boneDictV2 = {
+    "mixamorigHead_06": {
+        label: "nose",
+        show: true,
+        trackable: true,
+        angleRotationAxis: "x",
+        // angleThreshold: 15,
+        // firstEdgeIndex: 0,
+        // secondEdgeIndex: 1,
+    }
+    // ...
+}
+
 
 const edges = {
-    rightShoulder: ["rightShoulder", "rightHip"],
-    rightElbow: ["rightElbow", "rightShoulder"],
-    rightHip: ["rightHip", "rightKnee"],
-    rightKnee: ["rightKnee", "rightHip"],
+    rightShoulder: ["rightShoulder", "rightHip", "rightElbow"],
+    rightElbow: ["rightElbow", "rightShoulder", "rightWrist"],
+    rightHip: ["rightHip", "rightKnee", "rightShoulder"],
+    rightKnee: ["rightKnee", "rightHip", "rightAnkle"],
 
-    leftShoulder: ["leftShoulder", "leftHip"],
-    leftElbow: ["leftElbow", "leftShoulder"],
-    leftHip: ["leftHip", "leftKnee"],
-    leftKnee: ["leftKnee", "leftHip"],
+    leftShoulder: ["leftShoulder", "leftHip", "leftElbow"],
+    leftElbow: ["leftElbow", "leftShoulder", "leftWrist"],
+    leftHip: ["leftHip", "leftKnee", "leftShoulder"],
+    leftKnee: ["leftKnee", "leftHip", "leftAnkle"],
 };
 
-export default function Model({ getPose, setPose, pose }) {
+/* poses: [
+{
+    requirements: [
+        {
+            angleThreshold: 0.1,
+            requiredAngle: 0.5,
+            bodyJoint: {
+                label: "leftShoulder",
+                ...
+            }
+        }
+    ]
+}
+] */
 
-    const [controls, setControls] = useState();
-    const { camera, gl: renderer, raycaster } = useThree();
-    const [highlightPoints, setHighlightPoints] = useState([]);
+export default function Model({ getPose, setPose, pose }) {
+    const { camera, gl: renderer } = useThree();
     const mesh = useRef();
 
+    const [controls, setControls] = useState();
+    const [highlightPoints, setHighlightPoints] = useState([]);
+    const [defaultPose, setDefaultPose] = useState({});
+
+    const gltf = useLoader(GLTFLoader, "/simple_human.glb");
+    useHelper(mesh, THREE.SkeletonHelper, "visible");
+
+    // var defaultPose = {};
+    var bones = {};
+
+    useEffect(() => {
+        createJointHighlights();
+        initControls();
+    }, []);
+
+    useEffect(() => {
+        if (pose) {
+            resetPose();
+            applyPose();
+        }
+    }, [pose]);
+
+    // TODO: remove controls when not clickign on joint
+    // remove controls on right click
+    useEffect(() => {
+        function handleRightClick(e) {
+            if (e.target.nodeName === "CANVAS") {
+                e.preventDefault();
+                if (e.button === 2) {
+                    controls.detach();
+                }
+            }
+        }
+
+        function handleMouseMove(e) {
+            return;
+            if (e.target.nodeName === "CANVAS" && e.buttons === 2) {
+                mesh.current.rotation.y += e.movementX * 0.01;
+                updateJointHighlights();
+            }
+        }
+        window.addEventListener("contextmenu", handleRightClick);
+        window.addEventListener("mousemove", handleMouseMove);
+        return () => {
+            window.removeEventListener("contextmenu", handleRightClick);
+            window.removeEventListener("mousemove", handleMouseMove);
+        }
+    }, [controls]);
+
+    // useFrame is a React Three Fiber hook that allows you to run code on every frame
+    useFrame(() => {
+        // mesh.current.rotation.y += 0.01;
+        // updateJointHighlights();
+    });
+
+    //#region Control elements
     function createJointHighlights() {
         var spheres = [];
         for (const key in bones) {
@@ -93,9 +181,29 @@ export default function Model({ getPose, setPose, pose }) {
         controls.showX = false;
         controls.showY = false;
 
-        controls.addEventListener('objectChange', updateJointHighlights);
+        controls.addEventListener('objectChange', function (e) {
+            updateJointHighlights();
+            setPose(parsePoseToData());
+        });
 
         setControls(controls);
+    }
+    //#endregion
+
+    //#region Parsing
+    function angleBetweenPoints(p1, p2, p3) {
+        // get world position of points
+        p1 = p1.getWorldPosition(new THREE.Vector3());
+        p2 = p2.getWorldPosition(new THREE.Vector3());
+        p3 = p3.getWorldPosition(new THREE.Vector3());
+
+        // calculate angle at p1 in the triangle p1-p2-p3
+        var v1 = new THREE.Vector3().subVectors(p2, p1);
+        var v2 = new THREE.Vector3().subVectors(p3, p1);
+        var angle = v1.angleTo(v2);
+        angle = THREE.MathUtils.radToDeg(angle);
+        angle = Math.round(angle);
+        return angle;
     }
 
     function parseDataToPose(data) {
@@ -114,69 +222,61 @@ export default function Model({ getPose, setPose, pose }) {
     }
 
     function parsePoseToData() {
-        var data = {};
+        var newPose = { ...pose };
         for (const key in bones) {
             if (Object.hasOwnProperty.call(bones, key)) {
                 const bone = bones[key];
-                data[key] = {
-                    x: bone.joint.x,
-                    y: bone.joint.y,
-                    z: bone.joint.z
+
+                // check if requirement array has element with label
+                var requirement = newPose.requirements.find(req => req.bodyJoint.label === key);
+                if (requirement) {
+                    requirement.requiredAngle = Math.round(THREE.MathUtils.radToDeg(bone.rotation.x));
+                    requirement.angleThreshold = 15; //FIXME: hardcoded
+                } else {
+                    console.log(bone.rotation.y);
+                    newPose.requirements.push({
+                        bodyJoint: {
+                            label: key,
+                            desiredAngle: null,
+                            firstEdgeIndex: null,
+                            secondEdgeIndex: null
+                        },
+                        requiredAngle: Math.round(THREE.MathUtils.radToDeg(bone.rotation.y)),
+                        angleThreshold: 15 //FIXME: hardcoded
+                    });
                 }
             }
         }
-        return data;
+        // console.log(newPose);
+        // console.log(pose);
+        return newPose;
     }
+    //#endregion
 
-    /* poses: [
-    {
-        requirements: [
-            {
-                angleThreshold: 0.1,
-                requiredAngle: 0.5,
-                bodyJoint: {
-                    label: "leftShoulder",
-                    ...
-                }
-            }
-        ]
-    }
-] */
+    //#region Modify Pose
+    // TODO: reset not working properly, hip rotation is wrong
     function resetPose() {
+        console.log(defaultPose["leftHip"]);
         for (const key in bones) {
-            if (Object.hasOwnProperty.call(bones, key)) {
+            if (Object.hasOwnProperty.call(defaultPose, key)) {
                 const bone = bones[key];
-                bone.rotation.x = 0;
+                var defaultAngle = defaultPose[key];
+                switch (key) {
+                    case "leftHip":
+                    case "leftKnee":
+                    // defaultAngle.z = -defaultAngle.z;
+                    // defaultAngle.x = -defaultAngle.x;
+                    case "rightHip":
+                    case "rightKnee":
+                        bone.rotation.z = defaultAngle.z;
+                        break;
+
+                    default:
+                        bone.rotation.x = defaultAngle.x;
+                        break;
+                }
             }
         }
-    }
-
-    function exercisebuddyAngleToThreeAngle(angle) {
-        var angle = THREE.MathUtils.degToRad(angle);
-        angle = Math.abs(angle - 180);
-        return angle;
-    }
-
-    function angleBetweenBones(bone1, bone2) {
-        var angle = bone1.getWorldDirection(new THREE.Vector3()).angleTo(bone2.getWorldDirection(new THREE.Vector3()));
-        angle = THREE.MathUtils.radToDeg(angle);
-        angle = Math.round(angle);
-        return angle;
-    }
-
-    function angleBetween3Points(p1, p2, p3) {
-        // get world position of points
-        p1 = p1.getWorldPosition(new THREE.Vector3());
-        p2 = p2.getWorldPosition(new THREE.Vector3());
-        p3 = p3.getWorldPosition(new THREE.Vector3());
-
-        // calculate angle at p1 in the triangle p1-p2-p3
-        var v1 = new THREE.Vector3().subVectors(p2, p1);
-        var v2 = new THREE.Vector3().subVectors(p3, p1);
-        var angle = v1.angleTo(v2);
-        angle = THREE.MathUtils.radToDeg(angle);
-        angle = Math.round(angle);
-        return angle;
     }
 
     function applyPose() {
@@ -184,76 +284,74 @@ export default function Model({ getPose, setPose, pose }) {
             const key = req.bodyJoint.label;
             const bone = bones[key];
 
-            const translatetAngle = THREE.MathUtils.degToRad(req.requiredAngle);
+            if(!bone) return;
 
-            bone.rotation.x = translatetAngle;
+            var angle = req.requiredAngle;
+            // shift 0° to 180° (180° is expended joint)
+            angle = angle - 180;
+
+            var translatetAngle = THREE.MathUtils.degToRad(angle);
+
+            /* eslint-disable no-fallthrough */
+            switch (key) {
+                case "leftHip":
+                case "leftKnee":
+                    translatetAngle = -translatetAngle;
+                case "rightHip":
+                case "rightKnee":
+                    bone.rotation.z = translatetAngle;
+                    break;
+
+                default:
+                    bone.rotation.x = translatetAngle;
+                    break;
+            }
         });
     }
+    //#endregion
+
 
     // load simple_human.glb
-    const gltf = useLoader(GLTFLoader, "/simple_human.glb");
-
-    var bones = {};
     gltf.scene.traverse(function (node) {
         if (node.isBone) {
             if (!boneDict.hasOwnProperty(node.name)) {
                 return;
             }
             var translatedName = boneDict[node.name];
+            var boneName = translatedName || node.name;
+            var color = translatedName ? 0xff0000 : 0x00cc00;
 
-            if(translatedName) {
-                bones[translatedName] = node;
-                bones[translatedName].color = 0xff0000;
-            } else {
-                bones[node.name] = node;
-                bones[node.name].color = 0x00cc00;
-            }
+            bones[boneName] = node;
+            bones[boneName].color = color;
+
+            
+            // defaultPose[boneName] = {
+            //     x: node.rotation.x,
+            //     y: node.rotation.y,
+            //     z: node.rotation.z
+            // };
+            // check if defaultPose for bone is already set
+            if (defaultPose.hasOwnProperty(boneName))
+                return;
+            
+            console.log("set default pose for: " + boneName + "");
+            setDefaultPose(prevState => {
+                return {
+                    ...prevState,
+                    [boneName]: {
+                        x: node.rotation.x,
+                        y: node.rotation.y,
+                        z: node.rotation.z
+                    }
+                }
+            });
+
         }
-    });
-
-    // console.log(angleBetween3Points(bones.rightShoulder, bones.rightHip, bones.rightElbow));
-
-    useEffect(() => {
-        createJointHighlights();
-        initControls();
-    }, []);
-
-    useHelper(mesh, THREE.SkeletonHelper, "visible");
-
-    // useFrame is a React Three Fiber hook that allows you to run code on every frame
-    useFrame(() => {
-        // mesh.current.rotation.y += 0.01;
-        // updateJointHighlights();
     });
 
     mesh.current?.add(controls);
 
-    // TODO: remove controls when not clickign on joint
-    // remove controls on right click
-    useEffect(() => {
-        function handleRightClick(e) {
-            if (e.target.nodeName === "CANVAS") {
-                e.preventDefault();
-                if (e.button === 2) {
-                    controls.detach();
-                }
-            }
-        }
-
-        function handleMouseMove(e) {
-            return;
-            if (e.target.nodeName === "CANVAS" && e.buttons === 2) {
-                mesh.current.rotation.y += e.movementX * 0.01;
-                updateJointHighlights();
-            }
-        }
-        window.addEventListener("contextmenu", handleRightClick);
-        window.addEventListener("mousemove", handleMouseMove);
-        return () => {
-            window.removeEventListener("contextmenu", handleRightClick);
-            window.removeEventListener("mousemove", handleMouseMove);
-        }
-    }, [controls]);
+    
 
     if (pose) {
         resetPose();
@@ -261,6 +359,7 @@ export default function Model({ getPose, setPose, pose }) {
         updateJointHighlights();
     }
 
+    // console.log(angleBetweenPoints(bones.rightShoulder, bones.rightHip, bones.rightElbow));
 
     return (
         <>
@@ -276,8 +375,9 @@ export default function Model({ getPose, setPose, pose }) {
                         const edge = edges[key];
                         const bone1 = bones[edge[0]];
                         const bone2 = bones[edge[1]];
-                        const angle = angleBetweenBones(bone1, bone2);
-                        console.log(key, 180 - angle);
+                        const bone3 = bones[edge[2]];
+                        const angle = angleBetweenPoints(bone1, bone2, bone3);
+                        console.log(key, angle);
                     }
                     console.groupEnd();
                 }} />

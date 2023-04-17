@@ -6,7 +6,6 @@ import toast from 'react-hot-toast';
 
 import ExerciseContext from '../components/ExerciseProvider';
 import PoseEditor from '../components/PoseEditor/PoseEditor';
-import Model2 from '../components/PoseEditor/Model2';
 
 const FormContext = createContext();
 
@@ -414,11 +413,6 @@ export default function Exercise() {
                             <ExerciseAttribute label="Pose editor">
                                 <PoseEditor poses={exercise.poses} />
                             </ExerciseAttribute>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                                <Model2 />
                         </Col>
                     </Row>
 

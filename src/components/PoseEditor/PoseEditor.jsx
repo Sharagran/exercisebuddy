@@ -65,7 +65,8 @@ export default function PoseEditor({ poses }) {
                         rotation: [0, 0, 0]
                     }}>
                         <Suspense fallback={null}>
-                            <Model pose={currentPose} />
+                            <Model pose={currentPose} setPose={setCurrentPose} />
+                            {/* <Model2 pose={currentPose} setPose={setCurrentPose} /> */}
                         </Suspense>
 
                     </Canvas>
