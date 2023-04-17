@@ -85,10 +85,14 @@ export default function Model({ getPose, setPose, pose }) {
     // var defaultPose = {};
     var bones = {};
 
+    setupBones(); //TODO: optimize performance
     useEffect(() => {
+        // setupBones();
         createJointHighlights();
         initControls();
+        // console.log(bones);
     }, []);
+    // console.log(bones);
 
     useEffect(() => {
         if (pose) {
@@ -254,9 +258,7 @@ export default function Model({ getPose, setPose, pose }) {
     //#endregion
 
     //#region Modify Pose
-    // TODO: reset not working properly, hip rotation is wrong
     function resetPose() {
-        console.log(defaultPose["leftHip"]);
         for (const key in bones) {
             if (Object.hasOwnProperty.call(defaultPose, key)) {
                 const bone = bones[key];
@@ -284,7 +286,7 @@ export default function Model({ getPose, setPose, pose }) {
             const key = req.bodyJoint.label;
             const bone = bones[key];
 
-            if(!bone) return;
+            if (!bone) return;
 
             var angle = req.requiredAngle;
             // shift 0° to 180° (180° is expended joint)
@@ -311,47 +313,39 @@ export default function Model({ getPose, setPose, pose }) {
     //#endregion
 
 
-    // load simple_human.glb
-    gltf.scene.traverse(function (node) {
-        if (node.isBone) {
-            if (!boneDict.hasOwnProperty(node.name)) {
-                return;
-            }
-            var translatedName = boneDict[node.name];
-            var boneName = translatedName || node.name;
-            var color = translatedName ? 0xff0000 : 0x00cc00;
-
-            bones[boneName] = node;
-            bones[boneName].color = color;
-
-            
-            // defaultPose[boneName] = {
-            //     x: node.rotation.x,
-            //     y: node.rotation.y,
-            //     z: node.rotation.z
-            // };
-            // check if defaultPose for bone is already set
-            if (defaultPose.hasOwnProperty(boneName))
-                return;
-            
-            console.log("set default pose for: " + boneName + "");
-            setDefaultPose(prevState => {
-                return {
-                    ...prevState,
-                    [boneName]: {
-                        x: node.rotation.x,
-                        y: node.rotation.y,
-                        z: node.rotation.z
-                    }
+    function setupBones() {
+        gltf.scene.traverse(function (node) {
+            if (node.isBone) {
+                if (!boneDict.hasOwnProperty(node.name)) {
+                    return;
                 }
-            });
+                var translatedName = boneDict[node.name];
+                var boneName = translatedName || node.name;
+                var color = translatedName ? 0xff0000 : 0x00cc00;
 
-        }
-    });
+                bones[boneName] = node;
+                bones[boneName].color = color;
+
+                // check if defaultPose for bone is already set
+                if (defaultPose.hasOwnProperty(boneName))
+                    return;
+                setDefaultPose(prevState => {
+                    return {
+                        ...prevState,
+                        [boneName]: {
+                            x: node.rotation.x,
+                            y: node.rotation.y,
+                            z: node.rotation.z
+                        }
+                    }
+                });
+
+            }
+        });
+    }
 
     mesh.current?.add(controls);
 
-    
 
     if (pose) {
         resetPose();
