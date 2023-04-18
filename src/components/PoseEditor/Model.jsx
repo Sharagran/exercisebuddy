@@ -30,20 +30,6 @@ const boneDict = {
     "mixamorigSpine2_04": null,
 };
 
-const boneDictV2 = {
-    "mixamorigHead_06": {
-        label: "nose",
-        show: true,
-        trackable: true,
-        angleRotationAxis: "x",
-        // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
-    }
-    // ...
-}
-
-
 const edges = {
     rightShoulder: ["rightShoulder", "rightHip", "rightElbow"],
     rightElbow: ["rightElbow", "rightShoulder", "rightWrist"],
@@ -55,6 +41,158 @@ const edges = {
     leftHip: ["leftHip", "leftKnee", "leftShoulder"],
     leftKnee: ["leftKnee", "leftHip", "leftAnkle"],
 };
+
+const boneDictV2 = {
+    "mixamorigHead_06": {
+        label: "nose",
+        show: true,
+        trackable: true,
+        angleRotationAxis: "x",
+        defaultAngle: 0,
+        // angleThreshold: 15,
+        // firstEdgeIndex: 0,
+        // secondEdgeIndex: 1,
+    },
+
+    //#region right arm
+    "mixamorigLeftArm_09": {
+        label: "rightShoulder",
+        show: true,
+        trackable: true,
+        angleRotationAxis: "x",
+        defaultAngle: 0,
+        edges: ["rightShoulder", "rightHip", "rightElbow"],
+        // angleThreshold: 15,
+        // firstEdgeIndex: 0,
+        // secondEdgeIndex: 1,
+    },
+    "mixamorigLeftForeArm_010": {
+        label: "rightElbow",
+        show: true,
+        trackable: true,
+        angleRotationAxis: "x",
+        defaultAngle: 0,
+        edges: ["rightElbow", "rightShoulder", "rightWrist"],
+        // angleThreshold: 15,
+        // firstEdgeIndex: 0,
+        // secondEdgeIndex: 1,
+    },
+    "mixamorigLeftHand_011": {
+        label: "rightWrist",
+        show: false,
+        trackable: false,
+    },
+    //#endregion
+
+    //#region left arm
+    "mixamorigRightArm_017": {
+        label: "leftShoulder",
+        show: true,
+        trackable: true,
+        angleRotationAxis: "x",
+        defaultAngle: 0,
+        edges: ["leftShoulder", "leftHip", "leftElbow"],
+        // angleThreshold: 15,
+        // firstEdgeIndex: 0,
+        // secondEdgeIndex: 1,
+    },
+    "mixamorigRightForeArm_018": {
+        label: "leftElbow",
+        show: true,
+        trackable: true,
+        angleRotationAxis: "x",
+        defaultAngle: 0,
+        edges: ["leftElbow", "leftShoulder", "leftWrist"],
+        angleThreshold: 15,
+        firstEdgeIndex: 9,
+        secondEdgeIndex: 8,
+    },
+    "mixamorigRightHand_019": {
+        label: "leftWrist",
+        show: false,
+        trackable: false,
+    },
+    //#endregion
+
+    //#region right leg
+    "mixamorigLeftUpLeg_024": {
+        label: "rightHip",
+        show: true,
+        trackable: true,
+        angleRotationAxis: "x",
+        defaultAngle: 0,
+        edges: ["rightHip", "rightKnee", "rightShoulder"],
+        // angleThreshold: 15,
+        // firstEdgeIndex: 0,
+        // secondEdgeIndex: 1,
+    },
+    "mixamorigLeftLeg_025": {
+        label: "rightKnee",
+        show: true,
+        trackable: true,
+        angleRotationAxis: "x",
+        defaultAngle: 0,
+        edges: ["rightKnee", "rightHip", "rightAnkle"],
+        // angleThreshold: 15,
+        // firstEdgeIndex: 0,
+        // secondEdgeIndex: 1,
+    },
+    "mixamorigLeftFoot_026": {
+        label: "rightAnkle",
+        show: false,
+        trackable: false,
+    },
+    //#endregion
+
+    //#region left leg
+    "mixamorigRightUpLeg_00": {
+        label: "leftHip",
+        show: true,
+        trackable: true,
+        angleRotationAxis: "x",
+        defaultAngle: 0,
+        edges: ["leftHip", "leftKnee", "leftShoulder"],
+        // angleThreshold: 15,
+        // firstEdgeIndex: 0,
+        // secondEdgeIndex: 1,
+    },
+    "mixamorigRightLeg_029": {
+        label: "leftKnee",
+        show: true,
+        trackable: true,
+        angleRotationAxis: "x",
+        defaultAngle: 0,
+        edges: ["leftKnee", "leftHip", "leftAnkle"],
+        // angleThreshold: 15,
+        // firstEdgeIndex: 0,
+        // secondEdgeIndex: 1,
+    },
+    "mixamorigRightFoot_030": {
+        label: "leftAnkle",
+        show: false,
+        trackable: false
+    },
+    //#endregion
+
+    //#region spine
+    "mixamorigSpine_02": {
+        show: true,
+        trackable: false,
+        defaultAngle: 0,
+    },
+    "mixamorigSpine1_03": {
+        show: true,
+        trackable: false,
+        defaultAngle: 0,
+    },
+    "mixamorigSpine2_04": {
+        show: true,
+        trackable: false,
+        defaultAngle: 0
+    }
+    //#endregion
+}
+
 
 /* poses: [
 {

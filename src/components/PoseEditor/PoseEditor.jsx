@@ -2,41 +2,19 @@ import React, { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 
 import { Row, Col, Container, Pagination } from 'react-bootstrap';
+import { Stats } from "@react-three/drei";
 
 import Model from "./Model";
 import RawPoseEditor from "./RawPoseEditor";
 
-
+const editorHeight = "512px";
 export default function PoseEditor({ poses }) {
-
     const [poseIndex, setPoseIndex] = useState(0);
     const [currentPose, setCurrentPose] = useState(poses[poseIndex]);
 
     useEffect(() => {
         setCurrentPose(poses[poseIndex]);
     }, [poseIndex]);
-
-    const style = {
-        height: "512px"
-    }
-    // return (
-    //     <div className="d-flex flex-wrap ">
-    //         <div>
-    //             <Canvas style={style}>
-    //                 <Suspense fallback={null}>
-    //                     <Model />
-    //                 </Suspense>
-    //             </Canvas>
-    //         </div>
-    //         <div>
-    //             <ul>
-    //                 <li>1. Select a pose</li>
-    //                 <li>2. Adjust the pose</li>
-    //                 <li>3. Save the pose</li>
-    //             </ul>
-    //         </div>
-    //     </div>
-    // );
 
     function getBodyJoints() {
         // get all poses.requirements.bodyJoint.label
@@ -60,15 +38,14 @@ export default function PoseEditor({ poses }) {
         <Container>
             <Row>
                 <Col>
-                    <Canvas className="border rounded" style={style} camera={{
+                    <Canvas className="border rounded" style={{ height: editorHeight }} camera={{
                         position: [0, 1.5, 3.5],
                         rotation: [0, 0, 0]
                     }}>
                         <Suspense fallback={null}>
                             <Model pose={currentPose} setPose={setCurrentPose} />
-                            {/* <Model2 pose={currentPose} setPose={setCurrentPose} /> */}
                         </Suspense>
-
+                        <Stats />
                     </Canvas>
                     <Pagination className="justify-content-center flex-wrap">
                         {poses.map((pose, index) => {
@@ -98,7 +75,10 @@ export default function PoseEditor({ poses }) {
                         </Pagination.Item>
                     </Pagination>
                 </Col>
-                <Col className="overflow-auto" style={style}>
+                <Col className="overflow-auto" style={{
+                    height: editorHeight,
+                    minWidth: "300px"
+                }}>
                     {/* poses: [
                         {
                             requirements: [
