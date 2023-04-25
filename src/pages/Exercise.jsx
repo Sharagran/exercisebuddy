@@ -302,7 +302,6 @@ export default function Exercise() {
                     </Row>
                     <Row>
                         <Col>
-                            {/* <ExerciseAttribute label="Description" required /> */}
                             <ExerciseAttribute label="Description">
                                 <Form.Control as="textarea" rows={10} value={exercise.description} disabled={!editMode} />
                             </ExerciseAttribute>
@@ -411,28 +410,29 @@ export default function Exercise() {
                     <Row>
                         <Col>
                             <ExerciseAttribute label="Pose editor">
-                                <PoseEditor poses={exercise.poses} />
+                                <PoseEditor poses={exercise.poses} editMode={editMode} />
                             </ExerciseAttribute>
                         </Col>
                     </Row>
 
-
-                    {id === 'create' ? <Button variant="primary" type="submit">Create</Button>
-                        :
-                        <>
-                            {editMode ?
-                                <>
-                                    <Button variant="primary" type="submit" key="saveChangesButton">Save changes</Button>
-                                    <Button variant="warning" onClick={handleDiscardButton} key="discardButton">Discard changes</Button>
-                                </>
-                                :
-                                <>
-                                    <Button variant="primary" onClick={handleEditButton} key="editButton">Edit</Button>
-                                    <Button variant="danger" onClick={handleDeleteButton} key="deleteButton">Delete</Button>
-                                </>
-                            }
-                        </>
-                    }
+                    <Row>
+                        {id === 'create' ? <Button variant="primary" type="submit">Create</Button>
+                            :
+                            <>
+                                {editMode ?
+                                    <>
+                                        <Button variant="primary" type="submit" key="saveChangesButton">Save changes</Button>
+                                        <Button variant="warning" onClick={handleDiscardButton} key="discardButton">Discard changes</Button>
+                                    </>
+                                    :
+                                    <>
+                                        <Button variant="primary" onClick={handleEditButton} key="editButton">Edit</Button>
+                                        <Button variant="danger" onClick={handleDeleteButton} key="deleteButton">Delete exercise</Button>
+                                    </>
+                                }
+                            </>
+                        }
+                    </Row>
                 </Container>
             </FormContext.Provider>
         </Form>

@@ -8,7 +8,7 @@ import Model from "./Model";
 import RawPoseEditor from "./RawPoseEditor";
 
 const editorHeight = "512px";
-export default function PoseEditor({ poses }) {
+export default function PoseEditor({ poses, editMode }) {
     const [poseIndex, setPoseIndex] = useState(0);
     const [currentPose, setCurrentPose] = useState(poses[poseIndex]);
 
@@ -29,9 +29,37 @@ export default function PoseEditor({ poses }) {
         return bodyJoints;
     }
 
+    function addPose() {
+        var newPose = {
+            requirements: []
+        };
+        getBodyJoints().forEach(bodyJoint => {
+            newPose.requirements.push({
+                angleThreshold: 15,
+                requiredAngle: 0,
+                bodyJoint: {
+                    label: bodyJoint
+                }
+            });
+        });
+        poses.push(newPose);
+        setPoseIndex(poses.length - 1);
+    }
+
     function deleteCurrentPose() {
         poses.splice(poseIndex, 1);
         setPoseIndex(poseIndex - 1)
+    }
+
+    function setRequirementAttribute(identifier, attribute, value) {
+        value = parseInt(value);
+        var newPose = Object.assign({}, currentPose);
+        newPose.requirements.forEach(req => {
+            if (req.bodyJoint.label === identifier) {
+                req[attribute] = value;
+            }
+        });
+        setCurrentPose(newPose);
     }
 
     return (
@@ -45,6 +73,7 @@ export default function PoseEditor({ poses }) {
                         <Suspense fallback={null}>
                             <Model pose={currentPose} setPose={setCurrentPose} />
                         </Suspense>
+                        {/* FIXME: Stats.GUI debug only */}
                         <Stats />
                     </Canvas>
                     <Pagination className="justify-content-center flex-wrap">
@@ -55,54 +84,16 @@ export default function PoseEditor({ poses }) {
                                 </Pagination.Item>
                             )
                         })}
-                        <Pagination.Item onClick={() => {
-                            var newPose = {
-                                requirements: []
-                            };
-                            getBodyJoints().forEach(bodyJoint => {
-                                newPose.requirements.push({
-                                    angleThreshold: 0.1,
-                                    requiredAngle: 0,
-                                    bodyJoint: {
-                                        label: bodyJoint
-                                    }
-                                });
-                            });
-                            poses.push(newPose);
-                            setPoseIndex(poses.length - 1);
-                        }}>
+                        <Pagination.Item hidden={!editMode} onClick={addPose}>
                             Add Pose
                         </Pagination.Item>
                     </Pagination>
                 </Col>
                 <Col className="overflow-auto" style={{
-                    height: editorHeight,
+                    maxHeight: editorHeight,
                     minWidth: "300px"
                 }}>
-                    {/* poses: [
-                        {
-                            requirements: [
-                                {
-                                    angleThreshold: 0.1,
-                                    requiredAngle: 0.5,
-                                    bodyJoint: {
-                                        label: "leftShoulder",
-                                        ...
-                                    }
-                                }
-                            ]
-                        }
-                    ] */}
-                    <RawPoseEditor deleteCurrentPose={deleteCurrentPose} pose={currentPose} poseIndex={poseIndex} setValue={(identifier, value) => {
-                        value = parseInt(value);
-                        var newPose = Object.assign({}, currentPose);
-                        newPose.requirements.forEach(req => {
-                            if (req.bodyJoint.label === identifier) {
-                                req.requiredAngle = value;
-                            }
-                        });
-                        setCurrentPose(newPose);
-                    }} />
+                    <RawPoseEditor deleteCurrentPose={deleteCurrentPose} pose={currentPose} poseIndex={poseIndex} setValue={setRequirementAttribute} editMode={editMode} />
                 </Col>
             </Row>
         </Container>
