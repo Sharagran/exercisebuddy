@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, createContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Row, Col, Container, Form, Button, Placeholder, Alert, Image, ButtonGroup } from 'react-bootstrap';
+import { Row, Col, Container, Form, Button, Placeholder, Alert, Image, ButtonGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import CreatableSelect from 'react-select/creatable';
 import toast from 'react-hot-toast';
 
@@ -325,7 +325,6 @@ export default function Exercise() {
                         </Col>
                     </Row>
                     <Row>
-                        {/* TODO: use react-select here */}
                         <Col>
                             <ExerciseAttribute label="Complaints Areas">
                                 <CreatableSelect
@@ -382,6 +381,7 @@ export default function Exercise() {
                                             fetchExercise(id).then((exercise) => {
                                                 setExercise(exercise);
                                             });
+                                            // TODO: handle error, catch(display 'image not found' image) | check if this fixes error loop
                                         }}
                                             style={{ maxHeight: "256px" }} />
                                     </div>
@@ -410,6 +410,18 @@ export default function Exercise() {
                     <Row>
                         <Col>
                             <ExerciseAttribute label="Pose editor">
+                                <OverlayTrigger placement="auto" overlay={
+                                    <Tooltip id="button-tooltip">
+                                        <ol>
+                                            <li>Left click joints to display rotation wheel</li>
+                                            <li>drag along the displayed axis to rotate</li>
+                                            <li>Right click to close the rotation wheel</li>
+                                            <li>Hold and drag right click inside the Pose editor to rotate the camera</li>
+                                        </ol>
+                                    </Tooltip>
+                                }>
+                                    <i className="bi bi-info-circle-fill text-primary" />
+                                </OverlayTrigger>
                                 <PoseEditor poses={exercise.poses} editMode={editMode} />
                             </ExerciseAttribute>
                         </Col>
