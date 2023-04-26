@@ -73,7 +73,7 @@ export default function PoseEditor({ poses, editMode }) {
                         <Suspense fallback={null}>
                             <Model pose={currentPose} setPose={setCurrentPose} editMode={editMode} setValue={setRequirementAttribute} />
                         </Suspense>
-                        {/* FIXME: Stats.GUI debug only */}
+                        {/* Performance monitor */}
                         {process.env.NODE_ENV === "development" && <Perf />}
                     </Canvas>
                     <Pagination className="justify-content-center flex-wrap">
