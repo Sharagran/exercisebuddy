@@ -53,14 +53,17 @@ export default function PoseEditor({ poses, editMode }) {
 
     function setRequirementAttribute(identifier, attribute, value) {
         value = parseInt(value);
-        var newPose = Object.assign({}, currentPose);
-        newPose.requirements.forEach(req => {
+        setCurrentPose(prevPose => {
+          const newPose = { ...prevPose };
+          const requirements = newPose.requirements.map(req => {
             if (req.bodyJoint.label === identifier) {
-                req[attribute] = value;
+              return { ...req, [attribute]: value };
             }
+            return req;
+          });
+          return { ...newPose, requirements };
         });
-        setCurrentPose(newPose);
-    }
+      }
 
     return (
         <Container>
