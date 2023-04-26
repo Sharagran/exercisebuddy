@@ -1,8 +1,8 @@
 import React, { Suspense, useEffect, useState } from "react";
-import { Canvas } from "@react-three/fiber";
-
 import { Row, Col, Container, Pagination } from 'react-bootstrap';
-import { Stats } from "@react-three/drei";
+
+import { Canvas } from "@react-three/fiber";
+import { Perf } from 'r3f-perf'
 
 import Model from "./Model";
 import RawPoseEditor from "./RawPoseEditor";
@@ -71,10 +71,10 @@ export default function PoseEditor({ poses, editMode }) {
                         rotation: [0, 0, 0]
                     }}>
                         <Suspense fallback={null}>
-                            <Model pose={currentPose} setPose={setCurrentPose} />
+                            <Model pose={currentPose} setPose={setCurrentPose} editMode={editMode} setValue={setRequirementAttribute} />
                         </Suspense>
                         {/* FIXME: Stats.GUI debug only */}
-                        <Stats />
+                        {process.env.NODE_ENV === "development" && <Perf />}
                     </Canvas>
                     <Pagination className="justify-content-center flex-wrap">
                         {poses.map((pose, index) => {
