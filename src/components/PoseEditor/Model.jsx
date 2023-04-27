@@ -6,47 +6,7 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { useHelper } from "@react-three/drei";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 
-// import poseParser
-import * as PoseParser from "./usePose";
-
-// Spiegelverkehrte Bezeichner zwischen Model & Exercisebuddy app
 const boneDict = {
-    "mixamorigHead_06": "nose",
-    "mixamorigLeftArm_09": "rightShoulder",
-    "mixamorigLeftForeArm_010": "rightElbow",
-    "mixamorigLeftHand_011": "rightWrist",
-
-    "mixamorigRightArm_017": "leftShoulder",
-    "mixamorigRightForeArm_018": "leftElbow",
-    "mixamorigRightHand_019": "leftWrist",
-
-    "mixamorigLeftUpLeg_024": "rightHip",
-    "mixamorigLeftLeg_025": "rightKnee",
-    "mixamorigLeftFoot_026": "rightAnkle",
-
-    "mixamorigRightUpLeg_00": "leftHip",
-    "mixamorigRightLeg_029": "leftKnee",
-    "mixamorigRightFoot_030": "leftAnkle",
-
-    "mixamorigSpine_02": null,
-    "mixamorigSpine1_03": null,
-    "mixamorigSpine2_04": null,
-};
-
-const edges = {
-    rightShoulder: ["rightShoulder", "rightHip", "rightElbow"],
-    rightElbow: ["rightElbow", "rightShoulder", "rightWrist"],
-    rightHip: ["rightHip", "rightKnee", "rightShoulder"],
-    rightKnee: ["rightKnee", "rightHip", "rightAnkle"],
-
-    leftShoulder: ["leftShoulder", "leftHip", "leftElbow"],
-    leftElbow: ["leftElbow", "leftShoulder", "leftWrist"],
-    leftHip: ["leftHip", "leftKnee", "leftShoulder"],
-    leftKnee: ["leftKnee", "leftHip", "leftAnkle"],
-};
-
-// TODO: todo swap key with label, filter by label during one time setup
-const boneDictV2 = {
     "mixamorigHead_06": {
         label: "nose",
         show: true,
@@ -232,7 +192,6 @@ export default function Model({ pose, setValue, editMode }) {
         // setupBones();
         createJointHighlights();
         initControls();
-        // console.log(bones);
     }, []);
 
     useEffect(() => {
@@ -298,9 +257,6 @@ export default function Model({ pose, setValue, editMode }) {
                     renderer.clearDepth();
                 }
 
-                // scene.add(sphere);
-                // if (mesh.current != null)
-                //     mesh.current.add(sphere);
                 spheres.push(sphere);
             }
         }
@@ -336,16 +292,19 @@ export default function Model({ pose, setValue, editMode }) {
 
         controls.attach(e.object.bone);
         selectedJoint = boneDict[e.object.bone.name];
-        console.log(boneDict[e.object.bone.name]);
 
+        // TODO: remove code below debug only
+        console.log(e.object.bone.name, boneDict[e.object.bone.name].label);
         console.groupCollapsed("Angles");
-        for (const key in edges) {
-            const edge = edges[key];
-            const bone1 = bones[edge[0]];
-            const bone2 = bones[edge[1]];
-            const bone3 = bones[edge[2]];
-            const angle = angleBetweenPoints(bone1, bone2, bone3);
-            console.log(key, angle);
+        for (const key in boneDict) {
+            if (Object.hasOwnProperty.call(boneDict[key], "edges")) {
+                const edges = boneDict[key].edges;
+                const bone1 = bones[edges[0]];
+                const bone2 = bones[edges[1]];
+                const bone3 = bones[edges[2]];
+                const angle = angleBetweenPoints(bone1, bone2, bone3);
+                console.log(boneDict[key].label, angle);
+            }
         }
         console.groupEnd();
         console.groupCollapsed("Rquirements");
@@ -358,18 +317,7 @@ export default function Model({ pose, setValue, editMode }) {
 
     function handleGizmoMove(e) {
         updateJointHighlights();
-        console.log(selectedJoint);
-
-        // console.log(boneDictV2[selectedJoint].angleRotationAxis);
-        var angle = PoseParser.toExercisebuddyAngle(e.target.object.rotation.x);
-        // var r = e.target.object.rotation.x;
-        // r = THREE.MathUtils.radToDeg(r);
-        // r = Math.round(r);
-        // r = r + 180;
-        console.log(angle);
-        setValue(selectedJoint, 'requiredAngle', angle);
-        // console.log(pose);
-        // setPose(parsePoseToData());
+        updateJointAngle(selectedJoint, e.target.object.rotation.x);
     }
 
     function rotateCamera(rotation) {
@@ -405,32 +353,17 @@ export default function Model({ pose, setValue, editMode }) {
         return angle;
     }
 
-    function parseDataToPose(data) {
-        var pose = {};
-        for (const key in data) {
-            if (Object.hasOwnProperty.call(data, key)) {
-                const element = data[key];
-                pose[key] = {
-                    x: element.x,
-                    y: element.y,
-                    z: element.z
-                }
-            }
-        }
-        return pose;
-    }
-
     function parsePoseToData() {
         var newPose = { ...pose };
         for (const key in bones) {
             if (Object.hasOwnProperty.call(bones, key)) {
                 const bone = bones[key];
 
-                if (Object.hasOwnProperty.call(boneDictV2, key) === false) continue;
-                if (boneDictV2[key].trackable === false) continue;
+                if (Object.hasOwnProperty.call(boneDict, key) === false) continue;
+                if (boneDict[key].trackable === false) continue;
 
-                console.log(boneDictV2[key]);
-                var angle = angleBetweenPoints(...boneDictV2[key].edges);
+                console.log(boneDict[key]);
+                var angle = angleBetweenPoints(...boneDict[key].edges);
                 switch (key) {
                     case "leftHip":
                     case "leftKnee":
@@ -476,9 +409,9 @@ export default function Model({ pose, setValue, editMode }) {
 
     //#region Modify Pose
     function resetPose() {
-        for (const key in boneDictV2) {
-            if (Object.hasOwnProperty.call(boneDictV2[key], "angleRotationAxis")) {
-                const bone = boneDictV2[key];
+        for (const key in boneDict) {
+            if (Object.hasOwnProperty.call(boneDict[key], "angleRotationAxis")) {
+                const bone = boneDict[key];
                 bones[bone.label].rotation[bone.angleRotationAxis] = THREE.MathUtils.degToRad(bone.defaultAngle);
                 // bones[bone.label].rotation[bone.angleRotationAxis] = THREE.MathUtils.degToRad(180);
             }
@@ -513,6 +446,7 @@ export default function Model({ pose, setValue, editMode }) {
 
             if (!bone) return;
 
+            // TODO: angle transform required
             var angle = req.requiredAngle;
             // shift 0° to 180° (180° is expended joint)
             angle = angle - 180;
@@ -534,6 +468,18 @@ export default function Model({ pose, setValue, editMode }) {
                     break;
             }
         });
+
+        console.log(pose);
+    }
+
+    function updateJointAngle(joint, angle) {
+        // TODO: angle transform required
+
+        // var angle = e.target.object.rotation.x;
+        angle = THREE.MathUtils.radToDeg(angle);
+        angle = Math.round(angle);
+        angle = angle + 180;
+        setValue(joint.label, 'requiredAngle', angle);
     }
     //#endregion
 
@@ -544,7 +490,7 @@ export default function Model({ pose, setValue, editMode }) {
                 if (!boneDict.hasOwnProperty(node.name)) {
                     return;
                 }
-                var translatedName = boneDict[node.name];
+                var translatedName = boneDict[node.name].label;
                 var boneName = translatedName || node.name;
                 var color = translatedName ? 0xff0000 : 0x00cc00;
 
@@ -570,8 +516,6 @@ export default function Model({ pose, setValue, editMode }) {
             }
         });
     }
-
-    // mesh.current?.add(controls);
 
 
     return (
