@@ -6,6 +6,9 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { useHelper } from "@react-three/drei";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 
+// import poseParser
+import * as PoseParser from "./usePose";
+
 // Spiegelverkehrte Bezeichner zwischen Model & Exercisebuddy app
 const boneDict = {
     "mixamorigHead_06": "nose",
@@ -42,6 +45,7 @@ const edges = {
     leftKnee: ["leftKnee", "leftHip", "leftAnkle"],
 };
 
+// TODO: todo swap key with label, filter by label during one time setup
 const boneDictV2 = {
     "mixamorigHead_06": {
         label: "nose",
@@ -119,8 +123,8 @@ const boneDictV2 = {
         label: "rightHip",
         show: true,
         trackable: true,
-        angleRotationAxis: "x",
-        defaultAngle: 0,
+        angleRotationAxis: "z",
+        defaultAngle: 180,
         edges: ["rightHip", "rightKnee", "rightShoulder"],
         // angleThreshold: 15,
         // firstEdgeIndex: 0,
@@ -130,7 +134,7 @@ const boneDictV2 = {
         label: "rightKnee",
         show: true,
         trackable: true,
-        angleRotationAxis: "x",
+        angleRotationAxis: "z",
         defaultAngle: 0,
         edges: ["rightKnee", "rightHip", "rightAnkle"],
         // angleThreshold: 15,
@@ -149,8 +153,8 @@ const boneDictV2 = {
         label: "leftHip",
         show: true,
         trackable: true,
-        angleRotationAxis: "x",
-        defaultAngle: 0,
+        angleRotationAxis: "z",
+        defaultAngle: 180,
         edges: ["leftHip", "leftKnee", "leftShoulder"],
         // angleThreshold: 15,
         // firstEdgeIndex: 0,
@@ -160,7 +164,7 @@ const boneDictV2 = {
         label: "leftKnee",
         show: true,
         trackable: true,
-        angleRotationAxis: "x",
+        angleRotationAxis: "z",
         defaultAngle: 0,
         edges: ["leftKnee", "leftHip", "leftAnkle"],
         // angleThreshold: 15,
@@ -209,7 +213,8 @@ const boneDictV2 = {
 }
 ] */
 
-export default function Model({ getPose, setPose, pose }) {
+var selectedJoint = null;
+export default function Model({ pose, setValue, editMode }) {
     const { camera, gl: renderer } = useThree();
     const mesh = useRef();
 
@@ -220,7 +225,6 @@ export default function Model({ getPose, setPose, pose }) {
     const gltf = useLoader(GLTFLoader, "/simple_human.glb");
     useHelper(mesh, THREE.SkeletonHelper, "visible");
 
-    // var defaultPose = {};
     var bones = {};
 
     setupBones(); //TODO: optimize performance
@@ -230,32 +234,30 @@ export default function Model({ getPose, setPose, pose }) {
         initControls();
         // console.log(bones);
     }, []);
-    // console.log(bones);
 
     useEffect(() => {
         if (pose) {
             resetPose();
             applyPose();
+            updateJointHighlights();
         }
     }, [pose]);
-
-    // TODO: remove controls when not clickign on joint
-    // remove controls on right click
+    
     useEffect(() => {
         function handleRightClick(e) {
             if (e.target.nodeName === "CANVAS") {
                 e.preventDefault();
                 if (e.button === 2) {
+                    console.log("right click");
                     controls.detach();
+                    selectedJoint = null;
                 }
             }
         }
 
         function handleMouseMove(e) {
-            return;
             if (e.target.nodeName === "CANVAS" && e.buttons === 2) {
-                mesh.current.rotation.y += e.movementX * 0.01;
-                updateJointHighlights();
+                rotateCamera(-e.movementX * 0.01);
             }
         }
         window.addEventListener("contextmenu", handleRightClick);
@@ -279,7 +281,7 @@ export default function Model({ getPose, setPose, pose }) {
             if (Object.hasOwnProperty.call(bones, key)) {
                 const bone = bones[key];
 
-                const geometry = new THREE.SphereGeometry(0.05, 32, 32);
+                const geometry = new THREE.SphereGeometry(0.05, 8, 8);
                 const material = new THREE.MeshBasicMaterial({ color: bone.color });
                 const sphere = new THREE.Mesh(geometry, material);
                 const position = new THREE.Vector3();
@@ -319,16 +321,63 @@ export default function Model({ getPose, setPose, pose }) {
         // Gizmo controls for moving Joints
         const controls = new TransformControls(camera, renderer.domElement);
         controls.setMode("rotate");
-        // limit rotation to x-axis
+        // limit rotation to z-axis
         controls.showX = false;
         controls.showY = false;
 
-        controls.addEventListener('objectChange', function (e) {
-            updateJointHighlights();
-            setPose(parsePoseToData());
-        });
+        controls.addEventListener('objectChange', handleGizmoMove);
 
         setControls(controls);
+        mesh.current?.add(controls);
+    }
+
+    function handleJointClick(e) {
+        if(!editMode) return;
+
+        controls.attach(e.object.bone);
+        selectedJoint = boneDict[e.object.bone.name];
+        console.log(boneDict[e.object.bone.name]);
+
+        console.groupCollapsed("Angles");
+        for (const key in edges) {
+            const edge = edges[key];
+            const bone1 = bones[edge[0]];
+            const bone2 = bones[edge[1]];
+            const bone3 = bones[edge[2]];
+            const angle = angleBetweenPoints(bone1, bone2, bone3);
+            console.log(key, angle);
+        }
+        console.groupEnd();
+        console.groupCollapsed("Rquirements");
+        for (const key in pose.requirements) {
+            const req = pose.requirements[key];
+            console.log(req.bodyJoint.label, req.requiredAngle);
+        }
+        console.groupEnd();
+    }
+
+    function handleGizmoMove(e) {
+        updateJointHighlights();
+        console.log(selectedJoint);
+
+        // console.log(boneDictV2[selectedJoint].angleRotationAxis);
+        var angle = PoseParser.toExercisebuddyAngle(e.target.object.rotation.x);
+        // var r = e.target.object.rotation.x;
+        // r = THREE.MathUtils.radToDeg(r);
+        // r = Math.round(r);
+        // r = r + 180;
+        console.log(angle);
+        setValue(selectedJoint, 'requiredAngle', angle);
+        // console.log(pose);
+        // setPose(parsePoseToData());
+    }
+
+    function rotateCamera(rotation) {
+        var x = camera.position.x;
+        var z = camera.position.z;
+        camera.position.x = x * Math.cos(rotation) + z * Math.sin(rotation);
+        camera.position.z = z * Math.cos(rotation) - x * Math.sin(rotation);
+        camera.lookAt(0, 1.5, 0);
     }
     //#endregion
 
@@ -340,10 +389,18 @@ export default function Model({ getPose, setPose, pose }) {
         p3 = p3.getWorldPosition(new THREE.Vector3());
 
         // calculate angle at p1 in the triangle p1-p2-p3
-        var v1 = new THREE.Vector3().subVectors(p2, p1);
-        var v2 = new THREE.Vector3().subVectors(p3, p1);
-        var angle = v1.angleTo(v2);
+        // var v1 = new THREE.Vector3().subVectors(p2, p1);
+        // var v2 = new THREE.Vector3().subVectors(p3, p1);
+        // var angle = v1.angleTo(v2);
+        // angle = THREE.MathUtils.radToDeg(angle);
+        // angle = Math.round(angle);
+        // return angle;
+
+        // calculate angle at p1 in the triangle p1-p2-p3
+        // angle: 0-360
+        var angle = Math.atan2(p2.y - p1.y, p2.x - p1.x) - Math.atan2(p3.y - p1.y, p3.x - p1.x);
         angle = THREE.MathUtils.radToDeg(angle);
+        if (angle < 0) angle += 360;
         angle = Math.round(angle);
         return angle;
     }
@@ -369,10 +426,31 @@ export default function Model({ getPose, setPose, pose }) {
             if (Object.hasOwnProperty.call(bones, key)) {
                 const bone = bones[key];
 
+                if (Object.hasOwnProperty.call(boneDictV2, key) === false) continue;
+                if (boneDictV2[key].trackable === false) continue;
+
+                console.log(boneDictV2[key]);
+                var angle = angleBetweenPoints(...boneDictV2[key].edges);
+                switch (key) {
+                    case "leftHip":
+                    case "leftKnee":
+                    // angle = 180 - angle;
+                    case "rightHip":
+                    case "rightKnee":
+                    // angle = 180 - angle;
+                    // angle = Math.round(THREE.MathUtils.radToDeg(bone.rotation.z));
+                    default:
+                        // angle = Math.round(THREE.MathUtils.radToDeg(bone.rotation.x));
+                        break;
+                }
+
+
+                angle = 180;
                 // check if requirement array has element with label
                 var requirement = newPose.requirements.find(req => req.bodyJoint.label === key);
                 if (requirement) {
-                    requirement.requiredAngle = Math.round(THREE.MathUtils.radToDeg(bone.rotation.x));
+                    // requirement.requiredAngle = Math.round(THREE.MathUtils.radToDeg(bone.rotation.x));
+                    requirement.requiredAngle = angle;
                     requirement.angleThreshold = 15; //FIXME: hardcoded
                 } else {
                     console.log(bone.rotation.y);
@@ -383,7 +461,8 @@ export default function Model({ getPose, setPose, pose }) {
                             firstEdgeIndex: null,
                             secondEdgeIndex: null
                         },
-                        requiredAngle: Math.round(THREE.MathUtils.radToDeg(bone.rotation.y)),
+                        // requiredAngle: Math.round(THREE.MathUtils.radToDeg(bone.rotation.y)),
+                        requiredAngle: angle,
                         angleThreshold: 15 //FIXME: hardcoded
                     });
                 }
@@ -397,6 +476,14 @@ export default function Model({ getPose, setPose, pose }) {
 
     //#region Modify Pose
     function resetPose() {
+        for (const key in boneDictV2) {
+            if (Object.hasOwnProperty.call(boneDictV2[key], "angleRotationAxis")) {
+                const bone = boneDictV2[key];
+                bones[bone.label].rotation[bone.angleRotationAxis] = THREE.MathUtils.degToRad(bone.defaultAngle);
+                // bones[bone.label].rotation[bone.angleRotationAxis] = THREE.MathUtils.degToRad(180);
+            }
+        }
+        return;
         for (const key in bones) {
             if (Object.hasOwnProperty.call(defaultPose, key)) {
                 const bone = bones[key];
@@ -467,6 +554,8 @@ export default function Model({ getPose, setPose, pose }) {
                 // check if defaultPose for bone is already set
                 if (defaultPose.hasOwnProperty(boneName))
                     return;
+
+                // no defaultPose set, set defaultPose
                 setDefaultPose(prevState => {
                     return {
                         ...prevState,
@@ -482,37 +571,14 @@ export default function Model({ getPose, setPose, pose }) {
         });
     }
 
-    mesh.current?.add(controls);
+    // mesh.current?.add(controls);
 
-
-    if (pose) {
-        resetPose();
-        applyPose();
-        updateJointHighlights();
-    }
-
-    // console.log(angleBetweenPoints(bones.rightShoulder, bones.rightHip, bones.rightElbow));
 
     return (
         <>
             <primitive object={gltf.scene} ref={mesh} dispose={null} />
             {highlightPoints.map((point, index) => {
-                return <primitive key={point.uuid} object={point} onClick={(e) => {
-                    controls.attach(e.object.bone);
-                    console.log(e.object);
-                    console.log(boneDict[e.object.bone.name]);
-
-                    console.group("Angles");
-                    for (const key in edges) {
-                        const edge = edges[key];
-                        const bone1 = bones[edge[0]];
-                        const bone2 = bones[edge[1]];
-                        const bone3 = bones[edge[2]];
-                        const angle = angleBetweenPoints(bone1, bone2, bone3);
-                        console.log(key, angle);
-                    }
-                    console.groupEnd();
-                }} />
+                return <primitive key={point.uuid} object={point} onClick={handleJointClick} />
             })}
         </>
     );
