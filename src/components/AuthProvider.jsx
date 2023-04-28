@@ -9,7 +9,7 @@ import LoginPage from "../pages/LoginPage";
 const AuthContext = createContext();
 
 function AuthProvider({ children }) {
-    const { token, setToken } = useToken();
+    const { token, setToken, removeToken } = useToken();
 
     if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -40,7 +40,7 @@ function AuthProvider({ children }) {
     }
 
     function signOut() {
-        setToken(null);
+        removeToken();
     }
 
 
