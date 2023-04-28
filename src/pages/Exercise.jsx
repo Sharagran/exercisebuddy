@@ -215,62 +215,72 @@ export default function Exercise() {
         // Placeholder during loading
         return (
             <Form>
-                <Row>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Title" />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Description" />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Difficulty" />
-                    </Col>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Set" />
-                    </Col>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Repetition" />
-                    </Col>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Duration" />
-                    </Col>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Pause" />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Complaints Areas" />
-                    </Col>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Equipment" />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Link" />
-                    </Col>
-                </Row>
-                {id !== "create" && (
-                    <>
-                        <Row>
-                            <Col>
-                                <ExerciseAttributePlaceholder label="Image" />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <ExerciseAttributePlaceholder label="Video" />
-                            </Col>
-                        </Row>
-                    </>
-                )}
-                <Placeholder.Button variant="primary">Edit</Placeholder.Button>
-                <Placeholder.Button variant="danger">Delete</Placeholder.Button>
+                <Container>
+                    <Row>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Title" />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Description</Form.Label>
+                                <Placeholder as="textarea" rows={10} animation='wave' bg="secondary" disabled style={{
+                                    width: '100%',
+                                }} />
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Difficulty" />
+                        </Col>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Set" />
+                        </Col>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Repetition" />
+                        </Col>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Duration" />
+                        </Col>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Pause" />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Complaints Areas" />
+                        </Col>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Equipment" />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Link" />
+                        </Col>
+                    </Row>
+                    {id !== "create" && (
+                        <>
+                            <Row>
+                                <Col>
+                                    <ExerciseAttributePlaceholder label="Image" />
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col>
+                                    <ExerciseAttributePlaceholder label="Video" />
+                                </Col>
+                            </Row>
+                        </>
+                    )}
+                    <Row>
+                        <Placeholder.Button className='mb-1' variant="primary">Edit</Placeholder.Button>
+                        <Placeholder.Button variant="danger">Delete</Placeholder.Button>
+                    </Row>
+
+                </Container>
             </Form>
         )
     }
@@ -378,7 +388,7 @@ export default function Exercise() {
                                 <ExerciseAttribute label="Image">
                                     <div hidden={exercise.image === undefined}>
                                         <Image crossOrigin="anonymous" src={exercise.image} alt="Exercise image" fluid onError={(e) => {
-                                            if(imageTokenReloadCounter >= 3) {
+                                            if (imageTokenReloadCounter >= 3) {
                                                 console.log("Could not load image after 3 retries, giving up.");
                                                 return;
                                             }
@@ -439,12 +449,12 @@ export default function Exercise() {
                             <>
                                 {editMode ?
                                     <>
-                                        <Button variant="primary" type="submit" key="saveChangesButton">Save changes</Button>
+                                        <Button className='mb-1' variant="primary" type="submit" key="saveChangesButton">Save changes</Button>
                                         <Button variant="warning" onClick={handleDiscardButton} key="discardButton">Discard changes</Button>
                                     </>
                                     :
                                     <>
-                                        <Button variant="primary" onClick={handleEditButton} key="editButton">Edit</Button>
+                                        <Button className='mb-1' variant="primary" onClick={handleEditButton} key="editButton">Edit</Button>
                                         <Button variant="danger" onClick={handleDeleteButton} key="deleteButton">Delete exercise</Button>
                                     </>
                                 }

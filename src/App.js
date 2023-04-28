@@ -22,7 +22,7 @@ function App() {
   axios.defaults.baseURL = process.env.REACT_APP_EXERCISEBUDDY_API_URL;
 
   return (
-    <Container fluid>
+    <Container className='mt-4 mb-4' fluid>
       <Toaster position="bottom-right" />
       <BrowserRouter>
         <AuthProvider>
