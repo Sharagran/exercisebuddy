@@ -4,19 +4,11 @@ import { useEffect } from "react";
 
 import { Outlet } from "react-router-dom";
 
-import toast from 'react-hot-toast';
-
-import useToken from "./useToken";
-import AuthContext from "./AuthProvider";
-
 const ExerciseContext = createContext();
 
 function ExerciseProvider() {
     const [exercises, setExercises] = React.useState([]);
     const [finishedLoading, setFinishedLoading] = React.useState(false);
-
-    const { signOut } = React.useContext(AuthContext);
-    const { token, setToken } = useToken();
 
     function fetchExercises() {
         console.log('fetching exercises');
@@ -28,16 +20,6 @@ function ExerciseProvider() {
                 resolve(res.data);
             }).catch(err => {
                 console.log(err);
-
-                if (err.response.status === 401) {
-                    toast.error('Login expired, please log in again.');
-                    signOut();
-
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 3000);
-                }
-
                 reject(err);
             });
         });
