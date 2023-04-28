@@ -7,6 +7,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
+import { Container } from 'react-bootstrap';
 
 import { AuthProvider, ProtectedRoutes } from './components/AuthProvider';
 import { ExerciseProvider } from './components/ExerciseProvider';
@@ -21,9 +22,8 @@ function App() {
   axios.defaults.baseURL = process.env.REACT_APP_EXERCISEBUDDY_API_URL;
 
   return (
-    <div className='p-3'>
+    <Container fluid>
       <Toaster position="bottom-right" />
-      <h1>Exercisebuddy</h1>
       <BrowserRouter>
         <AuthProvider>
           <Routes>
@@ -47,7 +47,7 @@ function App() {
           </Routes>
         </AuthProvider>
       </BrowserRouter>
-    </div>
+    </Container>
   );
 }
 

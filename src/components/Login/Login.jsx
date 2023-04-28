@@ -35,7 +35,7 @@ export default function Login({ setLoginAction }) {
 
     return (
         <>
-            <h1>Login</h1>
+            <h2>Login</h2>
             <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formEmail">
                     <Form.Label>Email</Form.Label>
