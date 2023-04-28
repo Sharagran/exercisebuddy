@@ -157,22 +157,6 @@ const boneDict = {
     //#endregion
 }
 
-
-/* poses: [
-{
-    requirements: [
-        {
-            angleThreshold: 0.1,
-            requiredAngle: 0.5,
-            bodyJoint: {
-                label: "leftShoulder",
-                ...
-            }
-        }
-    ]
-}
-] */
-
 var selectedJoint = null;
 export default function Model({ pose, setValue, editMode }) {
     const { camera, gl: renderer } = useThree();
@@ -239,6 +223,10 @@ export default function Model({ pose, setValue, editMode }) {
         for (const key in bones) {
             if (Object.hasOwnProperty.call(bones, key)) {
                 const bone = bones[key];
+
+                if(boneDict[bone.name].show === false) {
+                    continue;
+                }
 
                 const geometry = new THREE.SphereGeometry(0.05, 8, 8);
                 const material = new THREE.MeshBasicMaterial({ color: bone.color });
@@ -317,7 +305,9 @@ export default function Model({ pose, setValue, editMode }) {
 
     function handleGizmoMove(e) {
         updateJointHighlights();
-        updateJointAngle(selectedJoint, e.target.object.rotation.x);
+        if (selectedJoint.trackable) {
+            updateJointAngle(selectedJoint, e.target.object.rotation.x);
+        }
     }
 
     function rotateCamera(rotation) {
@@ -488,6 +478,7 @@ export default function Model({ pose, setValue, editMode }) {
                 if (!boneDict.hasOwnProperty(node.name)) {
                     return;
                 }
+
                 var translatedName = boneDict[node.name].label;
                 var boneName = translatedName || node.name;
                 var color = translatedName ? 0xff0000 : 0x00cc00;
