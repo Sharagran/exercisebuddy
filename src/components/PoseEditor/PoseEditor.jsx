@@ -66,12 +66,20 @@ export default function PoseEditor({ poses, editMode }) {
             if (!exists) {
                 requirements.push({
                     angleThreshold: 15,
-                    requiredAngle: 0,
+                    requiredAngle: value,
                     bodyJoint: {
                         label: identifier
                     }
                 });
             }
+            return { ...newPose, requirements };
+        });
+    }
+
+    function deleteRequirement(identifier) {
+        setCurrentPose(prevPose => {
+            const newPose = { ...prevPose };
+            const requirements = newPose.requirements.filter(req => req.bodyJoint.label !== identifier);
             return { ...newPose, requirements };
         });
     }
@@ -107,7 +115,7 @@ export default function PoseEditor({ poses, editMode }) {
                     maxHeight: editorHeight,
                     minWidth: "300px"
                 }}>
-                    <RawPoseEditor deleteCurrentPose={deleteCurrentPose} pose={currentPose} poseIndex={poseIndex} setValue={setRequirementAttribute} editMode={editMode} />
+                    <RawPoseEditor deleteCurrentPose={deleteCurrentPose} pose={currentPose} poseIndex={poseIndex} setValue={setRequirementAttribute} editMode={editMode} deleteRequirement={deleteRequirement} />
                 </Col>
             </Row>
         </Container>
