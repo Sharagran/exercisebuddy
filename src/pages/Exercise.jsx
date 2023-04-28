@@ -380,6 +380,8 @@ export default function Exercise() {
                                             console.log("Image token expired, reloading exercise...");
                                             fetchExercise(id).then((exercise) => {
                                                 setExercise(exercise);
+                                            }).catch((err) => {
+                                                console.error(err);
                                             });
                                             // TODO: handle error, catch(display 'image not found' image) | check if this fixes error loop
                                         }}

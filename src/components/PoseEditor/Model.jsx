@@ -468,8 +468,6 @@ export default function Model({ pose, setValue, editMode }) {
                     break;
             }
         });
-
-        console.log(pose);
     }
 
     function updateJointAngle(joint, angle) {
