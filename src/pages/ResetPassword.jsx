@@ -2,34 +2,31 @@ import React from 'react'
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { ButtonGroup, Button, Form, Container } from 'react-bootstrap';
-import axios from 'axios';
+import AuthContext from '../components/AuthProvider';
 
 import { useParams } from 'react-router-dom';
 
 export default function ResetPassword() {
-
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
     const [formValid, setFormValid] = useState(false);
+    const { resetPassword } = React.useContext(AuthContext);
 
     const { token } = useParams();
-    console.log(token);
 
     async function handleSubmit(e) {
         e.preventDefault();
 
-        if (!formValid) {
-            return;
-        }
+        // FIXME: not working
+        // if (!formValid) {
+        //     return;
+        // }
         const form = e.currentTarget;
         if (form.checkValidity() === false) {
             e.stopPropagation();
         }
 
-        const result = await axios.post('/passwords/change', {
-            token: token,
-            password: password,
-        });
+        const result = await resetPassword(token, password);
 
         if (result.status >= 200 && result.status < 300) {
             console.log("Successfully reset password!");

@@ -79,12 +79,59 @@ function AuthProvider({ children }) {
         removeToken();
     }
 
+    function forgotPassword(email) {
+        return new Promise((resolve, reject) => {
+            axios.post(`/passwords/forgot`, {
+                email: email
+            }).then(res => {
+                resolve({
+                    status: res.status,
+                    statusText: res.statusText
+                });
+            }).catch(err => {
+                if (err.response) {
+                    resolve({
+                        status: err.response.status,
+                        statusText: err.response.statusText
+                    });
+                } else {
+                    reject(err);
+                }
+            })
+        });
+    }
+
+    function resetPassword(token, password) {
+        return new Promise((resolve, reject) => {
+            axios.post(`/passwords/change`, {
+                token: token,
+                password: password
+            }).then(res => {
+                resolve({
+                    status: res.status,
+                    statusText: res.statusText
+                });
+            }).catch(err => {
+                if (err.response) {
+                    resolve({
+                        status: err.response.status,
+                        statusText: err.response.statusText
+                    });
+                } else {
+                    reject(err);
+                }
+            })
+        });
+    }
 
 
     const contextValue = {
         token,
         signIn,
-        signOut
+        signOut,
+
+        forgotPassword,
+        resetPassword
     }
 
     return (

@@ -2,17 +2,17 @@ import React from 'react'
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { ButtonGroup, Button, Form, FloatingLabel } from 'react-bootstrap';
-import axios from 'axios';
+
+import AuthContext from '../AuthProvider';
 
 export default function ForgotPassword({ setLoginAction }) {
     const [email, setEmail] = useState("");
+    const { forgotPassword } = React.useContext(AuthContext);
 
     async function handleSubmit(e) {
         e.preventDefault();
 
-        const result = await axios.post('/passwords/forgot', {
-            email: email
-        });
+        const result = await forgotPassword(email);
 
         if (result.status >= 200 && result.status < 300) {
             console.log("Successfully sent email!");
