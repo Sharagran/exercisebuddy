@@ -86,7 +86,7 @@ export default function RawPoseEditor({ pose, poseIndex, setValue, deleteCurrent
                     )
                 })
             }
-            <Row>
+            <Row className='mb-2'>
                 <Col>
                     {remainingBodyJoints.length > 0 &&
                         <Select placeholder='Add requirement' value={null} isDisabled={!editMode} onChange={(e) => {
@@ -99,10 +99,10 @@ export default function RawPoseEditor({ pose, poseIndex, setValue, deleteCurrent
                 </Col>
             </Row>
 
-            {(poseIndex > 0 && editMode) &&
+            {(poseIndex > 0) &&
                 <Row>
                     <Col>
-                        <Button variant='danger' onClick={(e) => {
+                        <Button disabled={!editMode} variant='danger' onClick={(e) => {
                             deleteCurrentPose();
                         }}>Delete Pose</Button>
                     </Col>
