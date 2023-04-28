@@ -58,6 +58,7 @@ export default function Exercise() {
     const { finishedLoading, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise, uploadExerciseMedia, fetchExercise, deleteExerciseMedia, getSelectOptions } = React.useContext(ExerciseContext);
     const [exercise, setExercise] = useState();
     const [editMode, setEditMode] = useState(false);
+    const [imageTokenReloadCounter, setImageTokenReloadCounter] = useState(0);
 
     const selectOptions = getSelectOptions();
 
@@ -377,15 +378,16 @@ export default function Exercise() {
                                 <ExerciseAttribute label="Image">
                                     <div hidden={exercise.image === undefined}>
                                         <Image crossOrigin="anonymous" src={exercise.image} alt="Exercise image" fluid onError={(e) => {
+                                            if(imageTokenReloadCounter >= 3) {
+                                                console.log("Could not load image after 3 retries, giving up.");
+                                                return;
+                                            }
+
                                             console.log("Image token expired, reloading exercise...");
-                                            console.log(e);
+                                            setImageTokenReloadCounter(imageTokenReloadCounter + 1);
                                             fetchExercise(id).then((exercise) => {
                                                 setExercise(exercise);
-                                            }).catch((err) => {
-                                                console.error("Failed to load image");
-                                                console.log(err);
                                             });
-                                            // TODO: handle error, catch(display 'image not found' image) | check if this fixes error loop
                                         }}
                                             style={{ maxHeight: "256px" }} />
                                     </div>
