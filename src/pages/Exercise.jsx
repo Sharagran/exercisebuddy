@@ -378,10 +378,12 @@ export default function Exercise() {
                                     <div hidden={exercise.image === undefined}>
                                         <Image crossOrigin="anonymous" src={exercise.image} alt="Exercise image" fluid onError={(e) => {
                                             console.log("Image token expired, reloading exercise...");
+                                            console.log(e);
                                             fetchExercise(id).then((exercise) => {
                                                 setExercise(exercise);
                                             }).catch((err) => {
-                                                console.error(err);
+                                                console.error("Failed to load image");
+                                                console.log(err);
                                             });
                                             // TODO: handle error, catch(display 'image not found' image) | check if this fixes error loop
                                         }}
