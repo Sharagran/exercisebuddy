@@ -7,6 +7,8 @@ import { Perf } from 'r3f-perf'
 import Model from "./Model";
 import RawPoseEditor from "./RawPoseEditor";
 
+import { boneDict } from "./PoseHelper";
+
 const editorHeight = "512px";
 export default function PoseEditor({ poses, editMode }) {
     const [poseIndex, setPoseIndex] = useState(0);
@@ -63,15 +65,33 @@ export default function PoseEditor({ poses, editMode }) {
                 }
                 return req;
             });
+
             if (!exists) {
-                requirements.push({
-                    angleThreshold: 15,
-                    requiredAngle: value,
-                    bodyJoint: {
-                        label: identifier
+                var requirementDefauls;
+
+                for (const key in boneDict) {
+                    if (Object.hasOwnProperty.call(boneDict, key)) {
+                        const bone = boneDict[key];
+                        if (bone.label === identifier) {
+                            requirementDefauls = bone;
+                            break;
+                        }
                     }
+                }
+
+                requirements.push({
+                    bodyJoint: {
+                        label: identifier,
+                        firstEdgeIndex: requirementDefauls.firstEdgeIndex,
+                        secondEdgeIndex: requirementDefauls.secondEdgeIndex
+                    },
+                    requiredAngle: value,
+                    angleThreshold: 15
                 });
             }
+
+
+            console.log({ ...newPose, requirements });
             return { ...newPose, requirements };
         });
     }
