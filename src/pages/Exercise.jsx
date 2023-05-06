@@ -443,8 +443,11 @@ export default function Exercise() {
                                 }>
                                     <i className="bi bi-info-circle-fill text-primary" />
                                 </OverlayTrigger>
-                                <PoseEditor poses={exercise.poses} setPoses={() => {
-                                    console.log('setPoses'); //FIXME: debug only, remove this
+                                <PoseEditor poses={exercise.poses} setPoses={(poses) => {
+                                    setExercise({
+                                        ...exercise,
+                                        poses
+                                    });
                                 }} editMode={editMode} />
                             </ExerciseAttribute>
                         </Col>

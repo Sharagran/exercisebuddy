@@ -18,6 +18,12 @@ export default function PoseEditor({ poses, setPoses, editMode }) {
         setCurrentPose(poses[poseIndex]);
     }, [poseIndex]);
 
+    useEffect(() => {
+        var newPoses = [...poses];
+        newPoses[poseIndex] = currentPose;
+        setPoses(newPoses);
+    }, [currentPose]);
+
     function getBodyJoints() {
         // get all poses.requirements.bodyJoint.label
         var bodyJoints = [];
