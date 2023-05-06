@@ -10,8 +10,8 @@ import RawPoseEditor from "./RawPoseEditor";
 import { boneDict } from "./PoseHelper";
 
 const editorHeight = "512px";
-export default function PoseEditor({ poses, editMode }) {
-    const [poseIndex, setPoseIndex] = useState(0);
+export default function PoseEditor({ poses, setPoses, editMode }) {
+    const [poseIndex, setPoseIndex] = useState(0); // index of current pose
     const [currentPose, setCurrentPose] = useState(poses[poseIndex]);
 
     useEffect(() => {
@@ -91,7 +91,7 @@ export default function PoseEditor({ poses, editMode }) {
             }
 
 
-            console.log({ ...newPose, requirements });
+            // console.log({ ...newPose, requirements });
             return { ...newPose, requirements };
         });
     }
@@ -102,6 +102,13 @@ export default function PoseEditor({ poses, editMode }) {
             const requirements = newPose.requirements.filter(req => req.bodyJoint.label !== identifier);
             return { ...newPose, requirements };
         });
+
+        // poses[poseIndex].requirements = poses[poseIndex].requirements.filter(req => req.bodyJoint.label !== identifier);
+        // setPoses(prevPoses => {
+        //     const newPoses = [...prevPoses];
+        //     newPoses[poseIndex].requirements = newPoses[poseIndex].requirements.filter(req => req.bodyJoint.label !== identifier);
+        //     return newPoses;
+        // });
     }
 
     return (
@@ -113,7 +120,7 @@ export default function PoseEditor({ poses, editMode }) {
                         rotation: [0, 0, 0]
                     }}>
                         <Suspense fallback={null}>
-                            <Model pose={currentPose} setPose={setCurrentPose} editMode={editMode} setValue={setRequirementAttribute} />
+                            <Model pose={currentPose} editMode={editMode} setValue={setRequirementAttribute} />
                         </Suspense>
                         {/* Performance monitor */}
                         {process.env.NODE_ENV === "development" && <Perf />}

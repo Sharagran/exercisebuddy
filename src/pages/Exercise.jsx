@@ -55,7 +55,8 @@ function ExerciseAttributePlaceholder({ label }) {
 export default function Exercise() {
     const { id } = useParams();
     const naivgate = useNavigate();
-    const { finishedLoading, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise, uploadExerciseMedia, fetchExercise, deleteExerciseMedia, getSelectOptions } = React.useContext(ExerciseContext);
+    const { finishedLoading, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise,
+        uploadExerciseMedia, fetchExercise, deleteExerciseMedia, getSelectOptions } = React.useContext(ExerciseContext);
     const [exercise, setExercise] = useState();
     const [editMode, setEditMode] = useState(false);
     const [imageTokenReloadCounter, setImageTokenReloadCounter] = useState(0);
@@ -168,7 +169,11 @@ export default function Exercise() {
         e.preventDefault();
 
         // update exercise updatedAt
-        exercise.updatedAt = new Date();
+        // FIXME: API is setting updatedAt & createdAt, remove this
+        exercise.updatedAt = new Date().toISOString();
+
+        // setExercise({ ...exercise, poses });
+        console.log(exercise);
 
         toast.promise(updateExercise(exercise), {
             loading: 'Updating exercise...',
@@ -438,7 +443,9 @@ export default function Exercise() {
                                 }>
                                     <i className="bi bi-info-circle-fill text-primary" />
                                 </OverlayTrigger>
-                                <PoseEditor poses={exercise.poses} editMode={editMode} />
+                                <PoseEditor poses={exercise.poses} setPoses={() => {
+                                    console.log('setPoses'); //FIXME: debug only, remove this
+                                }} editMode={editMode} />
                             </ExerciseAttribute>
                         </Col>
                     </Row>
