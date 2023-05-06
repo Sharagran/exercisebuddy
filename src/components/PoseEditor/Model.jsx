@@ -6,7 +6,7 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { useHelper } from "@react-three/drei";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 
-import { boneDict } from "./PoseHelper";
+import { boneDict, parseAngleToExercisebuddy } from "./PoseHelper";
 
 var selectedJoint = null;
 export default function Model({ pose, setValue, editMode }) {
@@ -15,7 +15,6 @@ export default function Model({ pose, setValue, editMode }) {
 
     const [controls, setControls] = useState();
     const [highlightPoints, setHighlightPoints] = useState([]);
-    const [defaultPose, setDefaultPose] = useState({});
 
     const gltf = useLoader(GLTFLoader, "/simple_human.glb");
     useHelper(mesh, THREE.SkeletonHelper, "visible");
@@ -254,27 +253,6 @@ export default function Model({ pose, setValue, editMode }) {
                 // bones[bone.label].rotation[bone.angleRotationAxis] = THREE.MathUtils.degToRad(180);
             }
         }
-        return;
-        for (const key in bones) {
-            if (Object.hasOwnProperty.call(defaultPose, key)) {
-                const bone = bones[key];
-                var defaultAngle = defaultPose[key];
-                switch (key) {
-                    case "leftHip":
-                    case "leftKnee":
-                    // defaultAngle.z = -defaultAngle.z;
-                    // defaultAngle.x = -defaultAngle.x;
-                    case "rightHip":
-                    case "rightKnee":
-                        bone.rotation.z = defaultAngle.z;
-                        break;
-
-                    default:
-                        bone.rotation.x = defaultAngle.x;
-                        break;
-                }
-            }
-        }
     }
 
     function applyPose() {
@@ -284,27 +262,42 @@ export default function Model({ pose, setValue, editMode }) {
 
             if (!bone) return;
 
+            //#region angle shift (start point)
             // TODO: angle transform required
             var angle = req.requiredAngle;
             // shift 0° to 180° (180° is expended joint)
-            angle = angle - 180;
+            if (!key.includes("Hip")) {
+                angle = angle - 180;
+            }
 
             var translatetAngle = THREE.MathUtils.degToRad(angle);
+            //#endregion
+
+            //#region angle rotation (direction & angle)
+            var axis = boneDict.getBoneByLabel(key).angleRotationAxis;
+            axis = axis || "x";
+
+            if (key === "nose" || key === "rightHip" || key === "leftKnee" || key.includes("Shoulder")) {
+                translatetAngle = -translatetAngle;
+            }
+
+            bone.rotation[axis] = translatetAngle;
 
             /* eslint-disable no-fallthrough */
-            switch (key) {
-                case "leftHip":
-                case "leftKnee":
-                    translatetAngle = -translatetAngle;
-                case "rightHip":
-                case "rightKnee":
-                    bone.rotation.z = translatetAngle;
-                    break;
+            // switch (key) {
+            //     case "leftHip":
+            //     case "leftKnee":
+            //         translatetAngle = -translatetAngle;
+            //     case "rightHip":
+            //     case "rightKnee":
+            //         bone.rotation.z = translatetAngle;
+            //         break;
 
-                default:
-                    bone.rotation.x = translatetAngle;
-                    break;
-            }
+            //     default:
+            //         bone.rotation.x = translatetAngle;
+            //         break;
+            // }
+            //#endregion
         });
     }
 
@@ -333,23 +326,6 @@ export default function Model({ pose, setValue, editMode }) {
 
                 bones[boneName] = node;
                 bones[boneName].color = color;
-
-                // check if defaultPose for bone is already set
-                if (defaultPose.hasOwnProperty(boneName))
-                    return;
-
-                // no defaultPose set, set defaultPose
-                setDefaultPose(prevState => {
-                    return {
-                        ...prevState,
-                        [boneName]: {
-                            x: node.rotation.x,
-                            y: node.rotation.y,
-                            z: node.rotation.z
-                        }
-                    }
-                });
-
             }
         });
     }

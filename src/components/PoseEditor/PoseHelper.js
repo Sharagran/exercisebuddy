@@ -1,3 +1,4 @@
+import { MathUtils } from "three";
 
 const Edge = (origin, destination) => ({ origin, destination });
 
@@ -6,7 +7,7 @@ var boneDict = {
         label: "nose",
         show: true,
         trackable: true,
-        angleRotationAxis: "x",
+        angleRotationAxis: "z",
         defaultAngle: 0,
         edges: ["nose", "shoulderMid", "leftShoulder"],
         // angleThreshold: 15,
@@ -149,11 +150,21 @@ var boneDict = {
         show: true,
         trackable: false,
         defaultAngle: 0
-    }
+    },
     //#endregion
-}
 
-var edges = createEdges();
+    getBoneByLabel(label) {
+        for (const key in this) {
+            if (Object.hasOwnProperty.call(this, key)) {
+                const element = this[key];
+                if (element.label === label) {
+                    return element;
+                }
+            }
+        }
+        return null;
+    }
+}
 
 function createEdges() {
     var edges = [];
@@ -188,37 +199,54 @@ function createEdges() {
     return edges;
 }
 
-
-function getEdges(firstEdgeIndex, secondEdgeIndex) {
-    var a = [];
-
-    a.push(edges[firstEdgeIndex].origin);
-    a.push(edges[firstEdgeIndex].destination);
-
-    a.push(edges[secondEdgeIndex].origin);
-    a.push(edges[secondEdgeIndex].destination);
-
-    var set = new Set(a);
-    return Array.from(set);
+// FIXME: indices might be in the wrong order
+function getEdgeIndices(edgesArray) {
+    var r = [];
+    edges.forEach(edge => {
+      if(edgesArray.includes(edge.origin) && edgesArray.includes(edge.destination)) {
+        r.push(edge.index);
+      }
+    });
+    return r;
 }
 
-function getIndexofEdge(origin, destination) {
-    return edges.findIndex(edge => edge.origin == origin && edge.destination == destination);
-}
-
-
-function fillBoneDict() {
+function translateEdgeIndices() {
     for (const key in boneDict) {
-        const element = boneDict[key];
-        if (Object.hasOwnProperty.call(element, "firstEdgeIndex") && Object.hasOwnProperty.call(element, "secondEdgeIndex")) {
-            element.edges = getEdges(element.firstEdgeIndex, element.secondEdgeIndex);
-        } else if (Object.hasOwnProperty.call(element, "edges")) {
-            element.firstEdgeIndex = getIndexofEdge(element.edges[0], element.edges[1]);
-            element.secondEdgeIndex = getIndexofEdge(element.edges[1], element.edges[2]);
+        if (Object.hasOwnProperty.call(boneDict, key)) {
+            const element = boneDict[key];
+            if(element.edges && (!element.firstEdgeIndex || !element.secondEdgeIndex)) {
+                var edgeIndices = getEdgeIndices(element.edges);
+                element.firstEdgeIndex = edgeIndices[0];
+                element.secondEdgeIndex = edgeIndices[1];
+            }
         }
     }
 }
 
-fillBoneDict();
+function parseAngleToExercisebuddy(label, angle) {
+    //#region angle shift (start point)
+    // shift 0° to 180° (180° is expended joint)
+    if (!label.includes("Hip")) {
+        angle = angle - 180;
+    }
 
-export { boneDict, edges };
+    var translatetAngle = MathUtils.degToRad(angle);
+    //#endregion
+
+    //#region angle rotation (direction & angle)
+    if (label === "rightHip" || label === "leftKnee" || label.includes("Shoulder")) {
+        translatetAngle = -translatetAngle;
+    }
+
+    //#endregion
+    return translatetAngle;
+}
+
+function parseAngleFromExercisebuddy(label, angle) {
+
+}
+
+var edges = createEdges();
+translateEdgeIndices();
+
+export { boneDict, parseAngleToExercisebuddy, parseAngleFromExercisebuddy };
