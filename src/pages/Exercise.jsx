@@ -87,11 +87,17 @@ export default function Exercise() {
             repetition: 0,
             duration: 0,
             pause: 0,
-            complaintsAreas: '',
-            equipment: '',
+            complaintsAreas: [],
+            equipment: [],
             link: '',
             image: '',
-            video: ''
+            video: '',
+            poses: [
+                {
+                    requirements: [
+                    ]
+                }
+            ]
         });
     }
 
@@ -320,7 +326,12 @@ export default function Exercise() {
                     <Row>
                         <Col>
                             <ExerciseAttribute label="Description">
-                                <Form.Control as="textarea" rows={10} value={exercise.description} disabled={!editMode} />
+                                <Form.Control as="textarea" rows={10} value={exercise.description} disabled={!editMode} required onChange={(e) => {
+                                    setExercise({
+                                        ...exercise,
+                                        description: e.target.value
+                                    });
+                                }} />
                             </ExerciseAttribute>
                         </Col>
                     </Row>
