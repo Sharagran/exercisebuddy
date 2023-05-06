@@ -39,6 +39,7 @@ export default function RawPoseEditor({ pose, poseIndex, setValue, deleteCurrent
     return (
         <Container fluid>
             <h5>Requirements:</h5>
+            {pose.requirements.length > 0 &&
             <Row className='h6'>
                 <Col>
                     <Form.Label>Joint</Form.Label>
@@ -53,6 +54,7 @@ export default function RawPoseEditor({ pose, poseIndex, setValue, deleteCurrent
                     <Form.Label>Delete</Form.Label>
                 </Col>
             </Row>
+            }
             {
                 pose.requirements.map((req, index) => {
                     return (

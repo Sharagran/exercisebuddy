@@ -16,7 +16,7 @@ export default function PoseEditor({ poses, setPoses, editMode }) {
 
     useEffect(() => {
         setCurrentPose(poses[poseIndex]);
-    }, [poseIndex]);
+    }, [poseIndex, poses]);
 
     useEffect(() => {
         var newPoses = [...poses];
