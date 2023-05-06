@@ -172,13 +172,14 @@ export default function Exercise() {
         // FIXME: API is setting updatedAt & createdAt, remove this
         exercise.updatedAt = new Date().toISOString();
 
-        // setExercise({ ...exercise, poses });
-        console.log(exercise);
 
         toast.promise(updateExercise(exercise), {
             loading: 'Updating exercise...',
             success: (res) => {
-                reloadExercise(id);
+                reloadExercise(id).then((exercise) => {
+                    // reloading exercise to get _id's of newly created fields
+                    setExercise(exercise);
+                });
                 setEditMode(false);
                 return 'Exercise updated!';
             },
