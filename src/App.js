@@ -22,7 +22,7 @@ function App() {
   axios.defaults.baseURL = process.env.REACT_APP_EXERCISEBUDDY_API_URL;
 
   return (
-    <Container fluid>
+    <Container className='mt-4 mb-4' fluid>
       <Toaster position="bottom-right" />
       <BrowserRouter>
         <AuthProvider>
@@ -42,7 +42,7 @@ function App() {
 
               <Route path="/passwords/change/:token" element={<ResetPassword />} />
               {/* TODO: implement page not found page */}
-              <Route path="*" element={<h1>404</h1>} />
+              <Route path="*" element={<h1>Error: 404 <br /> Page not found</h1>} />
             </Route>
           </Routes>
         </AuthProvider>

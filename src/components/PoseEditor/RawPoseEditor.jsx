@@ -39,6 +39,7 @@ export default function RawPoseEditor({ pose, poseIndex, setValue, deleteCurrent
     return (
         <Container fluid>
             <h5>Requirements:</h5>
+            {pose.requirements.length > 0 &&
             <Row className='h6'>
                 <Col>
                     <Form.Label>Joint</Form.Label>
@@ -53,6 +54,7 @@ export default function RawPoseEditor({ pose, poseIndex, setValue, deleteCurrent
                     <Form.Label>Delete</Form.Label>
                 </Col>
             </Row>
+            }
             {
                 pose.requirements.map((req, index) => {
                     return (
@@ -86,7 +88,7 @@ export default function RawPoseEditor({ pose, poseIndex, setValue, deleteCurrent
                     )
                 })
             }
-            <Row>
+            <Row className='mb-2'>
                 <Col>
                     {remainingBodyJoints.length > 0 &&
                         <Select placeholder='Add requirement' value={null} isDisabled={!editMode} onChange={(e) => {
@@ -99,10 +101,10 @@ export default function RawPoseEditor({ pose, poseIndex, setValue, deleteCurrent
                 </Col>
             </Row>
 
-            {(poseIndex > 0 && editMode) &&
+            {(poseIndex > 0) &&
                 <Row>
                     <Col>
-                        <Button variant='danger' onClick={(e) => {
+                        <Button disabled={!editMode} variant='danger' onClick={(e) => {
                             deleteCurrentPose();
                         }}>Delete Pose</Button>
                     </Col>

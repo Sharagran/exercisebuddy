@@ -6,172 +6,7 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { useHelper } from "@react-three/drei";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 
-const boneDict = {
-    "mixamorigHead_06": {
-        label: "nose",
-        show: true,
-        trackable: true,
-        angleRotationAxis: "x",
-        defaultAngle: 0,
-        // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
-    },
-
-    //#region right arm
-    "mixamorigLeftArm_09": {
-        label: "rightShoulder",
-        show: true,
-        trackable: true,
-        angleRotationAxis: "x",
-        defaultAngle: 0,
-        edges: ["rightShoulder", "rightHip", "rightElbow"],
-        // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
-    },
-    "mixamorigLeftForeArm_010": {
-        label: "rightElbow",
-        show: true,
-        trackable: true,
-        angleRotationAxis: "x",
-        defaultAngle: 0,
-        edges: ["rightElbow", "rightShoulder", "rightWrist"],
-        // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
-    },
-    "mixamorigLeftHand_011": {
-        label: "rightWrist",
-        show: false,
-        trackable: false,
-    },
-    //#endregion
-
-    //#region left arm
-    "mixamorigRightArm_017": {
-        label: "leftShoulder",
-        show: true,
-        trackable: true,
-        angleRotationAxis: "x",
-        defaultAngle: 0,
-        edges: ["leftShoulder", "leftHip", "leftElbow"],
-        // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
-    },
-    "mixamorigRightForeArm_018": {
-        label: "leftElbow",
-        show: true,
-        trackable: true,
-        angleRotationAxis: "x",
-        defaultAngle: 0,
-        edges: ["leftElbow", "leftShoulder", "leftWrist"],
-        angleThreshold: 15,
-        firstEdgeIndex: 9,
-        secondEdgeIndex: 8,
-    },
-    "mixamorigRightHand_019": {
-        label: "leftWrist",
-        show: false,
-        trackable: false,
-    },
-    //#endregion
-
-    //#region right leg
-    "mixamorigLeftUpLeg_024": {
-        label: "rightHip",
-        show: true,
-        trackable: true,
-        angleRotationAxis: "z",
-        defaultAngle: 180,
-        edges: ["rightHip", "rightKnee", "rightShoulder"],
-        // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
-    },
-    "mixamorigLeftLeg_025": {
-        label: "rightKnee",
-        show: true,
-        trackable: true,
-        angleRotationAxis: "z",
-        defaultAngle: 0,
-        edges: ["rightKnee", "rightHip", "rightAnkle"],
-        // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
-    },
-    "mixamorigLeftFoot_026": {
-        label: "rightAnkle",
-        show: false,
-        trackable: false,
-    },
-    //#endregion
-
-    //#region left leg
-    "mixamorigRightUpLeg_00": {
-        label: "leftHip",
-        show: true,
-        trackable: true,
-        angleRotationAxis: "z",
-        defaultAngle: 180,
-        edges: ["leftHip", "leftKnee", "leftShoulder"],
-        // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
-    },
-    "mixamorigRightLeg_029": {
-        label: "leftKnee",
-        show: true,
-        trackable: true,
-        angleRotationAxis: "z",
-        defaultAngle: 0,
-        edges: ["leftKnee", "leftHip", "leftAnkle"],
-        // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
-    },
-    "mixamorigRightFoot_030": {
-        label: "leftAnkle",
-        show: false,
-        trackable: false
-    },
-    //#endregion
-
-    //#region spine
-    "mixamorigSpine_02": {
-        show: true,
-        trackable: false,
-        defaultAngle: 0,
-    },
-    "mixamorigSpine1_03": {
-        show: true,
-        trackable: false,
-        defaultAngle: 0,
-    },
-    "mixamorigSpine2_04": {
-        show: true,
-        trackable: false,
-        defaultAngle: 0
-    }
-    //#endregion
-}
-
-
-/* poses: [
-{
-    requirements: [
-        {
-            angleThreshold: 0.1,
-            requiredAngle: 0.5,
-            bodyJoint: {
-                label: "leftShoulder",
-                ...
-            }
-        }
-    ]
-}
-] */
+import { boneDict, parseAngleToExercisebuddy } from "./PoseHelper";
 
 var selectedJoint = null;
 export default function Model({ pose, setValue, editMode }) {
@@ -180,7 +15,6 @@ export default function Model({ pose, setValue, editMode }) {
 
     const [controls, setControls] = useState();
     const [highlightPoints, setHighlightPoints] = useState([]);
-    const [defaultPose, setDefaultPose] = useState({});
 
     const gltf = useLoader(GLTFLoader, "/simple_human.glb");
     useHelper(mesh, THREE.SkeletonHelper, "visible");
@@ -194,14 +28,6 @@ export default function Model({ pose, setValue, editMode }) {
         initControls();
     }, []);
 
-    useEffect(() => {
-        if (pose) {
-            resetPose();
-            applyPose();
-            updateJointHighlights();
-        }
-    }, [pose]);
-    
     useEffect(() => {
         function handleRightClick(e) {
             if (e.target.nodeName === "CANVAS") {
@@ -233,12 +59,22 @@ export default function Model({ pose, setValue, editMode }) {
         // updateJointHighlights();
     });
 
+    if (pose) {
+        resetPose();
+        applyPose();
+        updateJointHighlights();
+    }
+
     //#region Control elements
     function createJointHighlights() {
         var spheres = [];
         for (const key in bones) {
             if (Object.hasOwnProperty.call(bones, key)) {
                 const bone = bones[key];
+
+                if(boneDict[bone.name].show === false) {
+                    continue;
+                }
 
                 const geometry = new THREE.SphereGeometry(0.05, 8, 8);
                 const material = new THREE.MeshBasicMaterial({ color: bone.color });
@@ -299,10 +135,7 @@ export default function Model({ pose, setValue, editMode }) {
         for (const key in boneDict) {
             if (Object.hasOwnProperty.call(boneDict[key], "edges")) {
                 const edges = boneDict[key].edges;
-                const bone1 = bones[edges[0]];
-                const bone2 = bones[edges[1]];
-                const bone3 = bones[edges[2]];
-                const angle = angleBetweenPoints(bone1, bone2, bone3);
+                const angle = angleBetweenPoints(...edges.map(e => bones[e]));
                 console.log(boneDict[key].label, angle);
             }
         }
@@ -317,7 +150,9 @@ export default function Model({ pose, setValue, editMode }) {
 
     function handleGizmoMove(e) {
         updateJointHighlights();
-        updateJointAngle(selectedJoint, e.target.object.rotation.x);
+        if (selectedJoint.trackable) {
+            updateJointAngle(selectedJoint, e.target.object.rotation.x);
+        }
     }
 
     function rotateCamera(rotation) {
@@ -416,27 +251,6 @@ export default function Model({ pose, setValue, editMode }) {
                 // bones[bone.label].rotation[bone.angleRotationAxis] = THREE.MathUtils.degToRad(180);
             }
         }
-        return;
-        for (const key in bones) {
-            if (Object.hasOwnProperty.call(defaultPose, key)) {
-                const bone = bones[key];
-                var defaultAngle = defaultPose[key];
-                switch (key) {
-                    case "leftHip":
-                    case "leftKnee":
-                    // defaultAngle.z = -defaultAngle.z;
-                    // defaultAngle.x = -defaultAngle.x;
-                    case "rightHip":
-                    case "rightKnee":
-                        bone.rotation.z = defaultAngle.z;
-                        break;
-
-                    default:
-                        bone.rotation.x = defaultAngle.x;
-                        break;
-                }
-            }
-        }
     }
 
     function applyPose() {
@@ -446,30 +260,43 @@ export default function Model({ pose, setValue, editMode }) {
 
             if (!bone) return;
 
+            //#region angle shift (start point)
             // TODO: angle transform required
             var angle = req.requiredAngle;
             // shift 0° to 180° (180° is expended joint)
-            angle = angle - 180;
+            if (!key.includes("Hip")) {
+                angle = angle - 180;
+            }
 
             var translatetAngle = THREE.MathUtils.degToRad(angle);
+            //#endregion
+
+            //#region angle rotation (direction & angle)
+            var axis = boneDict.getBoneByLabel(key).angleRotationAxis;
+            axis = axis || "x";
+
+            if (key === "nose" || key === "rightHip" || key === "leftKnee" || key.includes("Shoulder")) {
+                translatetAngle = -translatetAngle;
+            }
+
+            bone.rotation[axis] = translatetAngle;
 
             /* eslint-disable no-fallthrough */
-            switch (key) {
-                case "leftHip":
-                case "leftKnee":
-                    translatetAngle = -translatetAngle;
-                case "rightHip":
-                case "rightKnee":
-                    bone.rotation.z = translatetAngle;
-                    break;
+            // switch (key) {
+            //     case "leftHip":
+            //     case "leftKnee":
+            //         translatetAngle = -translatetAngle;
+            //     case "rightHip":
+            //     case "rightKnee":
+            //         bone.rotation.z = translatetAngle;
+            //         break;
 
-                default:
-                    bone.rotation.x = translatetAngle;
-                    break;
-            }
+            //     default:
+            //         bone.rotation.x = translatetAngle;
+            //         break;
+            // }
+            //#endregion
         });
-
-        console.log(pose);
     }
 
     function updateJointAngle(joint, angle) {
@@ -490,33 +317,16 @@ export default function Model({ pose, setValue, editMode }) {
                 if (!boneDict.hasOwnProperty(node.name)) {
                     return;
                 }
+
                 var translatedName = boneDict[node.name].label;
                 var boneName = translatedName || node.name;
                 var color = translatedName ? 0xff0000 : 0x00cc00;
 
                 bones[boneName] = node;
                 bones[boneName].color = color;
-
-                // check if defaultPose for bone is already set
-                if (defaultPose.hasOwnProperty(boneName))
-                    return;
-
-                // no defaultPose set, set defaultPose
-                setDefaultPose(prevState => {
-                    return {
-                        ...prevState,
-                        [boneName]: {
-                            x: node.rotation.x,
-                            y: node.rotation.y,
-                            z: node.rotation.z
-                        }
-                    }
-                });
-
             }
         });
     }
-
 
     return (
         <>

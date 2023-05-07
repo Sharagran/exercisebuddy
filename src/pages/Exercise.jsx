@@ -52,12 +52,24 @@ function ExerciseAttributePlaceholder({ label }) {
     );
 }
 
+function Video(props) {
+    const { src, ...otherProps } = props;
+    return (
+        <video key={src} {...otherProps}>
+            <source src={src} />
+            Your browser does not support the video tag.
+        </video>
+    );
+}
+
 export default function Exercise() {
     const { id } = useParams();
     const naivgate = useNavigate();
-    const { finishedLoading, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise, uploadExerciseMedia, fetchExercise, deleteExerciseMedia, getSelectOptions } = React.useContext(ExerciseContext);
+    const { finishedLoading, reloadExercise, getExercise, createExercise, updateExercise, deleteExercise,
+        uploadExerciseMedia, fetchExercise, deleteExerciseMedia, getSelectOptions } = React.useContext(ExerciseContext);
     const [exercise, setExercise] = useState();
     const [editMode, setEditMode] = useState(false);
+    const [mediaTokenReloadCounter, setMediaTokenReloadCounter] = useState(0);
 
     const selectOptions = getSelectOptions();
 
@@ -76,6 +88,10 @@ export default function Exercise() {
         }
     }, [finishedLoading]);
 
+    useEffect(() => {
+        checkMediaTokenValidity();
+    }, [exercise]);
+
     function clearForm() {
         setExercise({
             title: '',
@@ -85,11 +101,17 @@ export default function Exercise() {
             repetition: 0,
             duration: 0,
             pause: 0,
-            complaintsAreas: '',
-            equipment: '',
+            complaintsAreas: [],
+            equipment: [],
             link: '',
             image: '',
-            video: ''
+            video: '',
+            poses: [
+                {
+                    requirements: [
+                    ]
+                }
+            ]
         });
     }
 
@@ -167,12 +189,20 @@ export default function Exercise() {
         e.preventDefault();
 
         // update exercise updatedAt
-        exercise.updatedAt = new Date();
+        // FIXME: API is setting updatedAt & createdAt, remove this
+        // exercise.updatedAt = new Date().toISOString();
 
-        toast.promise(updateExercise(exercise), {
+        // removed image and video from exercise to prevent validation errors on server
+        const { image, video, ...exerciseData } = exercise;
+
+
+        toast.promise(updateExercise(exerciseData), {
             loading: 'Updating exercise...',
             success: (res) => {
-                reloadExercise(id);
+                reloadExercise(id).then((exercise) => {
+                    // reloading exercise to get _id's of newly created fields
+                    setExercise(exercise);
+                });
                 setEditMode(false);
                 return 'Exercise updated!';
             },
@@ -210,66 +240,103 @@ export default function Exercise() {
         });
     }
 
+    // TODO: Edgecase: media token expires before redering & after validity check
+    function checkMediaTokenValidity() {
+        var mediaTestCase = exercise?.image || exercise?.video;
+        if (!mediaTestCase) {
+            return;
+        }
+
+        if (mediaTokenReloadCounter >= 10) {
+            console.log("Could not load media after 10 retries, giving up.");
+            return;
+        }
+
+        fetch(mediaTestCase).then((res) => {
+            if (res.status === 400) {
+                console.log("Media token(s) expired, reloading exercise...");
+                reloadExercise(id).then((exercise) => {
+                    setMediaTokenReloadCounter(mediaTokenReloadCounter + 1);
+                    setExercise(exercise);
+                });
+            } else {
+                console.log("Media token(s) valid");
+            }
+        }).catch((err) => {
+            console.error(err);
+        });
+    }
+
     if (!finishedLoading) {
         // Placeholder during loading
         return (
             <Form>
-                <Row>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Title" />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Description" />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Difficulty" />
-                    </Col>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Set" />
-                    </Col>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Repetition" />
-                    </Col>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Duration" />
-                    </Col>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Pause" />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Complaints Areas" />
-                    </Col>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Equipment" />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <ExerciseAttributePlaceholder label="Link" />
-                    </Col>
-                </Row>
-                {id !== "create" && (
-                    <>
-                        <Row>
-                            <Col>
-                                <ExerciseAttributePlaceholder label="Image" />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <ExerciseAttributePlaceholder label="Video" />
-                            </Col>
-                        </Row>
-                    </>
-                )}
-                <Placeholder.Button variant="primary">Edit</Placeholder.Button>
-                <Placeholder.Button variant="danger">Delete</Placeholder.Button>
+                <Container>
+                    <Row>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Title" />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Description</Form.Label>
+                                <Placeholder as="textarea" rows={10} animation='wave' bg="secondary" disabled style={{
+                                    width: '100%',
+                                }} />
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Difficulty" />
+                        </Col>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Set" />
+                        </Col>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Repetition" />
+                        </Col>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Duration" />
+                        </Col>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Pause" />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Complaints Areas" />
+                        </Col>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Equipment" />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <ExerciseAttributePlaceholder label="Link" />
+                        </Col>
+                    </Row>
+                    {id !== "create" && (
+                        <>
+                            <Row>
+                                <Col>
+                                    <ExerciseAttributePlaceholder label="Image" />
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col>
+                                    <ExerciseAttributePlaceholder label="Video" />
+                                </Col>
+                            </Row>
+                        </>
+                    )}
+                    <Row>
+                        <Placeholder.Button className='mb-1' variant="primary">Edit</Placeholder.Button>
+                        <Placeholder.Button variant="danger">Delete</Placeholder.Button>
+                    </Row>
+
+                </Container>
             </Form>
         )
     }
@@ -303,7 +370,12 @@ export default function Exercise() {
                     <Row>
                         <Col>
                             <ExerciseAttribute label="Description">
-                                <Form.Control as="textarea" rows={10} value={exercise.description} disabled={!editMode} />
+                                <Form.Control as="textarea" rows={10} value={exercise.description} disabled={!editMode} required onChange={(e) => {
+                                    setExercise({
+                                        ...exercise,
+                                        description: e.target.value
+                                    });
+                                }} />
                             </ExerciseAttribute>
                         </Col>
                     </Row>
@@ -376,14 +448,8 @@ export default function Exercise() {
                             {id !== "create" && (
                                 <ExerciseAttribute label="Image">
                                     <div hidden={exercise.image === undefined}>
-                                        <Image crossOrigin="anonymous" src={exercise.image} alt="Exercise image" fluid onError={(e) => {
-                                            console.log("Image token expired, reloading exercise...");
-                                            fetchExercise(id).then((exercise) => {
-                                                setExercise(exercise);
-                                            });
-                                            // TODO: handle error, catch(display 'image not found' image) | check if this fixes error loop
-                                        }}
-                                            style={{ maxHeight: "256px" }} />
+                                        <Image crossOrigin="anonymous" src={exercise.image} alt="Exercise image" fluid
+                                            style={{ maxHeight: "256px", maxWidth: "512px" }} />
                                     </div>
                                     <Form.Control name="image" disabled={!editMode} type="file" accept="image/*" />
                                     <ButtonGroup className="mt-2">
@@ -398,6 +464,9 @@ export default function Exercise() {
                         <Col>
                             {id !== 'create' && (
                                 <ExerciseAttribute label="Video">
+                                    <div hidden={exercise.video === undefined}>
+                                        <Video height="256px" width="512px" crossOrigin="anonymous" controls src={exercise.video} />
+                                    </div>
                                     <Form.Control name="video" disabled={!editMode} type="file" accept="video/*" />
                                     <ButtonGroup className="mt-2">
                                         <Button name="Video" disabled={!editMode} variant="primary" onClick={handleMediaUpload}>Upload media</Button>
@@ -422,7 +491,12 @@ export default function Exercise() {
                                 }>
                                     <i className="bi bi-info-circle-fill text-primary" />
                                 </OverlayTrigger>
-                                <PoseEditor poses={exercise.poses} editMode={editMode} />
+                                <PoseEditor poses={exercise.poses} setPoses={(poses) => {
+                                    setExercise({
+                                        ...exercise,
+                                        poses
+                                    });
+                                }} editMode={editMode} />
                             </ExerciseAttribute>
                         </Col>
                     </Row>
@@ -433,12 +507,12 @@ export default function Exercise() {
                             <>
                                 {editMode ?
                                     <>
-                                        <Button variant="primary" type="submit" key="saveChangesButton">Save changes</Button>
+                                        <Button className='mb-1' variant="primary" type="submit" key="saveChangesButton">Save changes</Button>
                                         <Button variant="warning" onClick={handleDiscardButton} key="discardButton">Discard changes</Button>
                                     </>
                                     :
                                     <>
-                                        <Button variant="primary" onClick={handleEditButton} key="editButton">Edit</Button>
+                                        <Button className='mb-1' variant="primary" onClick={handleEditButton} key="editButton">Edit</Button>
                                         <Button variant="danger" onClick={handleDeleteButton} key="deleteButton">Delete exercise</Button>
                                     </>
                                 }

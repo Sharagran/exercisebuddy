@@ -2,34 +2,28 @@ import React from 'react'
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { ButtonGroup, Button, Form, Container } from 'react-bootstrap';
-import axios from 'axios';
+import AuthContext from '../components/AuthProvider';
 
 import { useParams } from 'react-router-dom';
 
 export default function ResetPassword() {
-
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
-    const [formValid, setFormValid] = useState(false);
+    const { resetPassword } = React.useContext(AuthContext);
 
     const { token } = useParams();
-    console.log(token);
+
 
     async function handleSubmit(e) {
         e.preventDefault();
 
-        if (!formValid) {
+        if(password !== passwordConfirm) {
+            toast.error("Passwords do not match!");
+            console.error("Passwords do not match!");
             return;
         }
-        const form = e.currentTarget;
-        if (form.checkValidity() === false) {
-            e.stopPropagation();
-        }
 
-        const result = await axios.post('/passwords/change', {
-            token: token,
-            password: password,
-        });
+        const result = await resetPassword(token, password);
 
         if (result.status >= 200 && result.status < 300) {
             console.log("Successfully reset password!");
@@ -40,28 +34,40 @@ export default function ResetPassword() {
         }
     }
 
-    function validateForm() {
-        let passwordConfirmMatch = password.length > 0 && password === passwordConfirm;
-        setFormValid(passwordConfirmMatch);
-        console.log(passwordConfirmMatch);
-    }
-
-
 
     return (
         <Container>
             <h2>Reset Password</h2>
 
-            <Form noValidate validated={formValid} onSubmit={handleSubmit}>
+            <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formPassword">
                     <Form.Label>Password</Form.Label>
-                    <Form.Control type="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <Form.Control
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        isInvalid={password.length > 0 && password !== passwordConfirm}
+                        isValid={password.length > 0 && password === passwordConfirm}
+                    />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formPasswordConfirm">
                     <Form.Label>Confirm Password</Form.Label>
-                    <Form.Control type="password" placeholder="Confirm Password" required value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} />
+                    <Form.Control
+                        type="password"
+                        placeholder="Confirm Password"
+                        value={passwordConfirm}
+                        onChange={(e) => setPasswordConfirm(e.target.value)}
+                        required
+                        isInvalid={password.length > 0 && password !== passwordConfirm}
+                        isValid={password.length > 0 && password === passwordConfirm}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                        Passwords do not match!
+                    </Form.Control.Feedback>
                 </Form.Group>
-                <Button variant="primary" type="submit">Reset Password</Button>
+                <Button disabled={password.length === 0 || password !== passwordConfirm} variant="primary" type="submit">Reset Password</Button>
             </Form>
         </Container>
     )
