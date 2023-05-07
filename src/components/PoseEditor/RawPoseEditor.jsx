@@ -2,21 +2,14 @@ import React from 'react'
 import { Button, Col, Container, Row, Form } from 'react-bootstrap';
 import Select from 'react-select'
 
-const allBodyJoints = [
-    'nose',
+import { MathUtils } from 'three';
+import { boneDict, parseAngleToExercisebuddy } from './PoseHelper';
 
-    'rightShoulder',
-    'rightElbow',
-
-    'leftShoulder',
-    'leftElbow',
-
-    'rightHip',
-    'rightKnee',
-
-    'leftHip',
-    'leftKnee',
-];
+var allBodyJoints = [];
+Object.keys(boneDict).forEach(key => {
+    if (boneDict[key].label && boneDict[key].trackable)
+        allBodyJoints.push(boneDict[key].label);
+});
 
 export default function RawPoseEditor({ pose, poseIndex, setValue, deleteCurrentPose, editMode, deleteRequirement }) {
     var remainingBodyJoints = [];
@@ -92,8 +85,16 @@ export default function RawPoseEditor({ pose, poseIndex, setValue, deleteCurrent
                 <Col>
                     {remainingBodyJoints.length > 0 &&
                         <Select placeholder='Add requirement' value={null} isDisabled={!editMode} onChange={(e) => {
-                            setValue(e.value, 'requiredAngle', 180);
-                            setValue(e.value, 'angleThreshold', 15);
+                            var bone = boneDict.getBoneByLabel(e.value);
+
+                            var defaultAngle = bone.defaultAngle;
+                            defaultAngle = MathUtils.degToRad(defaultAngle);
+                            defaultAngle = parseAngleToExercisebuddy(e.value, defaultAngle);
+
+                            var defaultThreshold = bone.angleThreshold || 15;
+
+                            setValue(e.value, 'requiredAngle', defaultAngle);
+                            setValue(e.value, 'angleThreshold', defaultThreshold);
                         }} menuPosition='fixed' options={remainingBodyJoints.map((joint) => {
                             return { value: joint, label: joint };
                         })} />
