@@ -12,17 +12,8 @@ import { boneDict } from "./PoseHelper";
 const editorHeight = "512px";
 export default function PoseEditor({ poses, setPoses, editMode }) {
     const [poseIndex, setPoseIndex] = useState(0); // index of current pose
-    const [currentPose, setCurrentPose] = useState(poses[poseIndex]);
 
-    useEffect(() => {
-        setCurrentPose(poses[poseIndex]);
-    }, [poseIndex, poses]);
-
-    useEffect(() => {
-        var newPoses = [...poses];
-        newPoses[poseIndex] = currentPose;
-        setPoses(newPoses);
-    }, [currentPose]);
+    // FIXME: currentPose & poses are not in sync, discard changes not working properly
 
     function getBodyJoints() {
         // get all poses.requirements.bodyJoint.label
@@ -61,60 +52,49 @@ export default function PoseEditor({ poses, setPoses, editMode }) {
 
     function setRequirementAttribute(identifier, attribute, value) {
         value = parseInt(value);
-        setCurrentPose(prevPose => {
-            const newPose = { ...prevPose };
-            var exists = false;
-            const requirements = newPose.requirements.map(req => {
-                if (req.bodyJoint.label === identifier) {
-                    exists = true;
-                    return { ...req, [attribute]: value };
-                }
-                return req;
-            });
 
-            if (!exists) {
-                var requirementDefauls;
+        var newPoses = [...poses];
+        var exists = false;
+        newPoses[poseIndex].requirements = newPoses[poseIndex].requirements.map(req => {
+            if (req.bodyJoint.label === identifier) {
+                exists = true;
+                return { ...req, [attribute]: value };
+            }
+            return req;
+        }
+        );
 
-                for (const key in boneDict) {
-                    if (Object.hasOwnProperty.call(boneDict, key)) {
-                        const bone = boneDict[key];
-                        if (bone.label === identifier) {
-                            requirementDefauls = bone;
-                            break;
-                        }
+        if (!exists) {
+            var requirementDefauls;
+
+            for (const key in boneDict) {
+                if (Object.hasOwnProperty.call(boneDict, key)) {
+                    const bone = boneDict[key];
+                    if (bone.label === identifier) {
+                        requirementDefauls = bone;
+                        break;
                     }
                 }
-
-                requirements.push({
-                    bodyJoint: {
-                        label: identifier,
-                        firstEdgeIndex: requirementDefauls.firstEdgeIndex,
-                        secondEdgeIndex: requirementDefauls.secondEdgeIndex
-                    },
-                    requiredAngle: value,
-                    angleThreshold: 15
-                });
             }
 
+            newPoses[poseIndex].requirements.push({
+                bodyJoint: {
+                    label: identifier,
+                    firstEdgeIndex: requirementDefauls.firstEdgeIndex,
+                    secondEdgeIndex: requirementDefauls.secondEdgeIndex
+                },
+                requiredAngle: value,
+                angleThreshold: 15
+            });
+        }
 
-            // console.log({ ...newPose, requirements });
-            return { ...newPose, requirements };
-        });
+        setPoses(newPoses);
     }
 
     function deleteRequirement(identifier) {
-        setCurrentPose(prevPose => {
-            const newPose = { ...prevPose };
-            const requirements = newPose.requirements.filter(req => req.bodyJoint.label !== identifier);
-            return { ...newPose, requirements };
-        });
-
-        // poses[poseIndex].requirements = poses[poseIndex].requirements.filter(req => req.bodyJoint.label !== identifier);
-        // setPoses(prevPoses => {
-        //     const newPoses = [...prevPoses];
-        //     newPoses[poseIndex].requirements = newPoses[poseIndex].requirements.filter(req => req.bodyJoint.label !== identifier);
-        //     return newPoses;
-        // });
+        var newPoses = [...poses];
+        newPoses[poseIndex].requirements = newPoses[poseIndex].requirements.filter(req => req.bodyJoint.label !== identifier);
+        setPoses(newPoses);
     }
 
     return (
@@ -126,7 +106,7 @@ export default function PoseEditor({ poses, setPoses, editMode }) {
                         rotation: [0, 0, 0]
                     }}>
                         <Suspense fallback={null}>
-                            <Model pose={currentPose} editMode={editMode} setValue={setRequirementAttribute} />
+                            <Model pose={poses[poseIndex]} editMode={editMode} setValue={setRequirementAttribute} />
                         </Suspense>
                         {/* Performance monitor */}
                         {process.env.NODE_ENV === "development" && <Perf />}
@@ -148,7 +128,8 @@ export default function PoseEditor({ poses, setPoses, editMode }) {
                     maxHeight: editorHeight,
                     minWidth: "300px"
                 }}>
-                    <RawPoseEditor deleteCurrentPose={deleteCurrentPose} pose={currentPose} poseIndex={poseIndex} setValue={setRequirementAttribute} editMode={editMode} deleteRequirement={deleteRequirement} />
+                    <RawPoseEditor pose={poses[poseIndex]} poseIndex={poseIndex} editMode={editMode}
+                    setValue={setRequirementAttribute} deleteCurrentPose={deleteCurrentPose} deleteRequirement={deleteRequirement} />
                 </Col>
             </Row>
         </Container>

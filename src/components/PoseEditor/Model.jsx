@@ -29,14 +29,6 @@ export default function Model({ pose, setValue, editMode }) {
     }, []);
 
     useEffect(() => {
-        if (pose) {
-            resetPose();
-            applyPose();
-            updateJointHighlights();
-        }
-    }, [pose]);
-    
-    useEffect(() => {
         function handleRightClick(e) {
             if (e.target.nodeName === "CANVAS") {
                 e.preventDefault();
@@ -66,6 +58,12 @@ export default function Model({ pose, setValue, editMode }) {
         // mesh.current.rotation.y += 0.01;
         // updateJointHighlights();
     });
+
+    if (pose) {
+        resetPose();
+        applyPose();
+        updateJointHighlights();
+    }
 
     //#region Control elements
     function createJointHighlights() {
@@ -329,7 +327,6 @@ export default function Model({ pose, setValue, editMode }) {
             }
         });
     }
-
 
     return (
         <>
