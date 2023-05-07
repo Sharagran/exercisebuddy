@@ -52,6 +52,16 @@ function ExerciseAttributePlaceholder({ label }) {
     );
 }
 
+function Video(props) {
+    const { src, ...otherProps } = props;
+    return (
+        <video key={src} {...otherProps}>
+            <source src={src} type="video/mp4" />
+            Your browser does not support the video tag.
+        </video>
+    );
+}
+
 export default function Exercise() {
     const { id } = useParams();
     const naivgate = useNavigate();
@@ -59,7 +69,7 @@ export default function Exercise() {
         uploadExerciseMedia, fetchExercise, deleteExerciseMedia, getSelectOptions } = React.useContext(ExerciseContext);
     const [exercise, setExercise] = useState();
     const [editMode, setEditMode] = useState(false);
-    const [imageTokenReloadCounter, setImageTokenReloadCounter] = useState(0);
+    const [mediaTokenReloadCounter, setMediaTokenReloadCounter] = useState(0);
 
     const selectOptions = getSelectOptions();
 
@@ -77,6 +87,10 @@ export default function Exercise() {
             setExercise(exercise);
         }
     }, [finishedLoading]);
+
+    useEffect(() => {
+        checkMediaTokenValidity();
+    }, [exercise]);
 
     function clearForm() {
         setExercise({
@@ -220,6 +234,33 @@ export default function Exercise() {
 
         toast('Changes discarded', {
             icon: '❕',
+        });
+    }
+
+    // TODO: Edgecase: media token expires before redering & after validity check
+    function checkMediaTokenValidity() {
+        var mediaTestCase = exercise?.image || exercise?.video;
+        if (!mediaTestCase) {
+            return;
+        }
+
+        if (mediaTokenReloadCounter >= 10) {
+            console.log("Could not load media after 10 retries, giving up.");
+            return;
+        }
+
+        fetch(mediaTestCase).then((res) => {
+            if (res.status === 400) {
+                console.log("Media token(s) expired, reloading exercise...");
+                reloadExercise(id).then((exercise) => {
+                    setMediaTokenReloadCounter(mediaTokenReloadCounter + 1);
+                    setExercise(exercise);
+                });
+            } else {
+                console.log("Media token(s) valid");
+            }
+        }).catch((err) => {
+            console.error(err);
         });
     }
 
@@ -404,19 +445,8 @@ export default function Exercise() {
                             {id !== "create" && (
                                 <ExerciseAttribute label="Image">
                                     <div hidden={exercise.image === undefined}>
-                                        <Image crossOrigin="anonymous" src={exercise.image} alt="Exercise image" fluid onError={(e) => {
-                                            if (imageTokenReloadCounter >= 3) {
-                                                console.log("Could not load image after 3 retries, giving up.");
-                                                return;
-                                            }
-
-                                            console.log("Image token expired, reloading exercise...");
-                                            setImageTokenReloadCounter(imageTokenReloadCounter + 1);
-                                            fetchExercise(id).then((exercise) => {
-                                                setExercise(exercise);
-                                            });
-                                        }}
-                                            style={{ maxHeight: "256px" }} />
+                                        <Image crossOrigin="anonymous" src={exercise.image} alt="Exercise image" fluid
+                                            style={{ maxHeight: "256px", maxWidth: "512px" }} />
                                     </div>
                                     <Form.Control name="image" disabled={!editMode} type="file" accept="image/*" />
                                     <ButtonGroup className="mt-2">
@@ -431,6 +461,9 @@ export default function Exercise() {
                         <Col>
                             {id !== 'create' && (
                                 <ExerciseAttribute label="Video">
+                                    <div hidden={exercise.video === undefined}>
+                                        <Video height="256px" width="512px" crossOrigin="anonymous" controls src={exercise.video} />
+                                    </div>
                                     <Form.Control name="video" disabled={!editMode} type="file" accept="video/*" />
                                     <ButtonGroup className="mt-2">
                                         <Button name="Video" disabled={!editMode} variant="primary" onClick={handleMediaUpload}>Upload media</Button>
