@@ -88,10 +88,6 @@ export default function Exercise() {
         }
     }, [finishedLoading]);
 
-    useEffect(() => {
-        checkMediaTokenValidity();
-    }, [exercise]);
-
     function clearForm() {
         setExercise({
             title: '',
@@ -122,7 +118,7 @@ export default function Exercise() {
         exercise.createdAt = new Date();
         exercise.updatedAt = new Date();
 
-        // convert seconds to microseconds
+        // TODO: convert seconds to microseconds
         // exercise.duration *= 1000000;
         console.log(exercise); //FIXME: debug only, remove this
 

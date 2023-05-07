@@ -15,32 +15,11 @@ export default function PoseEditor({ poses, setPoses, editMode }) {
 
     // FIXME: currentPose & poses are not in sync, discard changes not working properly
 
-    function getBodyJoints() {
-        // get all poses.requirements.bodyJoint.label
-        var bodyJoints = [];
-        poses.forEach(pose => {
-            pose.requirements.forEach(req => {
-                bodyJoints.push(req.bodyJoint.label);
-            });
-        });
-        // remove duplicates
-        bodyJoints = [...new Set(bodyJoints)];
-        return bodyJoints;
-    }
-
     function addPose() {
         var newPose = {
             requirements: []
         };
-        getBodyJoints().forEach(bodyJoint => {
-            newPose.requirements.push({
-                angleThreshold: 15,
-                requiredAngle: 0,
-                bodyJoint: {
-                    label: bodyJoint
-                }
-            });
-        });
+
         poses.push(newPose);
         setPoseIndex(poses.length - 1);
     }
