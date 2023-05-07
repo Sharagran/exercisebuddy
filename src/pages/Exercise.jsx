@@ -56,7 +56,7 @@ function Video(props) {
     const { src, ...otherProps } = props;
     return (
         <video key={src} {...otherProps}>
-            <source src={src} type="video/mp4" />
+            <source src={src} />
             Your browser does not support the video tag.
         </video>
     );
@@ -190,10 +190,13 @@ export default function Exercise() {
 
         // update exercise updatedAt
         // FIXME: API is setting updatedAt & createdAt, remove this
-        exercise.updatedAt = new Date().toISOString();
+        // exercise.updatedAt = new Date().toISOString();
+
+        // removed image and video from exercise to prevent validation errors on server
+        const { image, video, ...exerciseData } = exercise;
 
 
-        toast.promise(updateExercise(exercise), {
+        toast.promise(updateExercise(exerciseData), {
             loading: 'Updating exercise...',
             success: (res) => {
                 reloadExercise(id).then((exercise) => {
