@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useState } from "react";
-import { Row, Col, Container, Pagination } from 'react-bootstrap';
+import { Row, Col, Container, Pagination, Button, Form } from 'react-bootstrap';
 
 import { Canvas } from "@react-three/fiber";
 import { Perf } from 'r3f-perf'
@@ -12,8 +12,14 @@ import { boneDict } from "./PoseHelper";
 const editorHeight = "512px";
 export default function PoseEditor({ poses, setPoses, editMode }) {
     const [poseIndex, setPoseIndex] = useState(0); // index of current pose
+    const [sideView, setSideView] = useState(false);
+    const [rightViewAngle, setRightViewAngle] = useState(true);
 
-    // FIXME: currentPose & poses are not in sync, discard changes not working properly
+    useEffect(() => {
+        if (poseIndex >= poses.length) {
+            setPoseIndex(poses.length - 1);
+        }
+    }, [poses]);
 
     function addPose() {
         var newPose = {
@@ -80,16 +86,46 @@ export default function PoseEditor({ poses, setPoses, editMode }) {
         <Container>
             <Row>
                 <Col>
-                    <Canvas className="border rounded" style={{ height: editorHeight }} camera={{
-                        position: [0, 1.5, 3.5],
-                        rotation: [0, 0, 0]
-                    }}>
-                        <Suspense fallback={null}>
-                            <Model pose={poses[poseIndex]} editMode={editMode} setValue={setRequirementAttribute} />
-                        </Suspense>
-                        {/* Performance monitor */}
-                        {process.env.NODE_ENV === "development" && <Perf />}
-                    </Canvas>
+                    <div className="mb-2">
+                        <h6>Pose type:</h6>
+                        <Pagination className="justify-content-center">
+                            <Pagination.Item active={!sideView} onClick={() => {
+                                setSideView(false);
+                            }}>
+                                front-to-camera pose
+                            </Pagination.Item>
+                            <Pagination.Item active={sideView} onClick={() => {
+                                setSideView(true);
+                            }}>
+                                side-to-camera pose
+                            </Pagination.Item>
+                        </Pagination>
+
+                        <div className="d-flex justify-content-center">
+                            <Button variant="secondary" hidden={!sideView} onClick={() => {
+                                setRightViewAngle(!rightViewAngle);
+                            }}>
+                                flip to {rightViewAngle ? "Left" : "Right"} view angle
+                            </Button>
+                        </div>
+                    </div>
+                    <div className="mb-2">
+                        <Canvas className="border rounded" style={{ height: editorHeight }} camera={{
+                            position: [0, 1.5, 3.5],
+                            rotation: [0, 0, 0]
+                        }}>
+                            <Suspense fallback={null}>
+                                <Model pose={poses[poseIndex]} setValue={setRequirementAttribute} editMode={editMode} sideView={sideView} rightViewAngle={rightViewAngle} />
+                            </Suspense>
+                            {/* Performance monitor */}
+                            {process.env.NODE_ENV === "development" && <Perf />}
+                        </Canvas>
+                        {sideView &&
+                            <Form.Text muted>
+                                Note: Gizmo controls for drag and drop rotation of joints are not available in side view.
+                            </Form.Text>
+                        }
+                    </div>
                     <Pagination className="justify-content-center flex-wrap">
                         {poses.map((pose, index) => {
                             return (
@@ -108,7 +144,7 @@ export default function PoseEditor({ poses, setPoses, editMode }) {
                     minWidth: "300px"
                 }}>
                     <RawPoseEditor pose={poses[poseIndex]} poseIndex={poseIndex} editMode={editMode}
-                    setValue={setRequirementAttribute} deleteCurrentPose={deleteCurrentPose} deleteRequirement={deleteRequirement} />
+                        setValue={setRequirementAttribute} deleteCurrentPose={deleteCurrentPose} deleteRequirement={deleteRequirement} />
                 </Col>
             </Row>
         </Container>

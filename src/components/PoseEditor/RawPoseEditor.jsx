@@ -12,6 +12,7 @@ Object.keys(boneDict).forEach(key => {
 });
 
 export default function RawPoseEditor({ pose, poseIndex, setValue, deleteCurrentPose, editMode, deleteRequirement }) {
+    if(!pose) return null;
     var remainingBodyJoints = [];
     function getRemainingBodyJoints() {
         allBodyJoints.forEach(bodyJoint => {
