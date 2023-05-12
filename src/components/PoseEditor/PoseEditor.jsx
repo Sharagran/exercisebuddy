@@ -83,7 +83,6 @@ export default function PoseEditor({ poses, setPoses, editMode }) {
         setPoses(newPoses);
     }
 
-    console.log(poses);
     return (
         <Container>
             <Row>
