@@ -12,8 +12,9 @@ import { boneDict } from "./PoseHelper";
 const editorHeight = "512px";
 export default function PoseEditor({ poses, setPoses, editMode }) {
     const [poseIndex, setPoseIndex] = useState(0); // index of current pose
-    const [sideView, setSideView] = useState(false);
     const [rightViewAngle, setRightViewAngle] = useState(true);
+
+    var sideView = poses[poseIndex]?.isSide;
 
     useEffect(() => {
         if (poseIndex >= poses.length) {
@@ -82,6 +83,7 @@ export default function PoseEditor({ poses, setPoses, editMode }) {
         setPoses(newPoses);
     }
 
+    console.log(poses);
     return (
         <Container>
             <Row>
@@ -89,13 +91,19 @@ export default function PoseEditor({ poses, setPoses, editMode }) {
                     <div className="mb-2">
                         <h6>Pose type:</h6>
                         <Pagination className="justify-content-center">
-                            <Pagination.Item active={!sideView} onClick={() => {
-                                setSideView(false);
+                            <Pagination.Item disabled={!editMode} active={!sideView} onClick={() => {
+                                var newPose = poses[poseIndex];
+                                newPose.isSide = false;
+                                poses[poseIndex] = newPose;
+                                setPoses([...poses]);
                             }}>
                                 front-to-camera pose
                             </Pagination.Item>
-                            <Pagination.Item active={sideView} onClick={() => {
-                                setSideView(true);
+                            <Pagination.Item disabled={!editMode} active={sideView} onClick={() => {
+                                var newPose = poses[poseIndex];
+                                newPose.isSide = true;
+                                poses[poseIndex] = newPose;
+                                setPoses([...poses]);
                             }}>
                                 side-to-camera pose
                             </Pagination.Item>
