@@ -6,10 +6,12 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { useHelper } from "@react-three/drei";
 import { useLoader, useThree } from "@react-three/fiber";
 
-import { boneDict, parseAngleFromExercisebuddy, parseAngleToExercisebuddy } from "./PoseHelper";
+import { boneDict, edges, parseAngleFromExercisebuddy, parseAngleToExercisebuddy } from "./PoseHelper";
 
 var selectedJoint = null;
-export default function Model({ pose, setValue, editMode }) {
+var defaultPose = {};
+
+export default function Model({ pose, setValue, editMode, sideView, rightViewAngle, setDebugData }) {
     const { camera, gl: renderer } = useThree();
     const mesh = useRef();
 
@@ -53,10 +55,38 @@ export default function Model({ pose, setValue, editMode }) {
         }
     }, [controls]);
 
+    useEffect(() => {
+        console.log("sideView changed");
+        resetPose();
+        if (sideView) {
+            if (rightViewAngle) {
+                mesh.current?.rotation.set(0, -Math.PI / 2, 0);
+            } else {
+                mesh.current?.rotation.set(0, Math.PI / 2, 0);
+            }
+
+            setSideViewRotations();
+        } else {
+            mesh.current?.rotation.set(0, 0, 0);
+        }
+        applyPose();
+        updateJointHighlights();
+    }, [sideView, rightViewAngle]);
+
     if (pose) {
         resetPose();
         applyPose();
         updateJointHighlights();
+    }
+
+    function setDefaultPose() {
+        for (const key in bones) {
+            if (Object.hasOwnProperty.call(bones, key)) {
+                if (Object.hasOwnProperty.call(defaultPose, key)) continue;
+                const bone = bones[key];
+                defaultPose[key] = bone.rotation.clone();
+            }
+        }
     }
 
     //#region Control elements
@@ -66,12 +96,12 @@ export default function Model({ pose, setValue, editMode }) {
             if (Object.hasOwnProperty.call(bones, key)) {
                 const bone = bones[key];
 
-                if(boneDict[bone.name].show === false) {
+                if (boneDict[bone.name].show === false) {
                     continue;
                 }
 
                 const geometry = new THREE.SphereGeometry(0.05, 8, 8);
-                const material = new THREE.MeshBasicMaterial({ color: bone.color });
+                const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
                 const sphere = new THREE.Mesh(geometry, material);
                 const position = new THREE.Vector3();
                 sphere.position.copy(bone.getWorldPosition(position));
@@ -79,7 +109,8 @@ export default function Model({ pose, setValue, editMode }) {
                 // add bone ref to jointHighlight
                 sphere.bone = bone;
                 // add jointHighlight ref to bone
-                bones[key].joint = sphere.position;
+                // bones[key].joint = sphere.position;
+                bones[key].jointHighlight = sphere;
 
                 // display sphere on top of everything
                 sphere.renderOrder = 1000;
@@ -97,8 +128,17 @@ export default function Model({ pose, setValue, editMode }) {
         for (const key in bones) {
             if (Object.hasOwnProperty.call(bones, key)) {
                 const bone = bones[key];
-                bone.joint?.copy(bone.getWorldPosition(new THREE.Vector3()));
-                bones[key].joint = bone.joint;
+                bone.jointHighlight?.position?.copy(bone.getWorldPosition(new THREE.Vector3()));
+                bones[key].jointHighlight = bone.jointHighlight;
+
+                // change color of jointHighlight if value is set
+                if (bones[key].jointHighlight?.material) {
+                    if (pose.requirements.find(req => req.bodyJoint.label === key)) {
+                        bones[key].jointHighlight.material.color.setHex(0x00cc00);
+                    } else {
+                        bones[key].jointHighlight.material.color.setHex(0xff0000);
+                    }
+                }
             }
         }
     }
@@ -118,7 +158,7 @@ export default function Model({ pose, setValue, editMode }) {
     }
 
     function handleJointClick(e) {
-        if(!editMode) return;
+        if (!editMode) return;
 
         controls.attach(e.object.bone);
         selectedJoint = boneDict[e.object.bone.name];
@@ -143,14 +183,15 @@ export default function Model({ pose, setValue, editMode }) {
     //#endregion
 
     function debugBoneRotation(e) {
-        return;
+        // return;
         // TODO: remove code below debug only
         console.log(e.object.bone.name, boneDict[e.object.bone.name].label);
         console.groupCollapsed("Angles");
         for (const key in boneDict) {
             if (Object.hasOwnProperty.call(boneDict[key], "edges")) {
                 const edges = boneDict[key].edges;
-                const angle = angleBetweenPoints(...edges.map(e => bones[e]));
+                // const angle = angleBetweenPoints(...edges.map(e => bones[e]));
+                const angle = angleBetweenThreePoints(...edges.map(e => bones[e]));
                 console.log(boneDict[key].label, angle);
             }
         }
@@ -163,7 +204,73 @@ export default function Model({ pose, setValue, editMode }) {
         console.groupEnd();
     }
 
+    function getAllRotations() {
+        var rotations = [];
+        for (const key in boneDict) {
+            if (Object.hasOwnProperty.call(boneDict[key], "edges")) {
+                const joint = boneDict[key];
+                // const edgesList = boneDict[key].edges;
+
+                // const angle = angleBetweenThreePoints(...edgesList.map(e => bones[e]));
+                // rotations.push({ label: boneDict[key].label, value: `${Math.round(angle)}°` });
+                // rotations.push({ label: boneDict[key].label, value: `[${edges[boneDict[key].firstEdgeIndex]?.origin}, ${edges[boneDict[key].firstEdgeIndex]?.destination}], [${edges[boneDict[key].secondEdgeIndex]?.origin}, ${edges[boneDict[key].secondEdgeIndex]?.destination}]` });
+
+                const firstEdgeIndex = joint.firstEdgeIndex;
+                const secondEdgeIndex = joint.secondEdgeIndex;
+                const angle = calculateEdgeAngle(
+                    edges[firstEdgeIndex],
+                    edges[secondEdgeIndex],
+                    true,
+                    true
+                );
+
+                const parsedAngle = parseAngleToExercisebuddy(joint.label, angle);
+
+                rotations.push({ label: boneDict[key].label, value: `${parsedAngle}°` });
+            }
+        }
+        return rotations;
+    }
+
     //#region Parsing
+
+    function calculateEdgeAngle(edge1, edge2, returnAsRadians = false, calcFullAngle = false) {
+        if(!edge1 || !edge2) return null;
+
+        const d1 = bones[edge1.destination].getWorldPosition(new THREE.Vector3());
+        const o1 = bones[edge1.origin].getWorldPosition(new THREE.Vector3());
+
+        const d2 = bones[edge2.destination].getWorldPosition(new THREE.Vector3());
+        const o2 = bones[edge2.origin].getWorldPosition(new THREE.Vector3());
+        // get Delta
+        edge1 = new THREE.Vector3().subVectors(d1, o1);
+        edge2 = new THREE.Vector3().subVectors(d2, o2);
+
+
+        var angle;
+        if (!edge2) {
+            //if no second edge is provided, calculate angle with horizontal line
+            angle = edge1.angleTo(new THREE.Vector3(1, 0, 0));
+        } else {
+            if (calcFullAngle) {
+                angle = Math.atan2(edge1.y, edge1.x) - Math.atan2(edge2.y, edge2.x); //Produces -180 to 180 degree angles
+            } else {
+                angle = edge1.angleTo(edge2); // only gives 0 to 180 degrees
+            }
+        }
+
+        if (!returnAsRadians) {
+            angle = THREE.MathUtils.radToDeg(angle);
+            if (calcFullAngle) {
+                angle = (angle + 360) % 360;
+            }
+
+            angle = Math.round(angle);
+        }
+
+        return angle;
+    }
+
     function angleBetweenPoints(p1, p2, p3) {
         // get world position of points
         p1 = p1.getWorldPosition(new THREE.Vector3());
@@ -187,6 +294,44 @@ export default function Model({ pose, setValue, editMode }) {
         return angle;
     }
 
+    function angleBetweenThreePoints(p1, apex, p3) {
+
+        p1 = p1.getWorldPosition(new THREE.Vector3());
+        apex = apex.getWorldPosition(new THREE.Vector3());
+        p3 = p3.getWorldPosition(new THREE.Vector3());
+
+        var edge1Delta = new THREE.Vector3().subVectors(p1, apex);
+        var edge2Delta = new THREE.Vector3().subVectors(p3, apex);
+
+        // var angleInRadians = atan2(edge.getDelta.y, edge.getDelta.x)-atan2(edge2.getDelta.y, edge2.getDelta.x);
+        var angleInRadians = Math.atan2(edge1Delta.y, edge1Delta.x) - Math.atan2(edge2Delta.y, edge2Delta.x);
+        var angle = THREE.MathUtils.radToDeg(angleInRadians);
+        angle = Math.round(angle);
+        angle = (angle + 360) % 360;
+
+        return angle;
+
+        // var angle;
+        // angle = Math.atan2(p3.y - apex.y, p3.x - apex.x) - Math.atan2(p1.y - apex.y, p1.x - apex.x);
+        // angle = THREE.MathUtils.radToDeg(angle);
+        // angle = Math.round(angle);
+        // angle = (angle + 360) % 360;
+        // return angle;
+
+        // p1 = p1.getWorldPosition(new THREE.Vector3());
+        // apex = apex.getWorldPosition(new THREE.Vector3());
+        // p3 = p3.getWorldPosition(new THREE.Vector3());
+        // // console.log(p1, apex, p3);
+        // var v1 = new THREE.Vector3();
+        // var v2 = new THREE.Vector3();
+        // v1.subVectors(apex, p1);
+        // v2.subVectors(apex, p3);
+
+        // var angle = v1.angleTo(v2);
+        // angle = THREE.MathUtils.radToDeg(angle);
+        // return angle;
+    }
+
     //#endregion
 
     //#region Modify Pose
@@ -194,8 +339,14 @@ export default function Model({ pose, setValue, editMode }) {
         for (const key in boneDict) {
             if (Object.hasOwnProperty.call(boneDict[key], "angleRotationAxis")) {
                 const bone = boneDict[key];
-                bones[bone.label].rotation[bone.angleRotationAxis] = THREE.MathUtils.degToRad(bone.defaultAngle);
-                // bones[bone.label].rotation[bone.angleRotationAxis] = THREE.MathUtils.degToRad(180);
+                var axis = bone.angleRotationAxis;
+                if (sideView) {
+                    axis = transformAxis(key, axis);
+                }
+                // bones[bone.label].rotation[axis] = THREE.MathUtils.degToRad(bone.defaultAngle);
+                bones[bone.label].rotation.x = defaultPose[bone.label].x;
+                bones[bone.label].rotation.y = defaultPose[bone.label].y;
+                bones[bone.label].rotation.z = defaultPose[bone.label].z;
             }
         }
     }
@@ -213,8 +364,35 @@ export default function Model({ pose, setValue, editMode }) {
             var axis = boneDict.getBoneByLabel(key).angleRotationAxis;
             axis = axis || "x";
 
+            if (sideView) {
+                axis = transformAxis(key, axis);
+            }
+
             bone.rotation[axis] = translatetAngle;
         });
+    }
+
+    function transformAxis(key, axis) {
+        if (key.includes("Elbow")) {
+            return "z";
+        }
+
+        if (key.includes("Shoulder")) {
+            return "z";
+        }
+
+
+        if (axis === "x") {
+            return "y";
+        } else if (axis === "z") {
+            return "x";
+        }
+    }
+
+    // setSideViewRotations();
+    function setSideViewRotations() {
+        bones["leftShoulder"].rotation.x = THREE.MathUtils.degToRad(90);
+        bones["rightShoulder"].rotation.x = THREE.MathUtils.degToRad(90);
     }
 
     function updateJointAngle(joint, rotation) {
@@ -236,20 +414,24 @@ export default function Model({ pose, setValue, editMode }) {
 
                 var translatedName = boneDict[node.name].label;
                 var boneName = translatedName || node.name;
-                var color = translatedName ? 0xff0000 : 0x00cc00;
 
                 bones[boneName] = node;
-                bones[boneName].color = color;
             }
         });
+
+        setDefaultPose();
     }
+
+    setDebugData(getAllRotations());
 
     return (
         <>
             <primitive object={gltf.scene} ref={mesh} dispose={null} />
-            {highlightPoints.map((point, index) => {
-                return <primitive key={point.uuid} object={point} onClick={handleJointClick} />
-            })}
+            {!sideView &&
+                highlightPoints.map((point, index) => {
+                    return <primitive key={point.uuid} object={point} onClick={handleJointClick} />
+                })
+            }
         </>
     );
 

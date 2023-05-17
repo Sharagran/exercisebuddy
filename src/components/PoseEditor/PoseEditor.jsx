@@ -13,6 +13,12 @@ const editorHeight = "512px";
 export default function PoseEditor({ poses, setPoses, editMode }) {
     const [poseIndex, setPoseIndex] = useState(0); // index of current pose
     const [rightViewAngle, setRightViewAngle] = useState(true);
+    const [debugData, setDebugData] = useState([
+        {
+            label: "test",
+            value: 17
+        }
+    ])
 
     var sideView = poses[poseIndex]?.isSide;
 
@@ -117,12 +123,37 @@ export default function PoseEditor({ poses, setPoses, editMode }) {
                         </div>
                     </div>
                     <div className="mb-2">
+                        {process.env.NODE_ENV === "development" &&
+                        <div style={{
+                            border: "1px solid #ccc",
+                            padding: "10px",
+                            marginBottom: "10px",
+
+                            position: "fixed",
+                            top: "106px",
+                            right: "0",
+                            zIndex: "1000",
+
+                            backgroundColor: "white"
+                        }}>
+                            <h6>Debug data:</h6>
+                            {debugData.map((data, index) => {
+                                return (
+                                    <div key={index}>
+                                        <span>{data.label}: </span>
+                                        <span>{data.value}</span>
+                                    </div>
+                                )
+                            })
+                            }
+                        </div>
+                        }
                         <Canvas className="border rounded" style={{ height: editorHeight }} camera={{
                             position: [0, 1.5, 3.5],
                             rotation: [0, 0, 0]
                         }}>
                             <Suspense fallback={null}>
-                                <Model pose={poses[poseIndex]} setValue={setRequirementAttribute} editMode={editMode} sideView={sideView} rightViewAngle={rightViewAngle} />
+                                <Model setDebugData={setDebugData} pose={poses[poseIndex]} setValue={setRequirementAttribute} editMode={editMode} sideView={sideView} rightViewAngle={rightViewAngle} />
                             </Suspense>
                             {/* Performance monitor */}
                             {process.env.NODE_ENV === "development" && <Perf />}

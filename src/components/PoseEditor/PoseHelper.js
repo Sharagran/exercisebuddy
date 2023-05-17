@@ -204,29 +204,6 @@ function createEdges() {
     return edges;
 }
 
-// FIXME: indices might be in the wrong order
-function getEdgeIndices(edgesArray) {
-    var r = [];
-    edges.forEach(edge => {
-        if (edgesArray.includes(edge.origin) && edgesArray.includes(edge.destination)) {
-            r.push(edge.index);
-        }
-    });
-    return r;
-}
-
-function translateEdgeIndices() {
-    for (const key in boneDict) {
-        if (Object.hasOwnProperty.call(boneDict, key)) {
-            const element = boneDict[key];
-            if (element.edges && (!element.firstEdgeIndex || !element.secondEdgeIndex)) {
-                var edgeIndices = getEdgeIndices(element.edges);
-                element.firstEdgeIndex = edgeIndices[0];
-                element.secondEdgeIndex = edgeIndices[1];
-            }
-        }
-    }
-}
 
 // javascript modulo operator is broken for negative numbers
 function mod(n, m) {
@@ -270,7 +247,43 @@ function parseAngleFromExercisebuddy(label, angle) {
 }
 
 // inverse function of parseAngleFromExercisebuddy
+function parseAngleToExercisebuddy_old(label, angle) {
+    //#region angle rotation (direction & angle)
+    if (label === "nose" || label === "rightHip" || label === "leftKnee" || label.includes("Shoulder")) {
+        angle = -angle;
+    }
+
+    var translatetAngle = MathUtils.radToDeg(angle);
+    translatetAngle = Math.round(translatetAngle);
+
+    //#endregion
+    //#region angle shift (start point)
+    switch (label) {
+        case "nose":
+        case "rightShoulder":
+        case "leftShoulder":
+            translatetAngle -= 90;
+            break;
+        default:
+            break;
+    }
+
+    // shift 0° to 180° (180° is expended joint)
+    if (!label.includes("Hip")) {
+        translatetAngle = translatetAngle + 180;
+    }
+    //#endregion
+
+    // required to prevent negative angles
+    translatetAngle = mod(translatetAngle, 360);
+
+    return translatetAngle;
+}
+
+// inverse function of parseAngleFromExercisebuddy
 function parseAngleToExercisebuddy(label, angle) {
+    //TODO: elbow -180; shoulder * -1
+    
     //#region angle rotation (direction & angle)
     if (label === "nose" || label === "rightHip" || label === "leftKnee" || label.includes("Shoulder")) {
         angle = -angle;
@@ -304,6 +317,10 @@ function parseAngleToExercisebuddy(label, angle) {
 }
 
 var edges = createEdges();
-translateEdgeIndices();
 
-export { boneDict, parseAngleToExercisebuddy, parseAngleFromExercisebuddy };
+export {
+    boneDict,
+    edges,
+    parseAngleToExercisebuddy,
+    parseAngleFromExercisebuddy
+};
