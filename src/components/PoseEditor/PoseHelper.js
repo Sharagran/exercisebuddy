@@ -14,6 +14,11 @@ var boneDict = {
         // firstEdgeIndex: 0,
         // secondEdgeIndex: 1,
     },
+    "mixamorigNeck_05": {
+        label: "shoulderMid",
+        show: false,
+        trackable: false,
+    },
 
     //#region right arm
     "mixamorigLeftArm_09": {
@@ -24,8 +29,8 @@ var boneDict = {
         defaultAngle: 0,
         edges: ["rightShoulder", "rightHip", "rightElbow"],
         // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
+        firstEdgeIndex: 15,
+        secondEdgeIndex: 10,
     },
     "mixamorigLeftForeArm_010": {
         label: "rightElbow",
@@ -35,8 +40,8 @@ var boneDict = {
         defaultAngle: 0,
         edges: ["rightElbow", "rightShoulder", "rightWrist"],
         // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
+        firstEdgeIndex: 10,
+        secondEdgeIndex: 11,
     },
     "mixamorigLeftHand_011": {
         label: "rightWrist",
@@ -54,8 +59,8 @@ var boneDict = {
         defaultAngle: 0,
         edges: ["leftShoulder", "leftHip", "leftElbow"],
         // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
+        firstEdgeIndex: 8,
+        secondEdgeIndex: 12,
     },
     "mixamorigRightForeArm_018": {
         label: "leftElbow",
@@ -65,8 +70,8 @@ var boneDict = {
         defaultAngle: 0,
         edges: ["leftElbow", "leftShoulder", "leftWrist"],
         angleThreshold: 15,
-        // firstEdgeIndex: 9,
-        // secondEdgeIndex: 8,
+        firstEdgeIndex: 9,
+        secondEdgeIndex: 8,
     },
     "mixamorigRightHand_019": {
         label: "leftWrist",
@@ -84,8 +89,8 @@ var boneDict = {
         defaultAngle: 180,
         edges: ["rightHip", "rightKnee", "rightShoulder"],
         // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
+        firstEdgeIndex: 15,
+        secondEdgeIndex: 16,
     },
     "mixamorigLeftLeg_025": {
         label: "rightKnee",
@@ -95,8 +100,8 @@ var boneDict = {
         defaultAngle: 0,
         edges: ["rightKnee", "rightHip", "rightAnkle"],
         // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
+        firstEdgeIndex: 17,
+        secondEdgeIndex: 16,
     },
     "mixamorigLeftFoot_026": {
         label: "rightAnkle",
@@ -114,8 +119,8 @@ var boneDict = {
         defaultAngle: 180,
         edges: ["leftHip", "leftKnee", "leftShoulder"],
         // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
+        firstEdgeIndex: 12,
+        secondEdgeIndex: 13,
     },
     "mixamorigRightLeg_029": {
         label: "leftKnee",
@@ -125,8 +130,8 @@ var boneDict = {
         defaultAngle: 0,
         edges: ["leftKnee", "leftHip", "leftAnkle"],
         // angleThreshold: 15,
-        // firstEdgeIndex: 0,
-        // secondEdgeIndex: 1,
+        firstEdgeIndex: 13,
+        secondEdgeIndex: 14,
     },
     "mixamorigRightFoot_030": {
         label: "leftAnkle",
