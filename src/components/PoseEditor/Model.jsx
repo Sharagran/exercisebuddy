@@ -10,6 +10,7 @@ import { boneDict, edges, parseAngleFromExercisebuddy, parseAngleToExercisebuddy
 
 var selectedJoint = null;
 var defaultPose = {};
+var bones = {};
 
 export default function Model({ pose, setValue, editMode, sideView, rightViewAngle, setDebugData }) {
     const { camera, gl: renderer } = useThree();
@@ -21,9 +22,7 @@ export default function Model({ pose, setValue, editMode, sideView, rightViewAng
     const gltf = useLoader(GLTFLoader, "/simple_human.glb");
     useHelper(mesh, THREE.SkeletonHelper, "visible");
 
-    var bones = {};
 
-    // setupBones(); //TODO: optimize performance
     useEffect(() => {
         setupBones();
         createJointHighlights();
