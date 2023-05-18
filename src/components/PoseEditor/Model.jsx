@@ -23,9 +23,9 @@ export default function Model({ pose, setValue, editMode, sideView, rightViewAng
 
     var bones = {};
 
-    setupBones(); //TODO: optimize performance
+    // setupBones(); //TODO: optimize performance
     useEffect(() => {
-        // setupBones();
+        setupBones();
         createJointHighlights();
         initControls();
     }, []);
@@ -74,9 +74,13 @@ export default function Model({ pose, setValue, editMode, sideView, rightViewAng
     }, [sideView, rightViewAngle]);
 
     if (pose) {
-        resetPose();
-        applyPose();
-        updateJointHighlights();
+        if (bones && Object.keys(bones).length > 0) {
+            resetPose();
+            applyPose();
+            updateJointHighlights();
+
+            setDebugData(getAllRotations());
+        }
     }
 
     function setDefaultPose() {
@@ -162,15 +166,11 @@ export default function Model({ pose, setValue, editMode, sideView, rightViewAng
 
         controls.attach(e.object.bone);
         selectedJoint = boneDict[e.object.bone.name];
-
-        debugBoneRotation(e);
     }
 
     function handleGizmoMove(e) {
         updateJointHighlights();
-        if (selectedJoint.trackable) {
-            updateJointAngle(selectedJoint, e.target.object.rotation);
-        }
+        updateJointAngle(selectedJoint, e.target.object.rotation);
     }
 
     function rotateCamera(rotation) {
@@ -182,38 +182,11 @@ export default function Model({ pose, setValue, editMode, sideView, rightViewAng
     }
     //#endregion
 
-    function debugBoneRotation(e) {
-        // return;
-        // TODO: remove code below debug only
-        console.log(e.object.bone.name, boneDict[e.object.bone.name].label);
-        console.groupCollapsed("Angles");
-        for (const key in boneDict) {
-            if (Object.hasOwnProperty.call(boneDict[key], "edges")) {
-                const edges = boneDict[key].edges;
-                // const angle = angleBetweenPoints(...edges.map(e => bones[e]));
-                const angle = angleBetweenThreePoints(...edges.map(e => bones[e]));
-                console.log(boneDict[key].label, angle);
-            }
-        }
-        console.groupEnd();
-        console.groupCollapsed("Rquirements");
-        for (const key in pose.requirements) {
-            const req = pose.requirements[key];
-            console.log(req.bodyJoint.label, req.requiredAngle);
-        }
-        console.groupEnd();
-    }
-
     function getAllRotations() {
         var rotations = [];
         for (const key in boneDict) {
             if (Object.hasOwnProperty.call(boneDict[key], "edges")) {
                 const joint = boneDict[key];
-                // const edgesList = boneDict[key].edges;
-
-                // const angle = angleBetweenThreePoints(...edgesList.map(e => bones[e]));
-                // rotations.push({ label: boneDict[key].label, value: `${Math.round(angle)}°` });
-                // rotations.push({ label: boneDict[key].label, value: `[${edges[boneDict[key].firstEdgeIndex]?.origin}, ${edges[boneDict[key].firstEdgeIndex]?.destination}], [${edges[boneDict[key].secondEdgeIndex]?.origin}, ${edges[boneDict[key].secondEdgeIndex]?.destination}]` });
 
                 const firstEdgeIndex = joint.firstEdgeIndex;
                 const secondEdgeIndex = joint.secondEdgeIndex;
@@ -225,7 +198,6 @@ export default function Model({ pose, setValue, editMode, sideView, rightViewAng
                 );
 
                 const parsedAngle = parseAngleToExercisebuddy(joint.label, angle);
-
                 rotations.push({ label: boneDict[key].label, value: `${parsedAngle}°` });
             }
         }
@@ -235,7 +207,7 @@ export default function Model({ pose, setValue, editMode, sideView, rightViewAng
     //#region Parsing
 
     function calculateEdgeAngle(edge1, edge2, returnAsRadians = false, calcFullAngle = false) {
-        if(!edge1 || !edge2) return null;
+        if (!edge1 || !edge2) return null;
 
         const d1 = bones[edge1.destination].getWorldPosition(new THREE.Vector3());
         const o1 = bones[edge1.origin].getWorldPosition(new THREE.Vector3());
@@ -253,7 +225,12 @@ export default function Model({ pose, setValue, editMode, sideView, rightViewAng
             angle = edge1.angleTo(new THREE.Vector3(1, 0, 0));
         } else {
             if (calcFullAngle) {
-                angle = Math.atan2(edge1.y, edge1.x) - Math.atan2(edge2.y, edge2.x); //Produces -180 to 180 degree angles
+                if (!sideView) {
+                    angle = Math.atan2(edge1.y, edge1.x) - Math.atan2(edge2.y, edge2.x); //Produces -180 to 180 degree angles
+                } else {
+                    // TODO: check if this is correct
+                    angle = Math.atan2(edge1.z, edge1.x) - Math.atan2(edge2.z, edge2.x); //Produces -180 to 180 degree angles
+                }
             } else {
                 angle = edge1.angleTo(edge2); // only gives 0 to 180 degrees
             }
@@ -357,11 +334,12 @@ export default function Model({ pose, setValue, editMode, sideView, rightViewAng
             const bone = bones[key];
 
             if (!bone) return;
+            var joint = boneDict.getBoneByLabel(key);
+
+            if (!joint.trackable) return;
 
             var translatetAngle = parseAngleFromExercisebuddy(key, req.requiredAngle);
-
-
-            var axis = boneDict.getBoneByLabel(key).angleRotationAxis;
+            var axis = joint.angleRotationAxis;
             axis = axis || "x";
 
             if (sideView) {
@@ -396,6 +374,10 @@ export default function Model({ pose, setValue, editMode, sideView, rightViewAng
     }
 
     function updateJointAngle(joint, rotation) {
+        if (!joint.trackable) {
+            return;
+        }
+
         var axis = boneDict.getBoneByLabel(joint.label).angleRotationAxis;
         axis = axis || "x";
 
@@ -421,8 +403,6 @@ export default function Model({ pose, setValue, editMode, sideView, rightViewAng
 
         setDefaultPose();
     }
-
-    setDebugData(getAllRotations());
 
     return (
         <>
