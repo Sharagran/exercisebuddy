@@ -37,9 +37,6 @@ function App() {
 
             {/* Public Routes */}
             <Route>
-              {/* FIXME: Dev only route */}
-              <Route path="/login" element={<LoginPage />} />
-
               <Route path="/passwords/change/:token" element={<ResetPassword />} />
               {/* TODO: implement page not found page */}
               <Route path="*" element={<h1>Error: 404 <br /> Page not found</h1>} />

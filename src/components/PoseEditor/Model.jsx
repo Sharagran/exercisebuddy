@@ -78,7 +78,7 @@ export default function Model({ pose, setValue, editMode, sideView, rightViewAng
             applyPose();
             updateJointHighlights();
 
-            setDebugData(getAllRotations());
+            setDebugData(getAllRotations()); //FIXME: causing rerender loop
         }
     }
 
@@ -184,7 +184,7 @@ export default function Model({ pose, setValue, editMode, sideView, rightViewAng
     function getAllRotations() {
         var rotations = [];
         for (const key in boneDict) {
-            if (Object.hasOwnProperty.call(boneDict[key], "edges")) {
+            if (Object.hasOwnProperty.call(boneDict[key], "firstEdgeIndex") && Object.hasOwnProperty.call(boneDict[key], "secondEdgeIndex") ) {
                 const joint = boneDict[key];
 
                 const firstEdgeIndex = joint.firstEdgeIndex;

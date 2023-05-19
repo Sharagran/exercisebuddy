@@ -134,7 +134,9 @@ export default function PoseEditor({ poses, setPoses, editMode }) {
                             right: "0",
                             zIndex: "1000",
 
-                            backgroundColor: "white"
+                            backgroundColor: "white",
+                            opacity: "0.8",
+                            pointerEvents: "none"
                         }}>
                             <h6>Debug data:</h6>
                             {debugData.map((data, index) => {

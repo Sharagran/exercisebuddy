@@ -54,8 +54,6 @@ export default function Login({ setLoginAction }) {
                 </Form.Group>
                 <Button variant="primary" type="submit">Sign in</Button>
             </Form>
-            {/* FIXME: debug only */}
-            <Button onClick={signOut}>Sign Out</Button>
         </>
     )
 }
